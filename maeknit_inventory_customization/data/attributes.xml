@@ -1,0 +1,21 @@
+<odoo>
+    <record id="attr_colorway" model="product.attribute">
+      <field name="name">Colorway</field>
+    </record>
+
+    <record id="attr_yarn_variant" model="product.attribute">
+      <field name="name">Yarn Variant</field>
+    </record>
+    <record id="attr_size" model="product.attribute">
+      <field name="name">Size</field>
+    </record>
+  
+    <record id="attr_run" model="product.attribute">
+      <field name="name">Run</field>
+    </record>
+  
+    <record id="attr_swatch" model="product.attribute">
+      <field name="name">Swatch #</field>
+    </record>
+  </odoo>
+  

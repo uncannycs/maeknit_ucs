@@ -1,0 +1,24 @@
+<odoo>
+  <record id="crm_stage_form_inherit_stage_filtering" model="ir.ui.view">
+    <field name="name">crm.stage.form.inherit.stage.filtering</field>
+    <field name="model">crm.stage</field>
+    <field name="inherit_id" ref="crm.crm_stage_form"/>
+    <field name="arch" type="xml">
+      <!-- Add stage type and category fields using safer XPath -->
+      <xpath expr="//form//group" position="inside">
+        <field name="x_stage_type"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="crm_stage_tree_inherit_stage_filtering" model="ir.ui.view">
+    <field name="name">crm.stage.tree.inherit.stage.filtering</field>
+    <field name="model">crm.stage</field>
+    <field name="inherit_id" ref="crm.crm_stage_tree"/>
+    <field name="arch" type="xml">
+      <xpath expr="//list" position="inside">
+        <field name="x_stage_type"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

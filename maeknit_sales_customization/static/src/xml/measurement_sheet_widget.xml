@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="measurement_sheet_widget.MeasurementSheetWidget">
+        <div class="measurement-sheet-widget">
+
+            <!-- Panel Navigation Buttons -->
+            <div class="panel-buttons mb-3 d-flex flex-wrap gap-2 align-items-center">
+
+                <!-- Panels -->
+                <t t-foreach="state.customPanels" t-as="panel" t-key="panel.id">
+                    <button t-att-class="(state.activePanel === panel.id)
+                                          ? 'btn btn-danger d-flex align-items-center justify-content-between rowbtn active'
+                                          : (panelHasData(panel.id)
+                                              ? 'btn btn-outline-primary d-flex align-items-center justify-content-between rowbtn'
+                                              : 'btn btn-secondary d-flex align-items-center justify-content-between rowbtn')"
+                            t-on-click="() => this.setActivePanel(panel.id)"
+                            style="min-width: 100px; position: relative;">
+                        <span><t t-esc="panel.name"/></span>
+                        <span class="ms-2" t-on-click.stop="() => this.removePanel(panel.id)">×</span>
+                    </button>
+                </t>
+
+                <!-- Add New Panel (hidden for toile when 1 panel already exists) -->
+                <t t-if="canAddPanel">
+                    <button class="btn btn-secondary d-flex align-items-center justify-content-between rowbtn"
+                            style="background-color: #b3aeae"
+                            t-on-click="() => this.showAddPanelModal()">
+                        + Add Panel
+                    </button>
+                </t>
+            </div>
+
+            <!-- Add Panel Modal -->
+            <div t-if="state.showAddPanelModal" class="modal-overlay position-fixed w-100 h-100 d-flex align-items-center justify-content-center" style="top: 0; left: 0; background-color: rgba(0,0,0,0.5); z-index: 1050;">
+                <div class="modal-content bg-white rounded shadow p-4" style="min-width: 400px; max-width: 500px;">
+                    <div class="modal-header mb-3">
+                        <h5 class="modal-title mb-0">Add New Panel</h5>
+                    </div>
+                    <div class="modal-body mb-3">
+                        <label class="form-label">Panel Name:</label>
+                        <input type="text" class="form-control" t-model="state.newPanelName" placeholder="Enter panel name" t-on-input="(ev) => this.updateNewPanelName(ev.target.value)" />
+                    </div>
+                    <div class="modal-footer d-flex gap-2 justify-content-end">
+                        <button class="btn btn-secondary" t-on-click="this.hideAddPanelModal">Cancel</button>
+                        <button class="btn btn-primary" t-on-click="this.confirmAddPanel" t-att-disabled="!state.newPanelName.trim()">Add Panel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Panel Content -->
+            <div class="active-panel-content">
+
+                <!-- Status + Unit bar -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="panel-buttons d-flex flex-wrap gap-2"></div>
+                    <div class="d-flex flex-column align-items-end" style="gap:6px; margin-top:-50px;">
+                        <!-- Status switch -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="msw-status-switch"
+                                   t-att-checked="state.status === 'ready'"
+                                   t-on-change="this.toggleStatus"/>
+                            <label class="form-check-label ms-2" for="msw-status-switch">
+                                <t t-esc="state.status === 'ready' ? 'Ready' : 'Draft'"/>
+                            </label>
+                        </div>
+                        <!-- Unit toggle -->
+                        <div class="btn-group" role="group">
+                            <button t-att-class="'btn btn-sm' + (state.unit === 'inches' ? ' btn-primary' : ' btn-outline-primary')"
+                                    t-on-click="this.toggleUnit">Inches</button>
+                            <button t-att-class="'btn btn-sm' + (state.unit === 'cm' ? ' btn-primary' : ' btn-outline-primary')"
+                                    t-on-click="this.toggleUnit">CM</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main panel layout: measurements + image -->
+                <div t-if="this.hasAnyPanels()" class="panel-layout d-flex gap-3">
+
+                    <!-- Left: Measurements Table -->
+                    <div class="measurements-section flex-shrink-0">
+
+                        <!-- Version info bar -->
+                        <div class="d-flex align-items-center gap-3 mb-2 flex-wrap">
+                            <t t-if="hasActiveRequest(state.activePanel)">
+                                <span class="text-muted small">
+                                    Req <t t-esc="getLastRequestVersion(state.activePanel)"/>
+                                    → Req <t t-esc="getActiveEditVersion(state.activePanel)"/>
+                                </span>
+                            </t>
+                            <!-- Actual version selector -->
+                            <t t-if="panelHasActuals(state.activePanel)">
+                                <span class="fw-bold text-success small">Actual:</span>
+                                <select class="form-select form-select-sm" style="width: auto;"
+                                        t-on-change="(ev) => setSelectedActualVersion(state.activePanel, ev.target.value)">
+                                    <t t-foreach="getActualVersionsForPanel(state.activePanel)" t-as="ver" t-key="ver.version">
+                                        <option t-att-value="ver.version"
+                                                t-att-selected="getSelectedActualVersion(state.activePanel) == ver.version">
+                                            Actual <t t-esc="ver.version"/> — <t t-esc="ver.submitted_at"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </t>
+                        </div>
+
+                        <div class="measurements-table-wrapper">
+                        <table class="measurements-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="20"></th>
+                                    <th width="50">Point</th>
+                                    <th width="120">Req <t t-esc="hasActiveRequest(state.activePanel) ? getLastRequestVersion(state.activePanel) : getLatestVersionNumber(state.activePanel)"/> (<t t-esc="this.getCurrentUnit()"/>)</th>
+                                    <t t-if="panelHasActuals(state.activePanel)">
+                                        <th width="120" class="text-success">Actual <t t-esc="getSelectedActualVersion(state.activePanel)"/></th>
+                                    </t>
+                                    <t t-if="hasActiveRequest(state.activePanel)">
+                                        <th width="100" class="text-muted">Change</th>
+                                        <th width="130" class="text-primary">Req <t t-esc="getActiveEditVersion(state.activePanel)"/> (<t t-esc="this.getCurrentUnit()"/>)</th>
+                                    </t>
+                                    <th style="display:none">Measurement Name</th>
+                                    <th width="40"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="this.getCurrentPanelMeasurements()" t-as="measurement" t-key="measurement_index"
+                                    class="measurement-row"
+                                    draggable="true"
+                                    t-on-dragstart="(ev) => this.handleRowDragStart(ev, measurement_index)"
+                                    t-on-dragover="(ev) => this.handleRowDragOver(ev)"
+                                    t-on-drop="(ev) => this.handleRowDrop(ev, state.activePanel, measurement_index)"
+                                    t-on-dragend="() => this.handleRowDragEnd()">
+                                    <td class="drag-handle text-center">
+                                        <span class="o_row_handle oi oi-draggable"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary" t-esc="measurement.point"/>
+                                    </td>
+                                    <!-- Last request value (read-only when active request exists) -->
+                                    <td>
+                                        <t t-if="hasActiveRequest(state.activePanel)">
+                                            <input type="number" class="form-control" readonly="1"
+                                                   t-att-value="getLastRequestValues(state.activePanel)[measurement.point]"/>
+                                        </t>
+                                        <t t-else="">
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                t-model="measurement.value"
+                                                step="0.001"
+                                                inputmode="decimal"
+                                                placeholder="0.000"
+                                                data-role="value-input"
+                                                t-on-blur="(ev) => { this.formatValueToGrid(state.activePanel, measurement_index); this.notifyFormChange(); this.handleInputBlur(ev); }"
+                                                t-on-keydown="(ev) => this.handleValueKeyDown(state.activePanel, measurement_index, ev)"
+                                                t-on-focus="handleInputFocus"
+                                            />
+                                        </t>
+                                    </td>
+                                    <!-- Actual column (left of Change) -->
+                                    <t t-if="panelHasActuals(state.activePanel)">
+                                        <td class="text-center text-success fw-bold">
+                                            <t t-esc="getActualValue(state.activePanel, measurement.point)"/>
+                                        </td>
+                                    </t>
+                                    <!-- Change + New Request columns (only when active request) -->
+                                    <t t-if="hasActiveRequest(state.activePanel)">
+                                        <!-- Change = New Req − Last Req (computed, read-only) -->
+                                        <td>
+                                            <t t-set="chg" t-value="getChangeForPoint(state.activePanel, measurement.point)"/>
+                                            <input type="number" class="form-control" readonly="1"
+                                                   t-att-value="chg !== 0 ? chg : ''"
+                                                   t-att-style="chg !== 0 ? 'background:#fff3cd; color:#856404;' : 'background:#f8f9fa;'"/>
+                                        </td>
+                                        <!-- New Request (editable) -->
+                                        <td>
+                                            <input type="number" class="form-control text-primary fw-semibold"
+                                                   step="0.001" placeholder="0.000"
+                                                   data-role="newreq-input"
+                                                   t-att-value="getNewRequestValues(state.activePanel)[measurement.point]"
+                                                   t-on-change="(ev) => setNewRequestValue(state.activePanel, measurement.point, ev.target.value)"
+                                                   t-on-keydown="(ev) => this.handleNewReqKeyDown(ev)"
+                                                   t-on-blur="(ev) => { this.notifyFormChange(); this.handleInputBlur(ev); }"
+                                                   t-on-focus="handleInputFocus"/>
+                                        </td>
+                                    </t>
+                                    <td style="display:none">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            t-model="measurement.name"
+                                            placeholder="Name"
+                                            data-role="name-input"
+                                            t-on-keydown="(ev) => this.handleNameKeyDown(state.activePanel, measurement_index, ev)"
+                                            t-on-focus="handleInputFocus"
+                                            t-on-blur="(ev) => { this.notifyFormChange(); this.handleInputBlur(ev); }"
+                                        />
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-danger" t-on-click="() => this.removeMeasurement(state.activePanel, measurement_index)" title="Delete measurement">
+                                            <i class="fa fa-trash"/>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-2 flex-wrap align-items-center">
+                            <t t-if="!hasActiveRequest(state.activePanel)">
+                                <button class="btn btn-outline-primary rowbtn" t-on-click="() => this.addMeasurement(state.activePanel)">
+                                    + Add Row
+                                </button>
+                                <button class="btn btn-outline-secondary rowbtn" t-on-click="() => this.addMultipleRows(state.activePanel)">
+                                    + Add Multiple
+                                </button>
+                            </t>
+                            <button class="btn btn-outline-success rowbtn" t-on-click="() => this.downloadAllPanelsCSV()" title="Download all panels as CSV">
+                                <i class="fa fa-download"/> CSV
+                            </button>
+                            <t t-if="getCurrentPanelMeasurements().length > 0">
+                                <button class="btn btn-outline-primary"
+                                        t-on-click="() => createNewRequest(state.activePanel)">
+                                    + Create Request
+                                </button>
+                            </t>
+                            <t t-if="hasActiveRequest(state.activePanel)">
+                                <button class="btn btn-outline-danger btn-sm"
+                                        t-on-click="() => deleteLatestRequest(state.activePanel)"
+                                        title="Delete latest request">
+                                    <i class="fa fa-trash"/> Req <t t-esc="getActiveEditVersion(state.activePanel)"/>
+                                </button>
+                            </t>
+                        </div>
+
+                        <!-- Request version badges -->
+                        <t t-if="getConfirmedRequests(state.activePanel).length > 0">
+                            <div class="mt-2 d-flex flex-wrap gap-1 align-items-center">
+                                <span class="text-muted small me-1">Versions:</span>
+                                <span class="badge bg-light text-dark border" style="font-size:0.75rem;">Req 1 (base)</span>
+                                <t t-foreach="getConfirmedRequests(state.activePanel)" t-as="req" t-key="req.version">
+                                    <span t-att-class="'badge d-flex align-items-center gap-1 ' + (req.version === getActiveEditVersion(state.activePanel) ? 'bg-primary' : 'bg-secondary')"
+                                          style="font-size:0.75rem; padding: 4px 7px;">
+                                        Req <t t-esc="req.version"/>
+                                    </span>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- Right: Panel image (shrunk) -->
+                    <div class="image-section">
+                        <div class="image-panel-label" t-esc="this.getCurrentPanelName()"/>
+                        <div class="image-container border border-2 border-dashed rounded p-2 text-center"
+                             t-on-dragover="this.handleDragOver"
+                             t-on-dragenter="this.handleDragEnter"
+                             t-on-dragleave="this.handleDragLeave"
+                             t-on-drop="this.handleDrop">
+
+                            <div t-if="this.getCurrentPanelImage()" class="image-display d-flex flex-column h-100">
+                                <div class="image-wrapper-container flex-grow-1 d-flex align-items-center justify-content-center mb-2">
+                                    <div class="zoom-container o_cad_preview_trigger"
+                                         t-on-wheel.prevent="this.handleWheel"
+                                         t-on-mousedown="this.handleMouseDown"
+                                         title="Click to preview">
+                                        <div class="image-wrapper">
+                                            <img
+                                                t-att-src="this.getCurrentPanelImage()"
+                                                t-att-alt="this.getCurrentPanelName()"
+                                                class="zoomable-image"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Image controls -->
+                                <div class="replace-button-area d-flex flex-wrap gap-1 justify-content-center">
+                                    <input type="file" class="form-control-file d-none" accept="image/*" t-ref="fileInput" t-on-change="this.handleImageUpload"/>
+                                    <button class="btn btn-outline-primary btn-sm" t-on-click="this.triggerFileInput">
+                                        Replace Image
+                                    </button>
+                                    <button class="btn btn-success btn-sm" t-on-click="this.generateAnnotatedImage">
+                                        <i class="fa fa-magic"/> Generate Values
+                                    </button>
+                                    <t t-if="this.hasAnnotatedImage()">
+                                        <button class="btn btn-warning btn-sm" t-on-click="this.restoreOriginalImage">
+                                            <i class="fa fa-undo"/> Restore
+                                        </button>
+                                    </t>
+                                    <button class="btn btn-danger btn-sm" t-on-click="this.deleteCurrentPanelImage">
+                                        <i class="fa fa-trash"/> Delete
+                                    </button>
+                                    <a t-if="getCurrentPanelImageDownloadUrl()"
+                                       class="btn btn-outline-success btn-sm"
+                                       t-att-href="getCurrentPanelImageDownloadUrl()"
+                                       download="panel_image.png"
+                                       title="Download image">
+                                        <i class="fa fa-download"/>
+                                    </a>
+                                </div>
+                                <div class="zoom-controls d-flex justify-content-center gap-1 mt-1">
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom(-0.1)">-</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.fitToContainer()">Fit</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.resetZoom()">Reset</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom(0.1)">+</button>
+                                    <button class="btn btn-sm btn-primary o_cad_preview_trigger ms-1">
+                                        <i class="fa fa-search-plus"/> Preview
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Upload area when no image -->
+                            <div t-else="" class="image-placeholder-clickable d-flex flex-column align-items-center justify-content-center h-100 w-100"
+                                 t-on-click="this.triggerFileInput"
+                                 style="cursor: pointer; min-height: 300px;">
+                                <input type="file" class="form-control-file d-none" accept="image/*" t-ref="fileInput" t-on-change="this.handleImageUpload"/>
+                                <i class="fa fa-cloud-upload fa-3x text-muted mb-2"/>
+                                <span class="text-muted small">Click to Upload</span>
+                            </div>
+                        </div>
+                    </div><!-- /.image-section -->
+
+                </div><!-- /.panel-layout -->
+
+            </div><!-- /.active-panel-content -->
+        </div>
+    </t>
+</templates>

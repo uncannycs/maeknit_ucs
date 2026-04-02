@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<record id="mrp_production_form_view_inherit_cad" model="ir.ui.view">
+    <field name="name">mrp.production.form.inherit.cad</field>
+    <field name="model">mrp.production</field>
+    <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='move_raw_ids']//field[@name='product_id']" position="after">
+            <field name="structure_id"
+                   string="Structure Line"
+                   options="{'no_create': True}"
+                   invisible="is_uk_company"
+                   domain="[('bom_request_id', '=', parent.bom_request_id)]"
+                   />
+            <field name="is_uk_company" invisible="1" column_invisible="1"/>
+        </xpath>
+
+    </field>
+</record>
+
+<record id="mrp_bom_form_view_inherit" model="ir.ui.view">
+    <field name="name">mrp.bom.form.inherit</field>
+    <field name="model">mrp.bom</field>
+    <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+    <field name="arch" type="xml">
+        
+        <xpath expr="//field[@name='bom_line_ids']/list" position="inside">
+            <field name="is_uk_company" invisible="1" column_invisible="1"/>
+            <field name="structure_id"
+                   string="Structure Line"
+                   options="{'no_create': True}"
+                   invisible="is_uk_company"
+                   />
+                   
+        </xpath>
+
+    </field>
+</record>
+</odoo>

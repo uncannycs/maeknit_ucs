@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sequence for Style Family unique identifier -->
+        <record id="seq_crm_lead_style_family" model="ir.sequence">
+            <field name="name">CRM Lead Style Family Sequence</field>
+            <field name="code">crm.lead.style.family</field>
+            <field name="prefix"></field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

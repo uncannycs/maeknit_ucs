@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_mrp_produce_all_wizard_form" model="ir.ui.view">
+        <field name="name">mrp.production.produce.all.wizard.form</field>
+        <field name="model">maeknit.mrp.produce.all.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Produce All">
+                <sheet>
+                    <field name="production_id" invisible="1"/>
+                    <field name="is_swatch_mo" invisible="1"/>
+                    <group>
+                        <field name="update_bom" widget="radio" options="{'horizontal': False}"/>
+                    </group>
+                    <!-- Stitch Density — pre-filled from MO, editable, syncs back on save -->
+                    <separator string="Stitch Density" invisible="not is_swatch_mo"/>
+                    <group col="1" invisible="not is_swatch_mo">
+                        <field name="calibration_data" widget="calibration_widget" nolabel="1" class="o_fullwidth_widget"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Confirm" type="object" name="action_confirm" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

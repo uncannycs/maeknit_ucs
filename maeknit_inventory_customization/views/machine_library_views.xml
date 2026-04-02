@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Machine Library Form View -->
+    <record id="view_machine_library_form" model="ir.ui.view">
+        <field name="name">machine.library.form</field>
+        <field name="model">machine.library</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Machine Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="manufacturer"/>
+                            <field name="model"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                            <field name="gauge_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Enter machine description..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Machine Library List View -->
+    <record id="view_machine_library_list" model="ir.ui.view">
+        <field name="name">machine.library.list</field>
+        <field name="model">machine.library</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="manufacturer"/>
+                <field name="model"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Machine Library Search View -->
+    <record id="view_machine_library_search" model="ir.ui.view">
+        <field name="name">machine.library.search</field>
+        <field name="model">machine.library</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="manufacturer"/>
+                <field name="model"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Machine Library Action -->
+    <record id="action_machine_library" model="ir.actions.act_window">
+        <field name="name">Machines</field>
+        <field name="res_model">machine.library</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new machine
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_machine_library"
+              name="Machines"
+              parent="mrp.menu_mrp_configuration"
+              action="action_machine_library"
+              sequence="30"/>
+</odoo>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_calibration_swatch_confirm_wizard_form" model="ir.ui.view">
+        <field name="name">calibration.swatch.confirm.wizard.form</field>
+        <field name="model">calibration.swatch.confirm.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Calibration Swatch?">
+                <group>
+                    <field name="mo_id" invisible="1"/>
+                    <div class="alert alert-info" role="alert">
+                        <p><strong>Would you like to generate a calibration swatch?</strong></p>
+                        <p>Generating a calibration swatch will help ensure accurate measurements for your garment production.</p>
+                    </div>
+                    <field name="generate_swatch" widget="boolean_toggle"/>
+                </group>
+                <footer>
+                    <button string="Confirm" type="object" name="action_confirm" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

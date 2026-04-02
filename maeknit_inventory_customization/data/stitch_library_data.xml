@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Basic Stitches -->
+        <record id="stitch_jersey_body" model="stitch.library">
+            <field name="name">Standard Jersey</field>
+            <field name="code">SJ-B</field>
+            <field name="stitch_type">Jersey</field>
+            <field name="stitch_type_selection">jersey</field>
+            <field name="body_part">Body</field>
+            <field name="description">Basic jersey stitch, smooth on one side with small loops on the reverse.</field>
+            <field name="stitch_density">7 stitches per inch</field>
+            <field name="tension">Medium</field>
+        </record>
+        
+        <record id="stitch_rib_body" model="stitch.library">
+            <field name="name">Standard Rib</field>
+            <field name="code">SR-B</field>
+            <field name="stitch_type">Rib</field>
+            <field name="stitch_type_selection">rib</field>
+            <field name="body_part">Body</field>
+            <field name="description">Alternating knit and purl stitches creating vertical ridges with excellent elasticity.</field>
+            <field name="stitch_density">6 stitches per inch</field>
+            <field name="tension">Medium-High</field>
+        </record>
+        
+        <record id="stitch_2x1_rib_cuff" model="stitch.library">
+            <field name="name">2x1 Rib</field>
+            <field name="code">2X1R-C</field>
+            <field name="stitch_type">2x1 Rib</field>
+            <field name="stitch_type_selection">2x1_rib</field>
+            <field name="body_part">Cuff</field>
+            <field name="description">Two knit stitches followed by one purl stitch, creating a ribbed texture with good elasticity.</field>
+            <field name="stitch_density">6 stitches per inch</field>
+            <field name="tension">Medium-High</field>
+        </record>
+        
+        <record id="stitch_2x2_rib_cuff" model="stitch.library">
+            <field name="name">2x2 Rib</field>
+            <field name="code">2X2R-C</field>
+            <field name="stitch_type">2x2 Rib</field>
+            <field name="stitch_type_selection">2x2_rib</field>
+            <field name="body_part">Cuff</field>
+            <field name="description">Two knit stitches followed by two purl stitches, creating a balanced ribbed texture with excellent elasticity.</field>
+            <field name="stitch_density">6 stitches per inch</field>
+            <field name="tension">Medium-High</field>
+        </record>
+        
+        <record id="stitch_interlock_body" model="stitch.library">
+            <field name="name">Interlock</field>
+            <field name="code">IL-B</field>
+            <field name="stitch_type">Interlock</field>
+            <field name="stitch_type_selection">interlock</field>
+            <field name="body_part">Body</field>
+            <field name="description">Double-knit structure that looks like jersey on both sides, with greater stability and weight.</field>
+            <field name="stitch_density">8 stitches per inch</field>
+            <field name="tension">Medium</field>
+        </record>
+        
+        <!-- Decorative Stitches -->
+        <record id="stitch_moss_body" model="stitch.library">
+            <field name="name">Moss Stitch</field>
+            <field name="code">MS-B</field>
+            <field name="stitch_type">Moss</field>
+            <field name="stitch_type_selection">other</field>
+            <field name="body_part">Body</field>
+            <field name="description">Alternating knit and purl stitches in both rows and columns, creating a textured, non-curling fabric.</field>
+            <field name="stitch_density">7 stitches per inch</field>
+            <field name="tension">Medium</field>
+        </record>
+        
+        <record id="stitch_cable_body" model="stitch.library">
+            <field name="name">Cable Knit</field>
+            <field name="code">CK-B</field>
+            <field name="stitch_type">Cable</field>
+            <field name="stitch_type_selection">other</field>
+            <field name="body_part">Body</field>
+            <field name="description">Raised pattern created by crossing stitches over each other, creating a rope-like appearance.</field>
+            <field name="stitch_density">5 stitches per inch</field>
+            <field name="tension">High</field>
+        </record>
+        
+        <record id="stitch_jacquard_body" model="stitch.library">
+            <field name="name">Jacquard</field>
+            <field name="code">JQ-B</field>
+            <field name="stitch_type">Jacquard</field>
+            <field name="stitch_type_selection">other</field>
+            <field name="body_part">Body</field>
+            <field name="description">Multi-colored pattern knitted into the fabric using different colored yarns.</field>
+            <field name="stitch_density">8 stitches per inch</field>
+            <field name="tension">Medium-High</field>
+        </record>
+        
+        <!-- Collar Stitches -->
+        <record id="stitch_rib_collar" model="stitch.library">
+            <field name="name">Rib Collar</field>
+            <field name="code">RB-COL</field>
+            <field name="stitch_type">Rib</field>
+            <field name="stitch_type_selection">rib</field>
+            <field name="body_part">Collar</field>
+            <field name="description">Ribbed structure for collars providing good elasticity and recovery.</field>
+            <field name="stitch_density">6 stitches per inch</field>
+            <field name="tension">Medium-High</field>
+        </record>
+        
+        <!-- Hem Stitches -->
+        <record id="stitch_rib_hem" model="stitch.library">
+            <field name="name">Rib Hem</field>
+            <field name="code">RB-H</field>
+            <field name="stitch_type">Rib</field>
+            <field name="stitch_type_selection">rib</field>
+            <field name="body_part">Hem</field>
+            <field name="description">Ribbed structure for hems providing good elasticity and preventing curling.</field>
+            <field name="stitch_density">6 stitches per inch</field>
+            <field name="tension">Medium-High</field>
+        </record>
+    </data>
+</odoo>

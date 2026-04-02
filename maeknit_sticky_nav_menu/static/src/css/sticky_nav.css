@@ -1,0 +1,242 @@
+/* =============================================
+   STICKY LEFT NAV - Component Styles
+   ============================================= */
+
+.sticky-left-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1001;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  transition: width 0.3s ease, visibility 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.sticky-nav-title {
+  padding: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #1a2530;
+  color: #fff;
+}
+
+.sticky-left-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.sticky-left-nav ul li {
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  border-left: 3px solid transparent;
+}
+
+.sticky-left-nav ul li:hover {
+  background-color: #34495e;
+  border-left: 3px solid #3498db;
+}
+
+.sticky-left-nav ul li.active {
+  background-color: #34495e;
+  border-left: 3px solid #2ecc71;
+}
+
+.sticky-left-nav .menu-icon {
+  margin-right: 12px;
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+  color: #3498db;
+}
+
+.sticky-left-nav ul li.active .menu-icon {
+  color: #2ecc71;
+}
+
+/* =============================================
+   TOGGLE BUTTON
+   ============================================= */
+
+.nav-toggle {
+  position: fixed;
+  top: 10px;
+  left: 200px;
+  z-index: 1002;
+  width: 32px;
+  height: 32px;
+  background-color: #1a2530;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ecf0f1;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.nav-toggle:hover {
+  background-color: #34495e;
+}
+
+/* =============================================
+   GLOBAL - Navbar is always fixed in our layout
+   ============================================= */
+
+.o_main_navbar {
+  position: fixed !important;
+  left: 0;
+  width: 100%;
+  height: auto !important;
+  z-index: 1000;
+}
+
+.o_action_manager {
+  margin-top: 46px !important;
+}
+
+/* Fix dropdown menus */
+.dropdown-menu {
+  max-height: calc(100vh - 100px) !important;
+}
+
+/* =============================================
+   EXPANDED STATE - Offset Odoo layout by nav width
+   ============================================= */
+
+body:not(.nav-collapsed) .o_web_client {
+  margin-left: 240px !important;
+  width: calc(100% - 240px) !important;
+}
+
+body:not(.nav-collapsed) .o_main_navbar {
+  left: 240px !important;
+  width: calc(100% - 240px) !important;
+}
+
+body:not(.nav-collapsed) .o_app_drawer {
+  left: 240px !important;
+  width: calc(100% - 240px) !important;
+}
+
+body:not(.nav-collapsed) .o_action_manager {
+  padding-left: 12px !important;
+}
+
+body:not(.nav-collapsed) .settings {
+  padding: 0 !important;
+}
+
+body:not(.nav-collapsed) .settings_tab {
+  padding-left: 0 !important;
+}
+
+/* Ensure content views fill the remaining space when expanded */
+body:not(.nav-collapsed) .o_content,
+body:not(.nav-collapsed) .o_action_manager,
+body:not(.nav-collapsed) .o_view_controller,
+body:not(.nav-collapsed) .o_calendar_container,
+body:not(.nav-collapsed) .o_calendar_view,
+body:not(.nav-collapsed) .o_form_view,
+body:not(.nav-collapsed) .o_list_view,
+body:not(.nav-collapsed) .o_kanban_view,
+body:not(.nav-collapsed) .o_settings_container,
+body:not(.nav-collapsed) .o_setting_container,
+body:not(.nav-collapsed) .o_form_sheet_bg,
+body:not(.nav-collapsed) .o_form_sheet {
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* =============================================
+   COLLAPSED STATE - Hide nav, navbar goes full width
+   ============================================= */
+
+body.nav-collapsed .sticky-left-nav {
+  width: 0 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  visibility: hidden;
+}
+
+body.nav-collapsed .nav-toggle {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 80px;
+  border-radius: 0 8px 8px 0;
+  background-color: #2c3e50;
+  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+}
+
+body.nav-collapsed .nav-toggle:hover {
+  width: 28px;
+  background-color: #34495e;
+}
+
+body.nav-collapsed .o_main_navbar {
+  left: 0 !important;
+  width: 100% !important;
+}
+
+body.nav-collapsed .o_web_client {
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
+/* =============================================
+   CHATTER - Reduce width by 20%
+   Default Odoo aside chatter is 530px → 424px
+   ============================================= */
+
+.o-mail-ChatterContainer.o-aside,
+.o-mail-Form-chatter.o-aside {
+  width: 150px !important;
+}
+
+/* =============================================
+   MOBILE - Hide nav entirely
+   ============================================= */
+
+@media (max-width: 768px) {
+  .sticky-left-nav {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: none;
+  }
+
+  .o_web_client {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .o_main_navbar {
+    left: 0 !important;
+    width: 100% !important;
+  }
+
+  .o_app_drawer {
+    left: 0 !important;
+    width: 100% !important;
+  }
+}

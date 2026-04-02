@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Replaced with program files wizard pattern for viewing and downloading -->
+        <record id="view_client_attachment_wizard_form" model="ir.ui.view">
+            <field name="name">client.attachment.wizard.form</field>
+            <field name="model">client.attachment.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Client Files Viewer">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>Client Files</h1>
+                            <p>Select and preview client files for this BOM request</p>
+                        </div>
+                        
+                        <group>
+                            <field name="bom_request_id" invisible="1"/>
+                            <field name="available_attachment_ids" invisible="1"/>
+                            <field name="selected_attachment_id" widget="selection" 
+                                   options="{'no_create': True, 'no_open': True}" class="mb-3"/>
+                        </group>
+                        
+                        <!-- Preview section -->
+                        <div class="mb-3">
+                            <field name="attachment_preview" readonly="1" nolabel="1" widget="html"/>
+                        </div>
+                    </sheet>
+                    <footer>
+                        <button string="Close" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_request_bids_wizard_form" model="ir.ui.view">
+        <field name="name">sale.order.rfq.wizard.form</field>
+        <field name="model">sale.order.rfq.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Request Bids from Factories">
+                <group string="Select Factories for Bidding">
+                    <field name="sale_order_id" invisible="1"/>
+                    <field name="factory_ids" 
+                           widget="many2many" 
+                           options="{'no_create': True}"
+                           context="{'show_bidding_buttons': True, 'default_sale_order_id': sale_order_id}">
+                        <list string="Factories">
+                            <field name="name"/>
+                            <field name="city"/>
+                            <field name="country_id"/>
+                        </list>
+                    </field>
+                </group>
+                <footer>
+                    <button name="action_generate_rfqs" string="Generate RFQ" type="object" class="o_replenish_buttons" data-hotkey="q" icon="fa-truck"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_request_bids_wizard" model="ir.actions.act_window">
+        <field name="name">Request Bids</field>
+        <field name="res_model">sale.order.rfq.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

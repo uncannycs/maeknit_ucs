@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <!-- Booked Revenue: Sale Order Lines list accessible from the Sales top menu -->
+  <record id="action_booked_revenue_order_lines" model="ir.actions.act_window">
+    <field name="name">Booked Revenue</field>
+    <field name="res_model">sale.order.line</field>
+    <field name="view_mode">list,form</field>
+    <field name="domain">[
+      ('invoice_status', 'in', ['invoiced', 'to invoice']),
+      ('price_subtotal', '!=', 0),
+      ('order_id.state', '=', 'sale')
+    ]</field>
+    <field name="context">{'group_by': ['create_date:month', 'order_id']}</field>
+  </record>
+
+  <menuitem
+    id="menu_booked_revenue"
+    name="Booked Revenue"
+    parent="sale.sale_menu_root"
+    action="action_booked_revenue_order_lines"
+    sequence="35"/>
+
+  <record id="view_order_tree_custom_leadname" model="ir.ui.view">
+    <field name="name">sale.order.tree.custom.leadname</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_quotation_tree"/>
+    <field name="arch" type="xml">
+
+      <xpath expr="//field[@name='name']" position="after">
+        <field name="lead_id" optional="show" widget="many2one"
+        options="{'no_open': True, 'no_create': True}"
+        readonly="1"/>
+        <field name="quotation_date" string="Quotation Sent" optional="show" readonly="1"/>
+      </xpath>
+      
+      <xpath expr="//field[@name='invoice_status']" position="attributes">
+        <attribute name="optional">show</attribute>
+        <attribute name="invisible">0</attribute>
+      </xpath>
+      <xpath expr="//field[@name='create_date']" position="attributes">
+        <attribute name="optional">hide</attribute>
+        <attribute name="invisible">1</attribute>
+        <attribute name="column_invisible">1</attribute>
+      </xpath>
+
+      <xpath expr="//field[@name='partner_id']" position="before">
+        <field name="x_rel_service_id"
+               widget="badge"
+               decoration-success="x_service_badge == 'success'"
+               decoration-info="x_service_badge == 'info'"
+               decoration-primary="x_service_badge == 'primary'"
+               decoration-warning="x_service_badge == 'warning'"/>
+    </xpath>
+    
+  
+      <xpath expr="//list" position="inside">
+        <field name="x_studio_order_name" invisible="1" optional="hide"/>
+    </xpath>
+      <!-- Add a View button -->
+      <xpath expr="//field[@name='invoice_status']" position="after">
+        <button name="action_open_order" string="View" type="object" class="btn btn-link" icon="fa-external-link"/>
+      </xpath>
+
+    </field>
+  </record>
+</odoo>

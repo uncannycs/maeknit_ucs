@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+         BOM Request Form View (Editable, syncs with BOM) 
+        <record id="view_bom_request_form" model="ir.ui.view">
+            <field name="name">maeknit.bom.request.form</field>
+            <field name="model">maeknit.bom.request</field>
+            <field name="arch" type="xml">
+                <form string="BOM Request">
+                    <header>
+                        <!-- Updated buttons to match new state flow -->
+                        <button name="action_generate_mo" string="Ready to Program" type="object" class="btn-primary" invisible="(state != 'draft') or (is_production_bom)"/>
+                        <!-- <button name="action_generate_mo" string="Ready to Knit" type="object" class="btn-primary" invisible="state != 'ready_to_program'"/>
+                         Added Submit Work Orders button -->
+                        <button name="action_produced" string="Sent to the Shopfloor" type="object" class="btn-primary" invisible="(state != 'mo_confirmed') or (is_production_bom)"/>
+                        <button name="action_ready_to_ship" string="Ready to Ship" type="object" class="btn-success" invisible="not (state in ('ready_to_spec')) or (is_production_bom)"/>
+                        <button name="action_generate_another_mo" string="Re-generate MO" type="object" class="btn-primary" invisible="(not (state in ('ready_to_spec'))) or (is_production_bom)"/>
+                        <button name="action_draft" string="Cancel" type="object" invisible="(state in ['cancelled']) or is_production_bom"/>
+                        
+                        <button name="action_set_production_ready_status" string="Ready" type="object" class="btn-primary" invisible="(state != 'draft') or not is_production_bom"/>
+                        <button name="action_draft" string="Cancel" type="object" class="btn-primary" invisible="(state != 'production_ready')"/>
+                        
+                        <!-- Updated statusbar to show new states matching ECO stages -->
+                        <field name="state" widget="statusbar" statusbar_visible="draft, produced, ready_to_spec, done" invisible="is_production_bom"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft, production_ready" invisible="not is_production_bom"/>
+
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <!-- Added sub-tasks button in button box -->
+                            <button name="action_view_delivery" type="object" class="oe_stat_button" icon="fa-truck" invisible="state != 'done'">
+                                <field name="delivery_count" widget="statinfo" string="Delivery"/>
+                            </button>
+                            <button name="action_view_sub_tasks" type="object" class="oe_stat_button" icon="fa-tasks" invisible="0">
+                                <field name="sub_task_count" widget="statinfo" string="Sub Tasks"/>
+                            </button>
+                            <button name="action_view_mo"
+                                    type="object"
+                                    class="oe_stat_button mo_stat_button"
+                                    icon="fa-wrench"
+                                    invisible="not mo_id">
+                                <span class="o_stat_text"> Manufacturing Order</span>
+                            </button>
+                            <!-- Added client files button -->
+                            <button name="action_manage_client_files" 
+                                    type="object" 
+                                    class="oe_stat_button" 
+                                    icon="fa-folder-open"
+                                    string="Client Files"/>
+                        </div>
+                        <field name="is_garment_bom" invisible="1"/>
+                        <field name="is_grading_bom" invisible="1"/>
+                        <field name="is_production_bom" invisible="1"/>
+                        <field name="is_reverse_bom" invisible="1"/>
+                        <field name="is_swatch_bom" invisible="1"/>
+                        <field name="is_development_bom" invisible="1"/>
+                        <field name="is_uk_company" invisible="1" column_invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <!-- Added style_colorway_ids/style_size_ids invisible fields for filtering -->
+                        <field name="style_colorway_ids" invisible="1"/>
+                        <field name="style_size_ids" invisible="1"/>
+                        <field name="style_yarn_variant_ids" invisible="1"/>
+                        <field name="measurement_widget_data" invisible="1"/>
+                        <!-- Added project task fields -->
+                        <field name="project_task_id" invisible="1"/>
+
+                        <div class="d-flex align-items-center justify-content-between" 
+                            style="white-space:nowrap; margin-top:-5px; margin-right:-5px;">
+
+                            <!-- Left side -->
+                            <span class="o_tag" style="color:black">
+                                <field name="sample"
+                                    readonly="1"
+                                    widget="badge"
+                                    decoration-info="1"
+                                    invisible="is_swatch_bom or is_grading_bom or is_production_bom"/>
+                            </span>
+
+                            <!-- Right side: grouped buttons with tight spacing -->
+                            <div class="d-flex" style="gap:4px; margin-left:8px;">
+                                <button name="action_request_revision" type="object" string="New Sample"
+                                        class="btn btn-primary custom_new_sample"
+                                        invisible="(state not in ('done')) or is_swatch_bom"/>
+
+                                <button name="action_add_to_grading" type="object" string="Add to Grading"
+                                        class="btn btn-warning"
+                                        invisible="(state not in ('done')) or is_swatch_bom or is_grading_bom"/>
+                                        
+                                <button name="action_production_ready" type="object" string="Production Ready"
+                                        class="btn btn-primary"
+                                        invisible="(state not in ('done')) or is_swatch_bom"/>
+                                
+                                <!-- Added Duplicate button for Development, Grading, and Production Ready BOMs -->
+                                <button name="%(action_bom_duplicate_wizard)d" 
+                                        type="action" 
+                                        string="Duplicate"
+                                        class="btn btn-secondary"
+                                        />
+
+                            </div>
+                        </div>
+
+                        <div class="oe_title d-flex align-items-baseline" style="gap: 16px; margin-top:16px; min-width:100%; white-space: nowrap;">
+                            <h1 class="m-0" style="flex: 1; min-width: 0;">
+                                <!-- New record: use many2one so value is reliably captured in create() vals -->
+                                <field name="product_tmpl_id"
+                                       invisible="id"
+                                       string="Product"
+                                       placeholder="Type a product name..."
+                                       required="1"
+                                       domain="[('product_category', '=', context.get('default_is_swatch_bom') and 'swatch' or 'garment')]"
+                                       context="{'default_product_category': context.get('default_is_swatch_bom') and 'swatch' or 'garment'}"
+                                       options="{'no_quick_create': False, 'no_create': False}"/>
+                                <!-- Saved record: show product name as editable text -->
+                                <field name="product_tmpl_name" invisible="not id"/>
+                            </h1>
+                            <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                        </div>
+
+
+                        <group string="Request Information">
+                            <group>
+                                <field name="sale_order_id" readonly="1" invisible="sale_order_id == False"/>
+                                <field name="user_id"/>
+                            </group>
+                            <group>
+                                <field name="bom_id" readonly="1" help="BOM is automatically created when you select a product"/>
+                                <field name="mo_id" readonly="1" invisible="not mo_id"/>
+                                <field name="purchase_order_id" readonly="1" invisible="not purchase_order_id"/>
+                                <!-- Added ECO integration fields -->
+                                <field name="eco_id" readonly="1" invisible="not eco_id"/>
+                                <field name="stage_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <group string="Tech Pack">
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <!-- Fields for new records (before save) -->
+                                    <group name="product_selection" invisible="id">
+                                        <!-- product_tmpl_id is now in the title h1 above; no duplicate here -->
+                                        <field name="partner_id" options="{'no_create': False}" string="Customer" required="1"/>
+
+                                        <!-- Garment fields - show for garment products -->
+                                        <field name="size_id"
+                                               options="{'no_create': False, 'no_create_edit': False}"
+                                               invisible="not (is_reverse_bom or is_garment_bom or is_grading_bom or is_production_bom or is_development_bom)"
+                                               required="is_garment_bom or is_development_bom"
+                                               domain="[('id', 'in', style_size_ids)]"
+                                               context="{'default_attribute_id': %(maeknit_inventory_customization.attr_size)d}"/>
+                                        <field name="colorway_id"
+                                               string="Colorway"
+                                               domain="[('id', 'in', style_colorway_ids)]"
+                                               invisible="not (is_reverse_bom or is_garment_bom or is_grading_bom or is_production_bom or is_development_bom or is_swatch_bom)"
+                                               required="is_garment_bom or is_development_bom or is_swatch_bom"
+                                               context="{'default_attribute_id': %(maeknit_inventory_customization.attr_colorway)d}"
+                                               options="{'no_create': False, 'no_create_edit': True}"/>
+
+                                        <!-- Swatch fields - show for swatch products -->
+                                        <field name="yarn_variant"
+                                               placeholder="Lot / Blend / Supplier / Other notes"
+                                               invisible="not is_swatch_bom"
+                                               context="{'default_attribute_id': %(maeknit_inventory_customization.attr_yarn_variant)d}"
+                                               domain="[('id', 'in', style_yarn_variant_ids)]"/>
+                                    </group>
+
+                                    <group name="garment_bom" invisible="not (is_reverse_bom or is_garment_bom or is_grading_bom or is_production_bom) or not id">
+                                        <field name="product_id"
+                                                domain="[('id','in',allowed_product_ids)]"
+                                                readonly="1"
+                                                />
+                                        <field name="partner_id" options="{'no_create': False}" string="Customer"/>
+                                        <field name="size_id" options="{'no_create': False, 'no_create_edit': False}" required="is_garment_bom or is_development_bom"
+                                        domain="[('id', 'in', style_size_ids)]"
+                                        context="{'default_attribute_id': %(maeknit_inventory_customization.attr_size)d}"
+                                        />
+                                        <field name="colorway_id" string="Colorway" domain="[('id', 'in', style_colorway_ids)]" required="is_garment_bom or is_development_bom"  context="{'default_attribute_id': %(maeknit_inventory_customization.attr_colorway)d}" options="{'no_create': False, 'no_create_edit': True}"/>
+                                        <field name="company_id" string="Company" options="{'no_create': True}"/>
+                                    </group>
+
+                                    <group name="swatch_bom" invisible="not is_swatch_bom or not id">
+                                        <field name="product_id"
+                                                domain="[('id','in',allowed_product_ids)]" readonly="1"
+                                                />
+                                        <field name="partner_id" options="{'no_create': False}" string="Customer"/>
+                                        <field name="colorway_id" string="Colorway" domain="[('id', 'in', style_colorway_ids)]" context="{'default_attribute_id': %(maeknit_inventory_customization.attr_colorway)d}" options="{'no_create': False, 'no_create_edit': True}"/>
+                                        <field name="yarn_variant" 
+                                                placeholder="Lot / Blend / Supplier / Other notes" 
+                                                context="{'default_attribute_id': %(maeknit_inventory_customization.attr_yarn_variant)d}"
+                                                domain="[('id', 'in', style_yarn_variant_ids)]"
+                                        />
+                                        <field name="company_id" string="Company" options="{'no_create': True}"/>
+                                    </group>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <group>
+                                        <field name="machine_id_selection" widget="radio"/>
+                                        <field name="gauge_id" string="Gauge" required="1"/>
+                                        <field name="type" required="1" string="BOM Type"/>
+                                        <field name="subcontractor_ids" widget="many2many_tags" options="{'no_create': False}" domain="[('supplier_rank','>',0)]" placeholder="Select subcontractors..." string="Subcontractors" invisible="type != 'subcontract'" required="type == 'subcontract'"></field>
+                                        <field name="due_date" string="Due Date"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </group>
+                        <notebook>
+                            <!-- Updated R&amp;D tasks tab with timer functionality -->
+                            <page string="R&amp;D Tasks">
+                                <field name="sub_task_ids" readonly="state == 'done'">
+                                    <list editable="bottom" readonly="state == 'done'">
+                                        <field name="sequence" widget="handle" string="" />
+                                        <field name="name" string="Task" widget="handle_open" required="1"/>
+                                        <button name="action_open_task" type="object" icon="fa-external-link" string="" title="Open Task" invisible="parent.state == 'done'"/>
+                                        <field name="state" string="Status" context="{'default_state': '00_ready_to_start'}"/>
+                                        <field name="user_ids" widget="many2many_tags" string="Assignees"  options="{'no_create': True, 'no_create_edit': True}"/>
+                                        <field name="display_timesheet_timer" invisible="1" column_invisible="1"/>
+                                        <field name="timer_pause" invisible="1" column_invisible="1" />
+                                        <field name="display_timer_start_primary" invisible="1" column_invisible="1"/>
+                                        <field name="display_timer_start_secondary" invisible="1" column_invisible="1"/>
+                                        <field name="display_timer_stop" invisible="1" column_invisible="1"/>
+                                        <field name="display_timer_pause" invisible="1" column_invisible="1"/>
+                                        <field name="display_timer_resume" invisible="1" column_invisible="1"/>
+                                        <button class="btn-primary" name="action_timer_start" type="object" icon="fa-play" data-hotkey="z" invisible="parent.state == 'done' or not display_timer_start_primary or encode_uom_in_days" groups="hr_timesheet.group_hr_timesheet_user"/>
+                                        <button class="btn-secondary" name="action_timer_start" type="object" icon="fa-play" data-hotkey="z" invisible="parent.state == 'done' or not display_timer_start_secondary or encode_uom_in_days" groups="hr_timesheet.group_hr_timesheet_user"/>
+                                        <button class="btn-primary o_fsm_stop" name="action_timer_stop" type="object" icon="fa-stop" data-hotkey="z" invisible="parent.state == 'done' or not display_timer_stop or encode_uom_in_days" groups="hr_timesheet.group_hr_timesheet_user"/>
+                                        <button class="btn-secondary" name="action_timer_pause" type="object" icon="fa-pause" data-hotkey="w" invisible="parent.state == 'done' or not display_timer_pause or encode_uom_in_days" groups="hr_timesheet.group_hr_timesheet_user"/>
+                                        <button class="btn-secondary" name="action_timer_resume" type="object" icon="fa-play" data-hotkey="w" invisible="parent.state == 'done' or not display_timer_resume or encode_uom_in_days" groups="hr_timesheet.group_hr_timesheet_user"/>
+                                        <field name="date_deadline" string="Deadline" required="1"/>
+                                        <field name="timer_start" widget="timer_start_field"  groups="hr_timesheet.group_hr_timesheet_user" string="Time Spent"/>
+                                        <field name="total_hours_spent" string="Total Hours" readonly="1" groups="hr_timesheet.group_hr_timesheet_user"/>
+                                        <field name="activity_ids" widget="list_activity" optional="hide" invisible="parent.state == 'done'"/>
+                                    </list>
+                                </field>
+                            </page>
+
+                            <page string="Structure">
+                                <field name="structure_ids" readonly="state == 'done'">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                    </list>
+                                </field>
+                            </page>             
+
+                            <page string="Components">
+                                <field name="bom_line_ids" readonly="state == 'done'">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <!-- Updated context to open product.template form instead of product.product -->
+                                        <field name="product_id"
+                                            domain="[('product_tmpl_id.product_category', '=', 'yarn')]"
+                                            required="1"
+                                            context="{
+                                                'default_detailed_type': 'product',
+                                                'default_product_category': 'yarn',
+                                                'force_create': True,
+                                                'force_create_product_template': True,
+                                                'form_view_ref': 'product.product_template_only_form_view'
+                                            }"
+                                            options="{
+                                                'no_quick_create': True,
+                                                'no_create': False,
+                                                'no_open': False
+                                            }"
+                                        />
+                                        <field name="ply" required="1"/>
+                                        <field name="left_carrier" invisible="is_uk_company" />
+                                        <field name="right_carrier" invisible="is_uk_company"/>
+                                        <field name="structure_id" invisible="is_uk_company"/>
+                                        <field name="product_qty" required="1"/>
+                                        <field name="product_uom_id" groups="uom.group_uom" required="1" />
+                                        <field name="unit_cost" readonly="1"/>
+                                        <field name="line_cost" readonly="1" sum="Total"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </list>
+                                </field>
+                            </page>
+
+                                         
+                            <!-- Added Excalidraw Sketch tab to BOM Request -->
+                            <page string="Sketch" name="sketch">
+                                <group col="1">
+                                    <field name="excalidraw_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                                </group>
+                            </page>
+
+                            <!-- Garment Construction Excalidraw tab (UK only) -->
+                            <page string="Garment Construction" name="garment_construction" invisible="not is_uk_company">
+                                <group col="1">
+                                    <field name="garment_construction_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                                </group>
+                            </page>
+
+                            <!-- Added new Whole CAD tab -->
+                            <page string="Whole CAD" name="whole_cad" invisible="is_swatch_bom">
+                                <group col="1">
+                                    <field name="whole_cad_data_with_images" widget="whole_cad_widget" nolabel="1" class="o_fullwidth_widget"/>
+                                    <field name="whole_cad_data" invisible="1"/>
+                                    <field name="whole_cad_image_id" invisible="1"/>
+                                </group>
+                            </page>
+
+                            <!-- CAD &amp; POM tab (UK only, no versioning) -->
+                            <page string="CAD &amp; POM" name="cad_pom" invisible="not is_uk_company">
+                                <group col="1">
+                                    <field name="cad_pom_data_with_images" widget="whole_cad_widget" nolabel="1" class="o_fullwidth_widget"/>
+                                    <field name="cad_pom_data" invisible="1"/>
+                                    <field name="cad_pom_image_id" invisible="1"/>
+                                </group>
+                            </page>
+
+                            <!-- Replaced measurement sheets page with OWL widget -->
+                            <page string="Panel CAD" name="measurements" invisible="is_swatch_bom">
+                                <group col="1">
+                                    <!-- Widget binds to storage field for saving, uses computed field for display with image URLs -->
+                                    <field name="measurement_widget_data" widget="measurement_sheet_widget" nolabel="1" class="o_fullwidth_widget"/>
+                                    <!-- Computed field with image URLs - hidden but available for widget to read -->
+                                    <field name="measurement_widget_data_with_images" invisible="1"/>
+                                    <!-- Attachment list - hidden from UI -->
+                                    <field name="measurement_panel_image_ids" invisible="1"/>
+                                </group>
+                            </page>
+
+                            <!-- Structure CAD tab with Excalidraw embed -->
+                            <page string="Structure CAD" name="structure_cad" invisible="is_swatch_bom">
+                                <group col="1">
+                                    <field name="structure_cad_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                                </group>
+                            </page>
+
+                            <!-- Artwork tab -->
+                            <page string="Artwork" name="artwork">
+                                <group col="1">
+                                    <field name="artwork_data" widget="artwork_widget" nolabel="1" class="o_fullwidth_widget"/>
+                                </group>
+                            </page>
+
+                            <!-- Added Calibration tab for swatch BOM Requests -->
+                            <page string="Stitch Density" name="stitchdensity" invisible="not is_swatch_bom">
+                                <group col="1">
+                                    <field name="calibration_data_with_images" widget="calibration_widget" nolabel="1" class="o_fullwidth_widget" hideSwatchSelection="True"/>
+                                    <field name="calibration_data" invisible="1"/>
+                                </group>
+                            </page>
+
+                            <!-- Added Calibration tab for all garment BOMs (visible only if MO exists) -->
+                            <page string="Calibration" name="calibration_garment" invisible="not (mo_id and (is_garment_bom or is_grading_bom or is_production_bom))">
+                                <group col="1">
+                                    <field name="calibration_data_with_images" widget="calibration_widget" nolabel="1" class="o_fullwidth_widget"/>
+                                    <field name="calibration_data" invisible="1"/>
+                                </group>
+                            </page>
+
+                            <!-- Render Tab -->
+                            <page string="Render" name="render_tab" invisible="is_swatch_bom">
+                                <group>
+                                    <group>
+                                        <label for="style_3d_link" string="STYLE 3D LINK:" class="fw-bold text-center"/>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <field name="style_3d_link" widget="url" placeholder="https://cloud.style3d.com/..." nolabel="1" class="flex-grow-1"/>
+                                        </div>
+                                    </group>
+                                </group>
+
+                                <separator string="Render Images"/>
+
+                                <field name="render_image_ids" nolabel="1">
+                                    <kanban create="false" delete="true">
+                                        <field name="id"/>
+                                        <field name="name"/>
+                                        <field name="image"/>
+                                        <field name="image_filename"/>
+                                        <field name="sequence"/>
+                                        <templates>
+                                            <t t-name="card">
+                                                <div class="card m-2" style="width: 220px;">
+                                                    <div class="card-body text-center p-2">
+                                                        <div class="o_kanban_image_wrapper mb-2">
+                                                            <t t-if="record.image.raw_value">
+                                                                <div class="oe_kanban_action o_render_lightbox_trigger" t-att-data-id="record.id.raw_value" title="Click to preview">
+                                                                    <field name="image" widget="image" options="{'size': [200, 200], 'preview_image': 'image'}" class="o_attachment_image"/>
+                                                                </div>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <div class="oe_kanban_action o_render_upload_trigger o_kanban_image_placeholder d-flex flex-column align-items-center justify-content-center" t-att-data-id="record.id.raw_value" style="height: 200px; width: 200px; border: 2px dashed #ccc; background: #f8f9fa;">
+                                                                    <i class="fa fa-cloud-upload fa-3x text-muted mb-2"/>
+                                                                    <span class="text-muted small">Click to Upload</span>
+                                                                </div>
+                                                            </t>
+                                                        </div>
+                                                        <field name="name" placeholder="Image Name" class="mb-2"/>
+                                                        <div class="d-flex gap-1 justify-content-center">
+                                                            <a class="btn btn-sm btn-secondary o_render_upload_trigger" t-att-data-id="record.id.raw_value">
+                                                                <i class="fa fa-upload"/> Replace
+                                                            </a>
+                                                            <a class="btn btn-sm btn-primary oe_kanban_action o_render_lightbox_trigger" t-att-data-id="record.id.raw_value" t-if="record.image.raw_value">
+                                                                <i class="fa fa-search-plus"/> Preview
+                                                            </a>
+                                                            <a class="btn btn-sm btn-outline-danger oe_kanban_action o_render_delete_trigger" t-att-data-id="record.id.raw_value" title="Delete">
+                                                                <i class="fa fa-trash"/>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
+                                </field>
+
+                                <div class="text-center mt-3">
+                                    <button name="action_add_render_image" type="object" string="Add More Images" class="btn btn-primary" icon="fa-plus"/>
+                                </div>
+                            </page>
+
+                            <!--
+                            <page string="Yarn Orchestration" class="yarn-orchestration-page">
+                                <field name="yarn_orchestration_ids" readonly="state == 'done'">
+                                    <list editable="bottom" class="yarn-orchestration-table">
+                                        <field name="yarn_carrier"/>
+                                        <field name="name"/>
+                                        <field name="left_ply"/>
+                                        <field name="right_ply"/>
+                                    </list>
+                                </field>
+                            </page>
+                            -->
+                            <!--
+                            <page string="Shop Floor Operations">
+                                <field name="operation_ids" readonly="state == 'done'">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="operation_id" string="Operation" options="{'no_create_edit': True, 'no_quick_create': True}"/>
+                                        <field name="workcenter_tag_ids" widget="many2many_tags" readonly="1" invisible="1" column_invisible="1"/>
+                                        <field name="workcenter_domain_ids" invisible="1" column_invisible="1"/>
+                                        <field name="workcenter_id" domain="[('id', 'in', workcenter_domain_ids)]" required="1"/>
+                                        <field name="employee_assigned_ids" widget="many2many_avatar_employee"/>
+                                        <button name="action_manage_instruction_files" type="object" string="📋 Upload Instructions" class="btn btn-sm" invisible="has_instruction_files"/>
+
+                                        <button name="action_manage_instruction_files" type="object" string="📋 Update Instructions" class="btn btn-sm btn-outline-success" invisible="not has_instruction_files"/>
+
+                                        <button name="action_manage_program_files" type="object" string="📁 Upload Programs" class="btn btn-sm" invisible="has_program_files"/>
+
+                                        <button name="action_manage_program_files" type="object" string="📁 Update Programs" class="btn btn-sm btn-outline-success" invisible="not has_program_files"/>
+                                        <field name="time_cycle" string="Default Duration"/>
+                                    </list>
+                                </field>
+                            </page>
+                            -->
+                            <!--
+                            <page string="Notes">
+                                <field name="notes" placeholder="Add technical notes, specifications, or requirements..." readonly="state == 'done'"/>
+                            </page>
+                            -->
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_bom_request_tree" model="ir.ui.view">
+            <field name="name">maeknit.bom.request.tree</field>
+            <field name="model">maeknit.bom.request</field>
+            <field name="arch" type="xml">
+                <!-- Updated list decorations to match new states state: draft, ready_to_program, produced, done, mo_confirmed, cancelled  -->
+                <list string="Development Queue" decoration-primary="state=='mo_confirmed'" decoration-info="state=='produced'"  decoration-success="state=='done'" decoration-warning="state=='ready_to_spec'" decoration-muted="state=='cancelled'">
+                    <field name="partner_id" optional="show"/>
+                    <field name="product_id" optional="show"/>
+                    <field name="colorway_id" optional="show"/>
+                    <field name="size_id" optional="show"/>
+                    <field name="sample" optional="show"/>
+                    <field name="user_id" optional="show"/>
+                    <field name="state" widget="badge" decoration-primary="state=='mo_confirmed'" decoration-info="state=='produced'"  decoration-success="state=='done'" decoration-warning="state=='ready_to_spec'" decoration-muted="state=='cancelled'" optional="show"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_bom_request_tree_production" model="ir.ui.view">
+            <field name="name">maeknit.bom.request.tree.production</field>
+            <field name="model">maeknit.bom.request</field>
+            <field name="arch" type="xml">
+                <!-- Updated list decorations to match new states -->
+                <list string="Production Queue" decoration-primary="state=='mo_confirmed'" decoration-info="state=='produced'"  decoration-success="state=='done'" decoration-warning="state=='ready_to_spec'" decoration-muted="state=='cancelled'">
+                    <field name="partner_id" optional="show"/>
+                    <field name="product_id" optional="show"/>
+                    <field name="sample" optional="show"/>
+                    <field name="size_id" optional="show"/>
+                    <field name="colorway_id" optional="show"/>
+                    <field name="user_id" optional="show"/>
+                    <field name="state" widget="badge" decoration-primary="state=='mo_confirmed'" decoration-info="state=='produced'"  decoration-success="state=='done'" decoration-warning="state=='ready_to_spec'" decoration-muted="state=='cancelled'" optional="show"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_bom_request_tree_grading" model="ir.ui.view">
+            <field name="name">maeknit.bom.request.tree.grading</field>
+            <field name="model">maeknit.bom.request</field>
+            <field name="arch" type="xml">
+                <!-- Updated list decorations to match new states -->
+                <list string="Grading Queue" decoration-primary="state=='mo_confirmed'" decoration-info="state=='produced'"  decoration-success="state=='done'" decoration-warning="state=='ready_to_spec'" decoration-muted="state=='cancelled'">
+                    <field name="partner_id" optional="show"/>
+                    <field name="product_id" optional="show"/>
+                    <field name="sample" optional="show"/>
+                    <field name="size_id" optional="show"/>
+                    <field name="colorway_id" optional="show"/>
+                    <field name="user_id" optional="show"/>
+                    <field name="state" widget="badge" decoration-primary="state=='mo_confirmed'" decoration-info="state=='produced'"  decoration-success="state=='done'" decoration-warning="state=='ready_to_spec'" decoration-muted="state=='cancelled'" optional="show"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_bom_request_tree_swatching" model="ir.ui.view">
+            <field name="name">maeknit.bom.request.tree.swatching</field>
+            <field name="model">maeknit.bom.request</field>
+            <field name="arch" type="xml">
+                <!-- Updated list decorations to match new states -->
+                <list string="Swatching Queue" decoration-primary="state=='mo_confirmed'" decoration-info="state=='produced'"  decoration-success="state=='done'" decoration-warning="state=='ready_to_spec'" decoration-muted="state=='cancelled'" >
+                    <field name="partner_id" optional="show"/>
+                    <field name="product_id" optional="show"/>
+                    <field name="yarn_variant" optional="show"/>
+                    <field name="colorway_id" optional="show"/>
+                    <field name="user_id" optional="show"/>
+                    <field name="state" widget="badge" decoration-primary="state=='mo_confirmed'" decoration-info="state=='produced'"  decoration-success="state=='done'" decoration-warning="state=='ready_to_spec'" decoration-muted="state=='cancelled'" optional="show"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_bom_request_search" model="ir.ui.view">
+            <field name="name">maeknit.bom.request.search</field>
+            <field name="model">maeknit.bom.request</field>
+            <field name="arch" type="xml">
+                <search string="BOM Queue">
+                    <!-- Main search fields that will be searched when typing in the search bar -->
+                    <field name="name" string="Search" filter_domain="['|','|','|','|',
+                            ('name', 'ilike', self),
+                            ('product_id.name', 'ilike', self),
+                            ('product_id.default_code', 'ilike', self),
+                            ('partner_id.name', 'ilike', self),
+                            ('sale_order_id.name', 'ilike', self)
+                        ]"/>
+                    <field name="product_id" string="Product" filter_domain="['|', ('product_id.name', 'ilike', self), ('product_id.default_code', 'ilike', self)]"/>
+                    <field name="partner_id" string="Customer"/>
+                    <!-- Additional searchable fields -->
+                    <field name="sale_order_id"/>
+                    <field name="partner_id"/>
+                    <field name="product_id"/>
+                    <field name="user_id"/>
+                    <separator/>
+                    <filter name="my_requests" string="My Requests" domain="[('user_id', '=', uid)]"/>
+                    <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                    <filter name="ready_to_program" string="Ready to Program" domain="[('state', '=', 'ready_to_program')]"/>
+                    <filter name="mo_confirmed" string="MO Confirmed" domain="[('state', '=', 'mo_confirmed')]"/>
+                    <filter name="done" string="Done" domain="[('state', '=', 'done')]"/>
+                    <filter name="is_garment_bom" string="Development" domain="[('is_garment_bom', '=', True)]"/>
+                    <filter name="is_grading_bom" string="Grading" domain="[('is_grading_bom', '=', True)]"/>
+                    <filter name="is_production_bom" string="Production" domain="[('is_production_bom', '=', True)]"/>
+                    <!-- <filter name="is_reverse_bom" string="Reverse Engineering" domain="[('is_reverse_bom', '=', True)]"/> -->
+                     <filter name="is_swatch_bom" string="Swatching" domain="[('is_swatch_bom', '=', True)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                        <filter name="group_by_user" string="Responsible" context="{'group_by': 'user_id'}"/>
+                        <filter name="group_by_product" string="Product" context="{'group_by': 'product_id'}"/>
+                        <filter name="group_by_customer" string="Customer" context="{'group_by': 'partner_id'}"/>
+                        <filter name="group_by_stage" string="ECO Stage" context="{'group_by': 'stage_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_bom_request" model="ir.actions.act_window">
+            <field name="name">BOM Queue</field>
+            <field name="res_model">maeknit.bom.request</field>
+            <field name="view_mode">list,form</field>
+            <field name="view_id" ref="view_bom_request_tree"/>
+            <field name="search_view_id" ref="view_bom_request_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first BOM Request
+                </p>
+                <p>
+                    BOM QUEUE are created automatically when Sales Orders are confirmed.
+                    Use this dashboard to manage and approve BOM specifications before manufacturing.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_bom_request_garment" model="ir.actions.act_window">
+            <field name="name">Development</field>
+            <field name="res_model">maeknit.bom.request</field>
+            <field name="view_mode">list,form</field>
+            <field name="view_id" ref="view_bom_request_tree"/>
+            <field name="domain">[('is_development_bom', '=', True)]</field>
+            <!-- Added search_default_is_garment_bom to automatically activate Development filter -->
+            <field name="context">{'default_is_development_bom': True, 'search_default_is_garment_bom': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No Development BOM QUEUE found.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_bom_request_grading" model="ir.actions.act_window">
+            <field name="name">Grading</field>
+            <field name="res_model">maeknit.bom.request</field>
+            <field name="view_mode">list,form</field>
+            <field name="view_id" ref="view_bom_request_tree_grading"/>
+            <field name="domain">[('is_grading_bom', '=', True)]</field>
+            <field name="context">{'default_is_grading_bom': True}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No Grading BOM QUEUE found.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_bom_request_production" model="ir.actions.act_window">
+            <field name="name">Production Ready</field>
+            <field name="res_model">maeknit.bom.request</field>
+            <field name="view_mode">list,form</field>
+            <field name="view_id" ref="view_bom_request_tree_production"/>
+            <field name="domain">[('is_production_bom', '=', True)]</field>
+            <field name="context">{'default_is_production_bom': True}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No Production BOM QUEUE found.
+                </p>
+            </field>
+        </record>
+        <!--
+        <record id="action_bom_request_reverse" model="ir.actions.act_window">
+            <field name="name">Reverse Engineering</field>
+            <field name="res_model">maeknit.bom.request</field>
+            <field name="view_mode">list,form</field>
+            <field name="view_id" ref="view_bom_request_tree"/>
+            <field name="domain">[('is_reverse_bom', '=', True)]</field>
+            <field name="context">{'default_is_reverse_bom': True}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No Reverse Engineering BOM QUEUE found.
+                </p>
+            </field>
+        </record>
+        -->
+
+        <record id="action_bom_request_swatch" model="ir.actions.act_window">
+            <field name="name">Swatching</field>
+            <field name="res_model">maeknit.bom.request</field>
+            <field name="view_mode">list,form</field>
+            <field name="view_id" ref="view_bom_request_tree_swatching"/>
+            <field name="domain">[('is_swatch_bom', '=', True)]</field>
+            <field name="context">{'default_is_swatch_bom': True}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No Swatch BOM QUEUE found.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_bom_request_main" name="BOM QUEUE" action="action_bom_request" sequence="15"  web_icon="stock,static/description/icon.png"/>
+        <menuitem id="menu_bom_request_swatch" name="Swatching" parent="menu_bom_request_main" action="action_bom_request_swatch" sequence="10"/>
+        <menuitem id="menu_bom_request_garment" name="Development" parent="menu_bom_request_main" action="action_bom_request_garment" sequence="20"/>
+        <!-- <menuitem id="menu_bom_request_reverse" name="Reverse Engineering" parent="menu_bom_request_main" action="action_bom_request_reverse" sequence="30"/> -->
+        <menuitem id="menu_bom_request_grading" name="Grading" parent="menu_bom_request_main" action="action_bom_request_grading" sequence="40"/>
+        <menuitem id="menu_bom_request_production" name="Production Ready" parent="menu_bom_request_main" action="action_bom_request_production" sequence="50"/>
+
+
+    </data>
+</odoo>

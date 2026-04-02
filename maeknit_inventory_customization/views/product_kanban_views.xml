@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Create a completely new product template kanban view -->
+    <record id="product_template_kanban_view_name_only" model="ir.ui.view">
+        <field name="name">product.template.kanban.name.only</field>
+        <field name="model">product.template</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="name"/>
+                <field name="is_favorite"/>
+                <field name="product_category"/>
+                <field name="image_128"/>
+                <field name="product_variant_ids"/>
+                <templates>
+                    <t t-name="card" class="flex-row">
+                        <main class="pe-2">
+                            <div class="mb-1">
+                                <div class="d-flex mb-0 h5">
+                                    <field class="me-1" name="is_favorite" widget="boolean_favorite" nolabel="1"/>
+                                    <field name="name"/>
+                                </div>
+                            </div>
+                            <div class="mb-1"  invisible="product_category != 'yarn'">
+                                <div class="d-flex mb-0 h5">
+                                    <field name="origin_country_id" invisible="product_category != 'yarn' and not origin_country_id"/>
+                                </div>
+                            </div>
+                            <div class="mb-1" invisible="product_category != 'yarn'">
+                                <div class="d-flex mb-0 h5">
+                                    <field name="vendor_id" invisible="product_category != 'yarn'"/>
+                                </div>
+                            </div>
+                            <div class="mb-1" invisible="product_category != 'garment'">
+                                <div class="d-flex mb-0 h5">
+                                    <field name="brand_id" invisible="product_category != 'garment'"/>
+                                </div>
+                            </div>
+                            <!-- Display variant count instead of listing all variants -->
+                            <div class="mb-1" invisible="product_category != 'garment'">
+                                <div class="d-flex mb-0 h5">
+                                    <span><t t-esc="record.product_variant_ids.raw_value.length"/></span>
+                                </div>
+                            </div>
+                            <div class="mb-1" t-if="record.product_category.value">
+                                <span class="badge bg-secondary">
+                                    <field name="product_category"/>
+                                </span>
+                            </div>
+                            
+                        </main>
+                        <aside>
+                            <field name="image_128" widget="image" alt="Product" options="{'img_class': 'w-100 object-fit-contain'}" invisible="not image_128"/>
+                        </aside>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Create a completely new search view -->
+    <record id="product_template_search_view_category" model="ir.ui.view">
+        <field name="name">product.template.search.category</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Product" filter_domain="['|', '|', '|', ('name', 'ilike', self), ('default_code', 'ilike', self), ('description', 'ilike', self), ('description_sale', 'ilike', self)]"/>
+                <field name="product_category" string="Product Category"/>
+                
+                <separator/>
+                <filter string="Yarn" name="product_category_yarn" domain="[('product_category', '=', 'yarn')]"/>
+                <filter string="Garment" name="product_category_garment" domain="[('product_category', '=', 'garment')]"/>
+                <filter string="Swatch" name="product_category_swatch" domain="[('product_category', '=', 'swatch')]"/>
+                <filter string="Services" name="product_category_services" domain="[('product_category', '=', 'services')]"/>
+                <filter string="Misc" name="product_category_misc" domain="[('product_category', '=', 'misc')]"/>
+                <separator/>
+                
+                <group expand="0" string="Group By">
+                    <filter string="Product Category" name="groupby_product_category" context="{'group_by': 'product_category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Create actions for each category -->
+    <record id="action_product_template_all" model="ir.actions.act_window">
+        <field name="name">All Products</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="product_template_kanban_view_name_only"/>
+        <field name="search_view_id" ref="product_template_search_view_category"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new product
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_product_template_yarn" model="ir.actions.act_window">
+        <field name="name">Yarn Products</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="product_template_kanban_view_name_only"/>
+        <field name="search_view_id" ref="product_template_search_view_category"/>
+        <field name="domain">[('product_category', '=', 'yarn')]</field>
+        <field name="context">{'search_default_product_category_yarn': 1, 'default_product_category': 'yarn'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new yarn product
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_product_template_garment" model="ir.actions.act_window">
+        <field name="name">Garment Products</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="product_template_kanban_view_name_only"/>
+        <field name="search_view_id" ref="product_template_search_view_category"/>
+        <field name="domain">[('product_category', '=', 'garment')]</field>
+        <field name="context">{'search_default_product_category_garment': 1, 'default_product_category': 'garment'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new garment product
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_product_template_swatch" model="ir.actions.act_window">
+        <field name="name">Swatch Products</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="product_template_kanban_view_name_only"/>
+        <field name="search_view_id" ref="product_template_search_view_category"/>
+        <field name="domain">[('product_category', '=', 'swatch')]</field>
+        <field name="context">{'search_default_product_category_swatch': 1, 'default_product_category': 'swatch'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new swatch product
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_product_template_services" model="ir.actions.act_window">
+        <field name="name">Service Products</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="product_template_kanban_view_name_only"/>
+        <field name="search_view_id" ref="product_template_search_view_category"/>
+        <field name="domain">[('product_category', '=', 'services')]</field>
+        <field name="context">{'search_default_product_category_services': 1, 'default_product_category': 'services'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new service product
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_product_template_misc" model="ir.actions.act_window">
+        <field name="name">Misc Products</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="product_template_kanban_view_name_only"/>
+        <field name="search_view_id" ref="product_template_search_view_category"/>
+        <field name="domain">[('product_category', '=', 'misc')]</field>
+        <field name="context">{'search_default_product_category_misc': 1, 'default_product_category': 'misc'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new misc product
+            </p>
+        </field>
+    </record>
+
+    <!-- Create a parent menu for products by category -->
+    <menuitem id="menu_product_by_category"
+        name="Products by Category"
+        parent="stock.menu_stock_inventory_control"
+        sequence="10"/>
+        
+    <!-- Add menu items for each category -->
+    <menuitem id="menu_product_template_all"
+        name="All Products"
+        action="action_product_template_all"
+        parent="menu_product_by_category"
+        sequence="10"/>
+        
+    <menuitem id="menu_product_template_yarn"
+        name="Yarn"
+        action="action_product_template_yarn"
+        parent="menu_product_by_category"
+        sequence="20"/>
+        
+    <menuitem id="menu_product_template_garment"
+        name="Garment"
+        action="action_product_template_garment"
+        parent="menu_product_by_category"
+        sequence="30"/>
+        
+    <menuitem id="menu_product_template_swatch"
+        name="Swatch"
+        action="action_product_template_swatch"
+        parent="menu_product_by_category"
+        sequence="40"/>
+        
+    <menuitem id="menu_product_template_services"
+        name="Services"
+        action="action_product_template_services"
+        parent="menu_product_by_category"
+        sequence="50"/>
+        
+    <menuitem id="menu_product_template_misc"
+        name="Misc"
+        action="action_product_template_misc"
+        parent="menu_product_by_category"
+        sequence="60"/>
+</odoo>

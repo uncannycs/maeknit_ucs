@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_hs_code_wizard_form" model="ir.ui.view">
+        <field name="name">product.hs.code.wizard.form</field>
+        <field name="model">product.hs.code.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate HS Code">
+                <group>
+                    <field name="purchase_order_id" invisible="1"/>
+                    <field name="product_id" force_save="1"/>
+                    <field name="product_name"/>
+                    <field name="country_code_id"/>
+                    <field name="country_code" force_save="1"/>
+                    <field name="hs_code" readonly="1"/>
+                    <field name="product_classification_name"/>
+                </group>
+                <footer>
+                    <button name="action_generate_dhl_hs_code" type="object" string="Generate" class="btn-success" invisible="is_generated"/>
+                    <button name="action_generate_dhl_hs_code" type="object" string="Re-Generate" class="o_generate_hs_btn" invisible="not is_generated"/>
+<!--                    <button name="action_apply_hs_code" type="object" string="Apply to Product" class="oe_highlight" invisible="not hs_code"/>-->
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_product_hs_code_wizard" model="ir.actions.act_window">
+        <field name="name">Generate HS Code</field>
+        <field name="res_model">product.hs.code.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

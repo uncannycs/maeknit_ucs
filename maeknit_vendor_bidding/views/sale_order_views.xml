@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_order_form_inherit_bidding" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.bidding</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            
+            <xpath expr="//header" position="inside">
+                <field name="bids_requested" invisible="1"/>
+                <field name="has_garment_product" invisible="1"/>
+                <button name="action_request_bids" 
+                        string="Request Bids" 
+                        type="object" 
+                        class="btn-primary" 
+                        invisible="state not in ['draft', 'sent'] or bids_requested or not has_garment_product"/>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_marketplace_bids" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-gavel" 
+                        invisible="marketplace_bids_count == 0">
+                    <field name="marketplace_bids_count" widget="statinfo" string="Marketplace Bids"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//group[@name='sale_header']" position="inside">
+                <field name="winning_factory_id" readonly="1" invisible="not winning_factory_id"/>
+            </xpath>
+
+            <xpath expr="//page[@name='other_information']" position="inside">
+                 <group string="Bidding Info" name="sale_bidding_group">
+                    <field name="garment_rfq_ids" widget="many2many_tags" readonly="1"/>
+                    <field name="component_rfq_ids" widget="many2many_tags" readonly="1"/>
+                 </group>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

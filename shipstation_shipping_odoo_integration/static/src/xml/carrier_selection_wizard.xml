@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="shipstation_shipping_integration_vts.CarrierSelectionWizard">
+        <div class="carrier-selection-wizard">
+            <div class="wizard-header">
+                <h2>ShipStation Rate Finder</h2>
+                <p>Compare rates across carriers and select the best shipping option</p>
+            </div>
+
+            <t t-if="state.pickingSummary">
+                <div class="shipstation-summary" style="display:flex; align-items:center; gap:24px; padding:8px 16px; border-radius:8px; border:1px solid #dde3ea; background:#fff; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span class="text-muted" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.03em;">Dims</span>
+                        <span style="font-size:0.95rem; font-weight:600;"><t t-esc="state.pickingSummary.dimension_display"/></span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span class="text-muted" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.03em;">Wt</span>
+                        <span style="font-size:0.95rem; font-weight:600;"><t t-esc="state.pickingSummary.weight_display"/></span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+                        <span class="text-muted" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.03em;">Ship to</span>
+                        <t t-if="state.pickingSummary.address_lines and state.pickingSummary.address_lines.length">
+                            <span style="font-size:0.85rem;"><t t-esc="state.pickingSummary.address_lines.join(', ')"/></span>
+                        </t>
+                        <t t-else="">
+                            <span class="text-muted" style="font-size:0.8rem;">No address</span>
+                        </t>
+                    </div>
+                </div>
+            </t>
+
+            <div class="wizard-content">
+                <!-- Step 1: Select Carriers -->
+                <div t-if="state.step === 'select_carriers'" class="step-carriers">
+                    <h3>Select Carriers to Compare</h3>
+                    <div class="carrier-grid">
+                        <div 
+                            class="carrier-card"
+                            t-att-class="isCarrierSelected('combined') ? 'selected' : ''"
+                            t-on-click="() => toggleCarrier('combined')">
+                            <div class="carrier-icon">🎯</div>
+                            <div class="carrier-name">Combined</div>
+                            <div class="carrier-desc">Top 10 Cheapest</div>
+                        </div>
+                        
+                        <!-- Updated to use ups_walleted and fedex_walleted, removed DHL -->
+                        <div 
+                            class="carrier-card"
+                            t-att-class="isCarrierSelected('stamps_com') ? 'selected' : ''"
+                            t-on-click="() => toggleCarrier('stamps_com')">
+                            <div class="carrier-icon">📮</div>
+                            <div class="carrier-name">USPS</div>
+                            <div class="carrier-desc">via Stamps.com</div>
+                        </div>
+
+                        <div 
+                            class="carrier-card"
+                            t-att-class="isCarrierSelected('ups_walleted') ? 'selected' : ''"
+                            t-on-click="() => toggleCarrier('ups_walleted')">
+                            <div class="carrier-icon">📦</div>
+                            <div class="carrier-name">UPS</div>
+                            <div class="carrier-desc">United Parcel Service</div>
+                        </div>
+
+                        <div 
+                            class="carrier-card"
+                            t-att-class="isCarrierSelected('fedex_walleted') ? 'selected' : ''"
+                            t-on-click="() => toggleCarrier('fedex_walleted')">
+                            <div class="carrier-icon">✈️</div>
+                            <div class="carrier-name">FedEx</div>
+                            <div class="carrier-desc">Federal Express</div>
+                        </div>
+                    </div>
+
+                    <div class="wizard-actions">
+                        <div class="residential-switch">
+                            <span>Delivery Address:</span>
+                            <button
+                                t-att-class="'btn btn-outline-secondary' + (state.residential ? '' : ' active')"
+                                t-on-click="() => toggleResidential(false)">
+                                Commercial
+                            </button>
+                            <button
+                                t-att-class="'btn btn-outline-secondary' + (state.residential ? ' active' : '')"
+                                t-on-click="() => toggleResidential(true)">
+                                Residential
+                            </button>
+                        </div>
+                        <button 
+                            class="btn btn-secondary"
+                            t-on-click="closeWizard"
+                            t-att-disabled="state.loading">
+                            <i class="fa fa-arrow-left"/> Back
+                        </button>
+                        <button 
+                            class="btn btn-primary btn-lg"
+                            t-on-click="fetchRates"
+                            t-att-disabled="state.loading">
+                            <t t-if="state.loading">
+                                <i class="fa fa-spinner fa-spin"/> Fetching Rates...
+                            </t>
+                            <t t-else="">
+                                Fetch Rates
+                            </t>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: View Rates -->
+                <div t-if="state.step === 'view_rates'" class="step-rates">
+                    <t t-if="state.error">
+                        <div class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                        </div>
+                    </t>
+
+                    <t t-if="!state.error and state.rates.length === 0">
+                        <div class="alert alert-warning">
+                            No rates available. Please try different carriers.
+                        </div>
+                    </t>
+
+                    <t t-if="state.rates.length > 0">
+                        <div class="rates-container">
+                            <t t-foreach="Object.keys(state.groupedRates)" t-as="carrier" t-key="carrier">
+                                <div class="carrier-section">
+                                    <div class="carrier-section-header" t-att-style="'border-left: 4px solid ' + getCarrierColor(carrier)">
+                                        <h4><t t-esc="getCarrierDisplayName(carrier)"/></h4>
+                                        <span class="badge"><t t-esc="state.groupedRates[carrier].length"/> options</span>
+                                    </div>
+                                    
+                                    <div class="rates-grid">
+                                        <t t-foreach="state.groupedRates[carrier]" t-as="rate" t-key="rate.id">
+                                            <div 
+                                                class="rate-card"
+                                                t-att-class="state.selectedRate?.id === rate.id ? 'selected' : ''"
+                                                t-on-click="() => selectRate(rate)">
+                                                <div class="rate-service">
+                                                    <t t-esc="rate.shipstation_service_name"/>
+                                                </div>
+                                                <div class="rate-price">
+                                                    $<t t-esc="(rate.shipping_cost + rate.other_cost).toFixed(2)"/>
+                                                </div>
+                                                <div class="rate-details">
+                                                    <span>Shipping: $<t t-esc="rate.shipping_cost.toFixed(2)"/></span>
+                                                    <t t-if="rate.other_cost > 0">
+                                                        <span>Other: $<t t-esc="rate.other_cost.toFixed(2)"/></span>
+                                                    </t>
+                                                </div>
+                                                <div t-if="state.selectedRate?.id === rate.id" class="rate-selected-badge">
+                                                    <i class="fa fa-check-circle"/> Selected
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+
+                    <div class="wizard-actions">
+                        <button 
+                            class="btn btn-secondary"
+                            t-on-click="back"
+                            t-att-disabled="state.loading">
+                            <i class="fa fa-arrow-left"/> Back
+                        </button>
+                        <button 
+                            class="btn btn-primary btn-lg"
+                            t-on-click="confirmSelection"
+                            t-att-disabled="!state.selectedRate or state.loading">
+                            <t t-if="state.loading and isApplying">
+                                <i class="fa fa-spinner fa-spin"/> Applying...
+                            </t>
+                            <t t-else="">
+                                <i class="fa fa-check"/> Use Selected Rate
+                            </t>
+                        </button>
+                        <button 
+                            class="btn btn-success btn-lg"
+                            style="margin-left: 0.5rem;"
+                            t-on-click="generateLabel"
+                            t-att-disabled="!state.selectedRate or state.loading">
+                            <t t-if="state.loading and isGeneratingLabel">
+                                <i class="fa fa-spinner fa-spin"/> Generating Label...
+                            </t>
+                            <t t-else="">
+                                <i class="fa fa-file-pdf-o"/> Generate ShipStation Label
+                            </t>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

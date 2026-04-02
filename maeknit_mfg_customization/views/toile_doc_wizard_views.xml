@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_toile_doc_wizard_form" model="ir.ui.view">
+        <field name="name">toile.doc.wizard.form</field>
+        <field name="model">toile.doc.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Record Actual Measurements">
+                <field name="workorder_id" invisible="1"/>
+                <field name="production_id" invisible="1"/>
+                <!-- Panel structure read by the widget -->
+                <field name="measurement_widget_data" invisible="1"/>
+                <!-- With image URLs restored from attachments for display -->
+                <field name="measurement_widget_data_with_images" invisible="1"/>
+                <!-- The documentation widget: panel tabs + actual inputs + version history -->
+                <field name="toile_doc_data" widget="toile_doc_widget" nolabel="1"/>
+                <footer>
+                    <button string="Re-manufacture"
+                            type="object"
+                            name="action_remanufacture"
+                            class="btn-warning"/>
+                    <button string="Approve for Shipment"
+                            type="object"
+                            name="action_approve_for_shipment"
+                            class="btn-success"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

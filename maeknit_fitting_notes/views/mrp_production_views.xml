@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mrp_production_form_fitting_notes_button" model="ir.ui.view">
+        <field name="name">mrp.production.form.fitting.notes.button</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+
+            <!-- Generate Fitting button in header (disappears once fitting exists) -->
+            <xpath expr="//header/button[last()]" position="after">
+                <button name="action_generate_fitting"
+                        type="object"
+                        string="Generate Fitting"
+                        class="btn-primary"
+                        invisible="fitting_id or state != 'done'"/>
+            </xpath>
+
+            <!-- Previous Fitting smart button (only on MFGs spawned via Manufacture) -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_source_fitting"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-history"
+                        invisible="not source_fitting_id">
+                    <div class="o_stat_info">
+                        <field name="source_fitting_id" readonly="1" nolabel="1"
+                               options="{'no_open': True}"/>
+                        <span class="o_stat_text">Prev. Fitting</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <!-- Fitting Link field below Gauge -->
+            <xpath expr="//field[@name='gauge_id']" position="after">
+                <field name="fitting_id"
+                       string="Fitting Link"
+                       readonly="1"
+                       invisible="not fitting_id"
+                       options="{'no_open': False}"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View with Button -->
+    <record id="view_shipping_tracking_tree" model="ir.ui.view">
+        <field name="name">maeknit.shipping.tracking.tree</field>
+        <field name="model">maeknit.shipping.tracking</field>
+        <field name="arch" type="xml">
+            <!-- Added button in list view header for fetching tracking status -->
+            <list string="Tracking Numbers" create="false">
+                <header>
+                    <button name="action_fetch_tracking" string="Fetch Tracking Status" type="object" class="btn-primary"/>
+                </header>
+                <field name="tracking_number"/>
+                <field name="carrier_code"/>
+                <field name="status"/>
+                <field name="last_event"/>
+                <field name="last_updated"/>
+                <field name="email_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_shipping_tracking_form" model="ir.ui.view">
+        <field name="name">maeknit.shipping.tracking.form</field>
+        <field name="model">maeknit.shipping.tracking</field>
+        <field name="arch" type="xml">
+            <form string="Tracking Number">
+                <header>
+                    <button name="action_fetch_tracking" 
+                            string="Fetch Tracking Status" 
+                            type="object" 
+                            class="oe_highlight"
+                            icon="fa-refresh"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="tracking_number"/>
+                            <field name="carrier_code"/>
+                            <field name="email_id"/>
+                        </group>
+                        <group>
+                            <field name="status"/>
+                            <field name="last_updated"/>
+                        </group>
+                    </group>
+                    <group string="Last Event">
+                        <field name="last_event" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="API Response">
+                            <field name="raw_response" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_shipping_tracking" model="ir.actions.act_window">
+        <field name="name">Tracking Numbers</field>
+        <field name="res_model">maeknit.shipping.tracking</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No tracking numbers found
+            </p>
+            <p>
+                Tracking numbers will be extracted automatically from incoming emails.
+            </p>
+        </field>
+    </record>
+</odoo>

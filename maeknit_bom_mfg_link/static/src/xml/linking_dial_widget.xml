@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="maeknit_bom_mfg_link.LinkingDialWidget">
+        <div class="linking_dial_widget" style="padding: 16px;">
+            <div style="border: 2px solid #333; border-radius: 8px; padding: 20px; background: white;">
+                <!-- Header with title and unit toggle -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Linking dial measurements</h3>
+                    <div style="display: flex; gap: 8px; border: 1px solid #ccc; border-radius: 4px; overflow: hidden;">
+                        <button 
+                            t-on-click="() => this.onUnitChange('inches')"
+                            t-att-style="state.unit === 'inches' ? 'background: #3b82f6; color: white; border: none; padding: 4px 12px; cursor: pointer; font-size: 12px;' : 'background: white; color: #333; border: none; padding: 4px 12px; cursor: pointer; font-size: 12px;'"
+                        >
+                            inches
+                        </button>
+                        <button 
+                            t-on-click="() => this.onUnitChange('cm')"
+                            t-att-style="state.unit === 'cm' ? 'background: #3b82f6; color: white; border: none; padding: 4px 12px; cursor: pointer; font-size: 12px;' : 'background: white; color: #333; border: none; padding: 4px 12px; cursor: pointer; font-size: 12px;'"
+                        >
+                            cm
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Measurements grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; margin-bottom: 16px;">
+                    <t t-foreach="state.measurements" t-as="measurement" t-key="measurement_index">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input
+                                type="text"
+                                t-att-value="measurement.label"
+                                t-on-input="(ev) => this.onLabelChange(measurement_index, ev.target.value)"
+                                placeholder="Label"
+                                style="flex: 0 0 auto; width: 100px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;"
+                            />
+                            <input
+                                type="text"
+                                t-att-value="measurement.value"
+                                t-on-input="(ev) => this.onMeasurementChange(measurement_index, ev.target.value)"
+                                placeholder="Value"
+                                style="flex: 1; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;"
+                            />
+                            <button
+                                t-on-click="() => this.removeMeasurement(measurement_index)"
+                                style="background: none; border: none; cursor: pointer; padding: 4px; color: #666; font-size: 16px;"
+                                title="Delete measurement"
+                            >
+                                🗑️
+                            </button>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Add button -->
+                <div style="text-align: center; margin-top: 12px;">
+                    <button
+                        t-on-click="() => this.addMeasurement()"
+                        style="background: none; border: none; cursor: pointer; font-size: 20px; color: #333; padding: 4px 12px;"
+                        title="Add measurement"
+                    >
+                        +
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

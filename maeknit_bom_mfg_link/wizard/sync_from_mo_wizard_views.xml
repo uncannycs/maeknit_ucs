@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_maeknit_sync_from_mo_wizard_form" model="ir.ui.view">
+        <field name="name">maeknit.sync.from.mo.wizard.form</field>
+        <field name="model">maeknit.sync.from.mo.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sync to Dev MO">
+                <sheet>
+
+                    <!-- Title row -->
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="fa fa-refresh fa-lg text-primary"/>
+                        <h4 class="mb-0">Sync to
+                            <field name="target_mo_id" readonly="1" nolabel="1" class="d-inline fw-bold"/>
+                        </h4>
+                    </div>
+
+                    <!-- Source type toggle -->
+                    <div class="mb-3">
+                        <span class="o_form_label fw-semibold text-muted small d-block mb-1">Sync from</span>
+                        <field name="source_type" widget="radio" nolabel="1"
+                               options="{'horizontal': true}"/>
+                    </div>
+
+                    <!-- Source MO picker -->
+                    <group col="1">
+                        <field name="available_swatch_ids" invisible="1"/>
+                        <field name="available_toile_ids"  invisible="1"/>
+
+                        <field name="swatch_source_id"
+                               invisible="source_type != 'swatch'"
+                               domain="[('id', 'in', available_swatch_ids)]"
+                               context="{'show_product_name': True}"
+                               options="{'no_create': True, 'no_open': True}"
+                               placeholder="Pick a swatch MO..."
+                               string="Swatch MO"/>
+
+                        <field name="toile_source_id"
+                               invisible="source_type != 'toile'"
+                               domain="[('id', 'in', available_toile_ids)]"
+                               context="{'show_product_name': True}"
+                               options="{'no_create': True, 'no_open': True}"
+                               placeholder="Pick a toile MO..."
+                               string="Toile MO"/>
+                    </group>
+
+                    <!-- Live preview of what will sync -->
+                    <div class="mt-3 p-3 rounded"
+                         style="background:#f8f9fa; border:1px solid #dee2e6; font-family:monospace; font-size:0.85rem; white-space:pre-wrap;">
+                        <field name="sync_preview" nolabel="1" readonly="1" widget="char"
+                               style="font-family:monospace; font-size:0.85rem; white-space:pre-wrap; display:block;"/>
+                    </div>
+
+                    <!-- Warning -->
+                    <div class="alert alert-warning mt-3 mb-0 small" role="alert">
+                        <i class="fa fa-exclamation-triangle me-1"/>
+                        Existing Structure, Artwork, Sketch, Development, and Stitch Density data on this Dev MO will be <strong>overwritten</strong>.
+                        Components are only replaced if the MO is in <strong>Draft</strong> state.
+                    </div>
+
+                </sheet>
+                <footer>
+                    <button name="action_sync" type="object"
+                            string="Sync Now"
+                            class="btn btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_maeknit_sync_from_mo_wizard" model="ir.actions.act_window">
+        <field name="name">Sync to Dev MO</field>
+        <field name="res_model">maeknit.sync.from.mo.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_maeknit_sync_from_mo_wizard_form"/>
+    </record>
+
+</odoo>

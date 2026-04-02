@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_maeknit_replenishment,access.maeknit.replenishment,model_maeknit_replenishment,,1,1,1,1
+access_maeknit_replenishment_line,access.maeknit.replenishment.line,model_maeknit_replenishment_line,,1,1,1,1
+access_maeknit_replenishment_component_line,access.maeknit.replenishment.component.line,model_maeknit_replenishment_component_line,,1,1,1,1

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Work Order Restart Wizard Form View -->
+        <record id="view_workorder_restart_wizard_form" model="ir.ui.view">
+            <field name="name">workorder.restart.wizard.form</field>
+            <field name="model">workorder.restart.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Restart Work Order">
+                    <sheet>
+                        <group>
+                            <field name="workorder_id" readonly="1"/>
+                        </group>
+                        
+                        <group string="Select Restart Point">
+                            <field name="restart_option" widget="radio" nolabel="1"/>
+                        </group>
+                        
+                        <div class="alert alert-info" role="alert">
+                            <strong>Note:</strong> This will reset the selected operation to 'Ready' state and all subsequent operations to 'Waiting' state.
+                        </div>
+                    </sheet>
+                    <footer>
+                        <button name="action_restart_workorder" string="Restart" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <!-- Re-manufacturing Wizard Form View (opened from MO button) -->
+        <record id="view_remanufacture_wizard_form" model="ir.ui.view">
+            <field name="name">workorder.restart.wizard.remanufacture.form</field>
+            <field name="model">workorder.restart.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Re-manufacturing">
+                    <sheet>
+                        <field name="production_id" invisible="1"/>
+                        <field name="is_program_selected" invisible="1"/>
+                        <group string="Select the WO you want to restart from">
+                            <field name="restart_workorder_id" widget="radio" nolabel="1"
+                                   domain="[('production_id', '=', production_id), ('state', '!=', 'cancel')]"
+                                   context="{'order': 'sequence asc'}"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                        </group>
+
+                        <!-- Extra fields shown when a Program WO is selected -->
+                        <group string="PLEASE SELECT ISSUE:" invisible="not is_program_selected">
+                            <field name="issue_type" widget="radio" nolabel="1"/>
+                        </group>
+                        <group invisible="not is_program_selected">
+                            <field name="description" placeholder="Description" nolabel="1" colspan="2"/>
+                        </group>
+                        <group invisible="not is_program_selected">
+                            <field name="swatch_mo_id" string="Swatch"
+                                   domain="[('product_category', '=', 'swatch'), ('state', '!=', 'cancel')]"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                        </group>
+                        <group invisible="not is_program_selected">
+                            <field name="sketch_data" widget="excalidraw_reprogram" nolabel="1" colspan="2"/>
+                            <field name="sketch_preview" invisible="1"/>
+                        </group>
+
+                        <div class="alert alert-info" role="alert">
+                            <strong>Note:</strong> The selected operation will be reset to 'Ready' and all subsequent operations to 'Waiting'.
+                        </div>
+                    </sheet>
+                    <footer>
+                        <button name="action_remanufacture" string="Confirm" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

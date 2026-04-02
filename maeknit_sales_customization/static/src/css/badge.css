@@ -1,0 +1,19 @@
+.maeknit_badge {
+    display: inline-block;
+    background-color: green;
+    color: white;
+    font-weight: regular;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    line-height: 1.2;
+    max-height: 20px;
+    min-width: 40px;  /* optional: keeps badge from shrinking */
+    text-align: center;
+}
+
+.o_form_view .custom_new_sample {
+    background-color: #007bff !important;
+    color: #fff !important;
+    border-color: #007bff !important;
+}

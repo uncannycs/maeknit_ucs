@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="maeknit_bom_mfg_link.GarmentDocWidget">
+        <div class="garment-doc-widget" style="padding: 20px; background: #f9f9f9;">
+
+            <!-- Header with title and unit toggle -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4 class="fw-bold mb-0">Documentation</h4>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm" t-att-class="state.unit === 'inches' ? 'btn-primary' : 'btn-outline-secondary'" t-on-click="toggleUnit">
+                            Inches
+                        </button>
+                        <button type="button" class="btn btn-sm" t-att-class="state.unit === 'cm' ? 'btn-primary' : 'btn-outline-secondary'" t-on-click="toggleUnit">
+                            cm
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Card -->
+            <div class="card">
+                <div class="card-body" style="padding: 30px;">
+
+                    <!-- Machine Settings Section - Always visible and editable -->
+                    <div class="mb-4" style="border: 2px solid #dee2e6; padding: 20px; border-radius: 8px; background: white;">
+                        <h5 class="fw-bold mb-3">Machine Settings</h5>
+
+                        <!-- NP Settings Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-2">NP Settings</h6>
+                            <t t-foreach="state.np_settings" t-as="row" t-key="row_index">
+                                <div class="row mb-2 align-items-center">
+                                    <div class="col-md-10">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <label class="fw-bold mb-0" style="min-width: 40px;">NP</label>
+                                            <input type="text" 
+                                                   class="form-control form-control-sm" 
+                                                   style="width: 120px;" 
+                                                   placeholder="NP1"
+                                                   t-att-value="row.np1 || ''" 
+                                                   t-on-input="(e) => this.updateNPField(row_index, 'np1', e.target.value)" />
+                                            <input type="text" 
+                                                   class="form-control form-control-sm" 
+                                                   style="width: 120px;" 
+                                                   placeholder="NP2"
+                                                   t-att-value="row.np2 || ''" 
+                                                   t-on-input="(e) => this.updateNPField(row_index, 'np2', e.target.value)" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <!-- Show + button on last row -->
+                                        <t t-if="row_index === state.np_settings.length - 1">
+                                            <button type="button" class="btn btn-sm btn-success me-1" t-on-click="addNPRow">+</button>
+                                        </t>
+                                        <!-- Show - button when more than 1 row -->
+                                        <t t-if="state.np_settings.length > 1">
+                                            <button type="button" class="btn btn-sm btn-danger" t-on-click="() => this.removeNPRow(row_index)">-</button>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- WMF Settings Section -->
+                        <div class="mb-2">
+                            <h6 class="fw-bold mb-2">WMF Settings</h6>
+                            <t t-foreach="state.wmf_settings" t-as="row" t-key="row_index">
+                                <div class="row mb-2 align-items-center">
+                                    <div class="col-md-10">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <label class="fw-bold mb-0" style="min-width: 50px;">WMF</label>
+                                            <input type="text" 
+                                                   class="form-control form-control-sm" 
+                                                   style="width: 120px;" 
+                                                   placeholder="WMF1"
+                                                   t-att-value="row.wmf1 || ''" 
+                                                   t-on-input="(e) => this.updateWMFField(row_index, 'wmf1', e.target.value)" />
+                                            <input type="text" 
+                                                   class="form-control form-control-sm" 
+                                                   style="width: 120px;" 
+                                                   placeholder="WMF2"
+                                                   t-att-value="row.wmf2 || ''" 
+                                                   t-on-input="(e) => this.updateWMFField(row_index, 'wmf2', e.target.value)" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <!-- Show + button on last row -->
+                                        <t t-if="row_index === state.wmf_settings.length - 1">
+                                            <button type="button" class="btn btn-sm btn-success me-1" t-on-click="addWMFRow">+</button>
+                                        </t>
+                                        <!-- Show - button when more than 1 row -->
+                                        <t t-if="state.wmf_settings.length > 1">
+                                            <button type="button" class="btn btn-sm btn-danger" t-on-click="() => this.removeWMFRow(row_index)">-</button>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Takedown Measurements only loads after panel data is ready -->
+                    <t t-if="state.isLoaded and !state.isSwatch">
+                        <!-- Takedown Measurements Section -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Takedown Measurements</h5>
+
+                            <t t-if="state.panel_names.length > 0">
+                                <div class="row">
+                                    <t t-foreach="state.panel_names" t-as="panel" t-key="panel.key">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <label class="fw-bold mb-0" style="min-width: 100px;" t-esc="panel.name"/>
+                                                <input type="text" class="form-control form-control-sm" style="width: 100px;" 
+                                                       placeholder="Height" 
+                                                       t-att-value="state.takedown_measurements[panel.key]?.height || ''" 
+                                                       t-on-input="(e) => this.updateTakedownField(panel.key, 'height', e.target.value)" />
+                                                <input type="text" class="form-control form-control-sm" style="width: 100px;" 
+                                                       placeholder="Width" 
+                                                       t-att-value="state.takedown_measurements[panel.key]?.width || ''" 
+                                                       t-on-input="(e) => this.updateTakedownField(panel.key, 'width', e.target.value)" />
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted">No panels available from Panel CAD data</p>
+                            </t>
+                        </div>
+                    </t>
+                    <t t-elif="!state.isSwatch">
+                        <div class="text-center p-3">
+                            <span class="fa fa-spinner fa-spin me-2"/>
+                            Loading panel data...
+                        </div>
+                    </t>
+
+                    <!-- Additional Notes Section - ALWAYS VISIBLE -->
+                    <div class="mb-2">
+                        <h5 class="fw-bold mb-2">Additional notes:</h5>
+                        <textarea class="form-control" rows="5" 
+                                  placeholder="Regular notes" 
+                                  t-att-value="state.notes || ''" 
+                                  t-on-input="(e) => this.updateNotes(e.target.value)" />
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </t>
+</templates>

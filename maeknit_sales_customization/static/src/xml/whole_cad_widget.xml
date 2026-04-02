@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="whole_cad_widget.WholeCadWidget">
+        <div class="whole-cad-widget">
+            <!-- Image section (shared by both views) -->
+            <div class="whole-cad-image-section-top">
+                <div class="whole-cad-image-container border border-2 border-dashed rounded p-2 text-center" style="min-height: 250px; background-color: #f8f9fa;" t-on-dragover.prevent="" t-on-drop.prevent="handleDrop">
+
+                    <div t-if="state.image" class="image-display">
+                        <div class="whole-cad-zoom-container mb-2 o_cad_preview_trigger" t-on-wheel.prevent="handleWheel" t-on-mousedown="handleMouseDown" title="Click to preview">
+                            <div class="whole-cad-image-wrapper">
+                                <img t-att-src="state.image" alt="Whole Garment CAD" class="whole-cad-zoomable-image" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-1 mb-2">
+                            <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom(-0.1)">-</button>
+                            <button class="btn btn-sm btn-outline-secondary" t-on-click="fitToContainer">Fit</button>
+                            <button class="btn btn-sm btn-outline-secondary" t-on-click="resetZoom">Reset</button>
+                            <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom(0.1)">+</button>
+                            <button class="btn btn-sm btn-primary o_cad_preview_trigger ms-2">
+                                <i class="fa fa-search-plus"/> Preview
+                            </button>
+                        </div>
+
+                        <input type="file" class="d-none" accept="image/*" t-ref="fileInput" t-on-change="handleImageUpload"/>
+                        <button class="btn btn-outline-primary btn-sm" t-on-click="triggerFileInput">
+                            Replace Image
+                        </button>
+                        <button class="btn btn-danger btn-sm ms-2" t-on-click="deleteImage">
+                            <i class="fa fa-trash"/> Delete Image
+                        </button>
+                        <button
+                            class="btn btn-outline-success btn-sm ms-2"
+                            t-if="getWholeCadDownloadUrl()"
+                            t-on-click="downloadImage"
+                            title="Download image">
+                            <i class="fa fa-download"/>
+                        </button>
+                    </div>
+
+                    <div t-else="" class="whole-cad-image-placeholder">
+                        <p class="text-muted mb-1 small">Drag and drop CAD image here</p>
+                        <p class="text-muted small">or</p>
+                        <input type="file" class="d-none" accept="image/*" t-ref="fileInput" t-on-change="handleImageUpload"/>
+                        <button class="btn btn-outline-secondary btn-sm" t-on-click="triggerFileInput">
+                            Upload Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Updated measurements section to match Panel POM's minimal styling -->
+            <div class="whole-cad-measurements-section">
+                <!-- Only show tabs if maxVersion > 0 -->
+                <ul class="nav nav-tabs mb-2" t-if="state.maxVersion > 0">
+                    <li class="nav-item">
+                        <a t-att-class="'nav-link' + (state.viewMode === 'single' ? ' active' : '')" 
+                           href="#" 
+                           t-on-click.prevent="() => this.switchViewMode('single')">
+                            Default View
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a t-att-class="'nav-link' + (state.viewMode === 'compare' ? ' active' : '')" 
+                           href="#" 
+                           t-on-click.prevent="() => this.switchViewMode('compare')">
+                            Compare Revs
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Show basic table when maxVersion === 0 (no version columns) -->
+                <div t-if="state.maxVersion === 0" class="tab-content">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="btn-group" role="group">
+                            <button t-att-class="'btn btn-sm' + (state.unit === 'inches' ? ' btn-primary' : ' btn-outline-primary')" t-on-click="toggleUnit">Inches</button>
+                            <button t-att-class="'btn btn-sm' + (state.unit === 'cm' ? ' btn-primary' : ' btn-outline-primary')" t-on-click="toggleUnit">CM</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Basic table with only Point, Name, Tolerance, Request columns -->
+                    <table class="whole-cad-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 4%;"></th>
+                                <th style="width: 8%;">Point</th>
+                                <th style="width: 38%;">Measurement Name</th>
+                                <th style="width: 16%;">Tol.</th>
+                                <th style="width: 16%;">Request</th>
+                                <th style="width: 8%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="state.measurements" t-as="measurement" t-key="measurement_index"
+                                draggable="true"
+                                t-on-dragstart="(ev) => this.handleRowDragStart(ev, measurement_index)"
+                                t-on-dragover="(ev) => this.handleRowDragOver(ev)"
+                                t-on-drop="(ev) => this.handleRowDrop(ev, measurement_index)"
+                                t-on-dragend="() => this.handleRowDragEnd()">
+                                <td class="drag-handle text-center">
+                                    <span class="o_row_handle oi oi-draggable"/>
+                                </td>
+                                <td class="text-center">
+                                    <span class="point-letter" t-esc="measurement.point"/>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" data-field="name" t-att-value="measurement.name" placeholder="Enter measurement name" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'name', ev.target.value)" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'name', ev)" t-on-focus="handleInputFocus" t-on-blur="handleInputBlur" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" data-field="tolerance" t-att-value="measurement.tolerance" step="0.01" placeholder="0.00" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'tolerance', ev.target.value)" t-on-blur="(ev) => { this.formatValue(measurement_index, 'tolerance'); this.handleInputBlur(ev); }" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'tolerance', ev)" t-on-focus="handleInputFocus" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" data-field="request" t-att-value="measurement.request" step="0.01" placeholder="0.00" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'request', ev.target.value)" t-on-blur="(ev) => { this.formatValue(measurement_index, 'request'); this.handleInputBlur(ev); }" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'request', ev)" t-on-focus="handleInputFocus" />
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-danger" t-on-click="() => this.removeMeasurement(measurement_index)" title="Delete measurement">
+                                        <i class="fa fa-trash"/>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-outline-primary btn-sm" t-on-click="addMeasurement">
+                            + Add Row
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" t-on-click="addMultipleRows">
+                            + Add Multiple Rows
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" t-on-click="downloadCSV" title="Download table as CSV">
+                            <i class="fa fa-download"/> CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Single View Tab Content -->
+                <div t-if="state.viewMode === 'single' and state.maxVersion > 0" class="tab-content">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 fw-bold small">Actual:</label>
+                            <select class="form-select form-select-sm" style="width: auto;" t-on-change="onVersionChange">
+                                <t t-foreach="getVersionNumbers()" t-as="versionNum" t-key="versionNum">
+                                    <option t-att-value="versionNum" t-att-selected="versionNum === state.currentVersion ? 'selected' : undefined" t-esc="'' + versionNum"/>
+                                </t>
+                            </select>
+                        </div>
+                        
+                        <div class="btn-group" role="group">
+                            <button t-att-class="'btn btn-sm' + (state.unit === 'inches' ? ' btn-primary' : ' btn-outline-primary')" t-on-click="toggleUnit">Inches</button>
+                            <button t-att-class="'btn btn-sm' + (state.unit === 'cm' ? ' btn-primary' : ' btn-outline-primary')" t-on-click="toggleUnit">CM</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Simplified table structure to match Panel POM's clean appearance -->
+                    <table class="whole-cad-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 4%;"></th>
+                                <th style="width: 8%;">Point</th>
+                                <th style="width: 28%;">Measurement Name</th>
+                                <th style="width: 12%;">Tol.</th>
+                                <th style="width: 12%;">Request</th>
+                                <th style="width: 12%;" t-esc="'Actual:' + state.currentVersion"/>
+                                <th style="width: 12%;">+/-</th>
+                                <th style="width: 8%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="state.measurements" t-as="measurement" t-key="measurement_index"
+                                draggable="true"
+                                t-on-dragstart="(ev) => this.handleRowDragStart(ev, measurement_index)"
+                                t-on-dragover="(ev) => this.handleRowDragOver(ev)"
+                                t-on-drop="(ev) => this.handleRowDrop(ev, measurement_index)"
+                                t-on-dragend="() => this.handleRowDragEnd()">
+                                <td class="drag-handle text-center">
+                                    <span class="o_row_handle oi oi-draggable"/>
+                                </td>
+                                <td class="text-center">
+                                    <!-- Using point-letter class for circular badge like Panel POM -->
+                                    <span class="point-letter" t-esc="measurement.point"/>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" data-field="name" t-att-value="measurement.name" placeholder="Enter measurement name" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'name', ev.target.value)" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'name', ev)" t-on-focus="handleInputFocus" t-on-blur="handleInputBlur" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" data-field="tolerance" t-att-value="measurement.tolerance" step="0.01" placeholder="0.00" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'tolerance', ev.target.value)" t-on-blur="(ev) => { this.formatValue(measurement_index, 'tolerance'); this.handleInputBlur(ev); }" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'tolerance', ev)" t-on-focus="handleInputFocus" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" data-field="request" t-att-value="measurement.request" step="0.01" placeholder="0.00" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'request', ev.target.value)" t-on-blur="(ev) => { this.formatValue(measurement_index, 'request'); this.handleInputBlur(ev); }" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'request', ev)" t-on-focus="handleInputFocus" />
+                                </td>
+                                <td t-att-class="this.isOutOfTolerance(measurement.request, measurement['v' + state.currentVersion], measurement.tolerance) ? 'bg-danger bg-opacity-25' : ''">
+                                    <input type="number" class="form-control" t-att-data-field="'v' + state.currentVersion" t-att-value="measurement['v' + state.currentVersion]" step="0.01" placeholder="0.00" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'v' + state.currentVersion, ev.target.value)" t-on-blur="(ev) => { this.formatValue(measurement_index, 'v' + state.currentVersion); this.handleInputBlur(ev); }" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'v' + state.currentVersion, ev)" t-on-focus="handleInputFocus" />
+                                </td>
+                                <td class="text-center">
+                                    <span t-esc="this.calculateDifference(measurement.request, measurement['v' + state.currentVersion])"/>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-danger" t-on-click="() => this.removeMeasurement(measurement_index)" title="Delete measurement">
+                                        <i class="fa fa-trash"/>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-outline-primary btn-sm" t-on-click="addMeasurement">
+                            + Add Row
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" t-on-click="addMultipleRows">
+                            + Add Multiple Rows
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" t-on-click="downloadCSV" title="Download table as CSV">
+                            <i class="fa fa-download"/> CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Compare Versions Tab Content -->
+                <div t-if="state.viewMode === 'compare' and state.maxVersion > 0" class="tab-content">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 fw-bold small">Rev A:</label>
+                            <select class="form-select form-select-sm" style="width: auto;" t-on-change="onCompareVersionAChange">
+                                <t t-foreach="getVersionNumbers()" t-as="versionNum" t-key="versionNum">
+                                    <option t-att-value="versionNum" t-att-selected="versionNum === state.compareVersionA ? 'selected' : undefined" t-esc="'' + versionNum"/>
+                                </t>
+                            </select>
+                        </div>
+                        
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 fw-bold small">Rev B:</label>
+                            <select class="form-select form-select-sm" style="width: auto;" t-on-change="onCompareVersionBChange">
+                                <t t-foreach="getVersionNumbers()" t-as="versionNum" t-key="versionNum">
+                                    <option t-att-value="versionNum" t-att-selected="versionNum === state.compareVersionB ? 'selected' : undefined" t-esc="'' + versionNum"/>
+                                </t>
+                            </select>
+                        </div>
+                        
+                        <div class="btn-group" role="group">
+                            <button t-att-class="'btn btn-sm' + (state.unit === 'inches' ? ' btn-primary' : ' btn-outline-primary')" t-on-click="toggleUnit">Inches</button>
+                            <button t-att-class="'btn btn-sm' + (state.unit === 'cm' ? ' btn-primary' : ' btn-outline-primary')" t-on-click="toggleUnit">CM</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Comparison table with same minimal styling -->
+                    <table class="whole-cad-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 4%;"></th>
+                                <th style="width: 6%;">Point</th>
+                                <th style="width: 22%;">Measurement Name</th>
+                                <th style="width: 10%;">Tol.</th>
+                                <th style="width: 10%;">Request</th>
+                                <th style="width: 10%;" t-esc="'Actual: ' + state.compareVersionA"/>
+                                <th style="width: 10%;" t-esc="'Actual: ' + state.compareVersionB"/>
+                                <th style="width: 10%;">Diff (B-A)</th>
+                                <th style="width: 6%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="state.measurements" t-as="measurement" t-key="measurement_index"
+                                draggable="true"
+                                t-on-dragstart="(ev) => this.handleRowDragStart(ev, measurement_index)"
+                                t-on-dragover="(ev) => this.handleRowDragOver(ev)"
+                                t-on-drop="(ev) => this.handleRowDrop(ev, measurement_index)"
+                                t-on-dragend="() => this.handleRowDragEnd()">
+                                <td class="drag-handle text-center">
+                                    <span class="o_row_handle oi oi-draggable"/>
+                                </td>
+                                <td class="text-center">
+                                    <span class="point-letter" t-esc="measurement.point"/>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" data-field="name" t-att-value="measurement.name" placeholder="Enter measurement name" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'name', ev.target.value)" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'name', ev)" t-on-focus="handleInputFocus" t-on-blur="handleInputBlur" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" data-field="tolerance" t-att-value="measurement.tolerance" step="0.01" placeholder="0.00" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'tolerance', ev.target.value)" t-on-blur="(ev) => { this.formatValue(measurement_index, 'tolerance'); this.handleInputBlur(ev); }" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'tolerance', ev)" t-on-focus="handleInputFocus" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" data-field="request" t-att-value="measurement.request" step="0.01" placeholder="0.00" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'request', ev.target.value)" t-on-blur="(ev) => { this.formatValue(measurement_index, 'request'); this.handleInputBlur(ev); }" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'request', ev)" t-on-focus="handleInputFocus" />
+                                </td>
+                                <td t-att-class="this.isOutOfTolerance(measurement.request, measurement['v' + state.compareVersionA], measurement.tolerance) ? 'bg-danger bg-opacity-25' : ''">
+                                    <input type="number" class="form-control" t-att-data-field="'v' + state.compareVersionA" t-att-value="measurement['v' + state.compareVersionA]" step="0.01" placeholder="0.00" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'v' + state.compareVersionA, ev.target.value)" t-on-blur="(ev) => { this.formatValue(measurement_index, 'v' + state.compareVersionA); this.handleInputBlur(ev); }" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'v' + state.compareVersionA, ev)" t-on-focus="handleInputFocus" />
+                                </td>
+                                <td t-att-class="this.isOutOfTolerance(measurement.request, measurement['v' + state.compareVersionB], measurement.tolerance) ? 'bg-danger bg-opacity-25' : ''">
+                                    <input type="number" class="form-control" t-att-data-field="'v' + state.compareVersionB" t-att-value="measurement['v' + state.compareVersionB]" step="0.01" placeholder="0.00" t-on-input="(ev) => this.updateMeasurement(measurement_index, 'v' + state.compareVersionB, ev.target.value)" t-on-blur="(ev) => { this.formatValue(measurement_index, 'v' + state.compareVersionB); this.handleInputBlur(ev); }" t-on-keydown="(ev) => this.handleInputKeyDown(measurement_index, 'v' + state.compareVersionB, ev)" t-on-focus="handleInputFocus" />
+                                </td>
+                                <td class="text-center">
+                                    <span t-esc="this.calculateVersionDifference(measurement['v' + state.compareVersionA], measurement['v' + state.compareVersionB])"/>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-danger" t-on-click="() => this.removeMeasurement(measurement_index)" title="Delete measurement">
+                                        <i class="fa fa-trash"/>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-outline-primary btn-sm" t-on-click="addMeasurement">
+                            + Add Row
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" t-on-click="addMultipleRows">
+                            + Add Multiple Rows
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" t-on-click="downloadCSV" title="Download table as CSV">
+                            <i class="fa fa-download"/> CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="whole_cad_widget.AddRowsDialog">
+        <Dialog title="'Add Multiple Rows'" size="'sm'">
+            <div class="p-1">
+                <p class="text-muted small mb-3">Enter the number of measurement rows to append to the table.</p>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <label class="form-label fw-semibold mb-0" style="white-space: nowrap;">Number of rows</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        style="width: 90px;"
+                        min="1"
+                        max="200"
+                        t-ref="countInput"
+                        t-att-value="state.count"
+                        t-on-input="onInput"
+                        t-on-keydown="onKeydown"
+                    />
+                </div>
+                <div t-if="isValid" class="alert alert-info py-2 px-3 mb-0 small">
+                    <i class="fa fa-info-circle me-1"/>
+                    Will add <strong><t t-esc="state.count"/></strong> row(s):
+                    <span class="badge bg-secondary ms-1 me-1" t-esc="startLabel"/>
+                    <t t-if="state.count > 1">
+                        through
+                        <span class="badge bg-secondary ms-1" t-esc="endLabel"/>
+                    </t>
+                </div>
+            </div>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="onConfirm" t-att-disabled="!isValid ? 'disabled' : undefined">
+                    <i class="fa fa-plus me-1"/> Add Rows
+                </button>
+                <button class="btn btn-secondary ms-2" t-on-click="() => props.close()">
+                    Cancel
+                </button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

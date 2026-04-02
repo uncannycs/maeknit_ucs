@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <div t-name="maeknit_sale_replenishment.ReplenishmentOverviewComponent" class="o_action d-flex flex-column h-100 overflow-hidden">
+        <div class="o_content flex-grow-1 overflow-auto">
+            <div class="container-fluid py-3">
+                 <h1>Procurement Overview: <t t-esc="state.orderName"/></h1>
+                 <div t-if="state.lines.length === 0" class="alert alert-info mt-3">
+                    No BOMs found for the products in this order.
+                 </div>
+                 
+                 <t t-foreach="state.lines" t-as="line" t-key="line.lineId">
+                     <div class="card mt-3">
+                        <div class="card-header">
+                            <h4 class="m-0"><t t-esc="line.productName"/></h4>
+                        </div>
+                        <div class="card-body p-0">
+                             <BomOverviewTable
+                                uomName="line.uomName"
+                                showOptions="line.showOptions"
+                                currentWarehouseId="line.currentWarehouse.id"
+                                data="line.bomData"
+                                precision="line.precision"
+                                changeFolded="(foldInfo) => this.onChangeFolded(line, foldInfo)" 
+                             />
+                        </div>
+                     </div>
+                 </t>
+            </div>
+        </div>
+    </div>
+</templates>

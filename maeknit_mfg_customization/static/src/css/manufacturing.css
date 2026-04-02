@@ -1,0 +1,377 @@
+/* Styling for manufacturing views */
+
+/* Sample indicator styling */
+.badge-sample {
+  background-color: #17a2b8;
+  color: white;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+
+/* Styling for attribute fields */
+.attribute-field {
+  font-weight: bold;
+  color: #495057;
+}
+
+ .text-content{
+  min-height: 200px;
+ }
+
+/* Styling for machine fields */
+.machine-field {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Styling for quality check indicators */
+.quality-passed {
+  color: #28a745;
+}
+
+.quality-failed {
+  color: #dc3545;
+}
+
+/* Styling for work order status */
+.workorder-status-pending {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.workorder-status-progress {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.workorder-status-done {
+  background-color: #28a745;
+  color: white;
+}
+
+/* Styling for machine compatibility section */
+.machine-compatibility {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.machine-compatibility .o_field_widget {
+  margin-bottom: 5px;
+}
+
+/* Styling for detailed instructions */
+.detailed-instructions {
+  background-color: #f8f9fa;
+  border-left: 3px solid #6c757d;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+/* Styling for setup instructions */
+.setup-instructions {
+  border-left: 3px solid #17a2b8;
+}
+
+/* Styling for quality check instructions */
+.quality-instructions {
+  border-left: 3px solid #28a745;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+/* Styling for expected vs actual time */
+.time-exceeded {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.time-under {
+  color: #28a745;
+  font-weight: bold;
+}
+
+/* Styling for sample production indicators */
+.is-sample-badge {
+  background-color: #17a2b8;
+  color: white;
+  font-size: 0.8em;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 5px;
+}
+
+/* Styling for the field when it contains an existing value */
+.bom-attribute-field.o_field_many2one input {
+  border-left: 3px solid #dc3545;
+}
+
+/* Dropdown option styling for existing values */
+.o_m2o_dropdown_option.existing-bom-value {
+  background-color: #f8d7da;
+  border-left: 3px solid #dc3545;
+}
+
+.o_m2o_dropdown_option.existing-bom-value:hover {
+  background-color: #f5c6cb;
+}
+
+/* New styles for the indicator */
+.o_indicator_container {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #ffffff;
+}
+
+.o_indicator_label {
+  font-weight: bold;
+  margin-right: 10px;
+  font-size: 1.1em;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.o_indicator_boxes {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid #dee2e6; /* Light grey outer border for the group of boxes */
+  border-radius: 4px;
+  overflow: hidden; /* Ensures inner borders align correctly and clip excess */
+  flex-grow: 1;
+}
+
+.o_indicator_box {
+  padding: 8px 15px;
+  background-color: white; /* Default background for BOM-connected but inactive */
+  color: #212529; /* Default text color for BOM-connected but inactive */
+  font-weight: bold;
+  border-right: 1px solid #28a745; /* Green separator border for BOM-connected */
+  border-bottom: 1px solid #28a745; /* Green separator border for BOM-connected */
+  text-align: center;
+  box-sizing: border-box;
+  flex: 1 1 25%; /* 4 items per row */
+  max-width: 25%;
+}
+
+/* Remove right border for the last item in each row */
+.o_indicator_box:nth-child(4n) {
+  border-right: none;
+}
+
+/* Style for the currently active (selected) run */
+.o_indicator_box.o_indicator_box_active {
+  background-color: #28a745; /* Green background for active */
+  color: white; /* White text for active */
+  border-color: #28a745; /* Ensure green border for active box */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .o_indicator_box {
+    flex: 1 1 50%; /* 2 items per row on smaller screens */
+    max-width: 50%;
+  }
+  /* Re-apply green right border for 4th item if it's not 2nd in a row */
+  .o_indicator_box:nth-child(4n) {
+    border-right: 1px solid #28a745;
+  }
+  /* Remove right border for the 2nd item in a row */
+  .o_indicator_box:nth-child(2n) {
+    border-right: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .o_indicator_box {
+    flex: 1 1 100%; /* 1 item per row on very small screens */
+    max-width: 100%;
+    border-right: none; /* No right border when only one item per row */
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Global list cell default — restore Odoo's native single-line behaviour.
+   Every column clips to one line with "…" unless opted-in below.
+   ───────────────────────────────────────────────────────────────────── */
+.o_list_renderer .o_list_table tbody > tr > td:not(.o_list_record_selector):not(.o_handle_cell):not(.o_list_button):not(.o_list_record_remove):not(.o_list_record_open_form_view) {
+  --fieldWidget-display: block;
+  display: table-cell;
+  white-space: nowrap;       /* single line — Odoo default */
+  overflow: hidden;          /* clip overflow */
+  text-overflow: ellipsis;   /* show … when clipped */
+}
+
+/* ── Columns that SHOULD wrap (opt-in) ──────────────────────────────── */
+/* Add data-field names here if you want a column to show multiple lines */
+.o_list_renderer td[data-field='employee_assigned_ids'] {
+  white-space: normal;
+  word-break: break-word;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+/* Layout/tightening adjustments for work order list & sidebar */
+.o_main_navbar {
+  width: 220px;
+  min-width: 220px;
+}
+.o_main_navbar .o_main_navbar_footer,
+.o_main_navbar .o_main_navbar_menu,
+.o_main_navbar .o_main_navbar_content {
+  width: 220px;
+}
+.o_applications_nav,
+.o_menu_toggle_button {
+  width: 220px;
+}
+
+.maeknit-mrp-list .o_list_table th,
+.maeknit-mrp-list .o_list_table td {
+  padding: 0.35rem 0.55rem;
+  vertical-align: middle;
+}
+
+.maeknit-mrp-list .o_list_table th[data-field='name'],
+.maeknit-mrp-list .o_list_table td[data-field='name'] {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.maeknit-mrp-list .o_list_table th[data-field='employee_assigned_ids'],
+.maeknit-mrp-list .o_list_table td[data-field='employee_assigned_ids'] {
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.maeknit-mrp-list .o_list_table th[data-field='product_id'],
+.maeknit-mrp-list .o_list_table td[data-field='product_id'],
+.maeknit-mrp-list .o_list_table th[data-field='partner_id'],
+.maeknit-mrp-list .o_list_table td[data-field='partner_id'] {
+  white-space: nowrap;
+}
+
+.maeknit-mrp-list .o_list_table td[data-field='state'] {
+  min-width: 100px;
+}
+
+.maeknit-mrp-list .o_list_table td .o_badge {
+  display: inline-flex;
+}
+
+/* Work Orders list: freeze checkbox + Product columns — horizontal scroll */
+
+/* ── CHECKBOX column (col 1) ─────────────────────────────────── */
+/* data cells */
+.maeknit-workorder-sticky .o_list_record_selector {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 3 !important;
+  background-color: #fff;
+}
+/* header cell — use nth-child because Odoo doesn't copy class to <th> */
+.maeknit-workorder-sticky thead tr th:nth-child(1) {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 5 !important;
+  background-color: #f8f9fa;
+}
+.maeknit-workorder-sticky tr:hover .o_list_record_selector {
+  background-color: #f0f0f0;
+}
+.maeknit-workorder-sticky tr.o_selected_row .o_list_record_selector {
+  background-color: #e8f4ff;
+}
+
+/* ── PRODUCT column (col 2) — right after the 40px checkbox ──── */
+/* data cells (class applied by Odoo to <td> only) */
+.maeknit-sticky-product {
+  position: sticky !important;
+  left: 40px !important;
+  z-index: 2 !important;
+  background-color: #fff;
+  box-shadow: 3px 0 8px -3px rgba(0, 0, 0, 0.18);
+  min-width: 300px !important;
+  width: 300px !important;
+}
+/* header cell — nth-child because class doesn't reach <th> */
+.maeknit-workorder-sticky thead tr th:nth-child(2) {
+  position: sticky !important;
+  left: 40px !important;
+  z-index: 4 !important;
+  background-color: #f8f9fa;
+  box-shadow: 3px 0 8px -3px rgba(0, 0, 0, 0.18);
+  min-width: 300px !important;
+  width: 300px !important;
+}
+tr:hover .maeknit-sticky-product,
+tr.o_data_row:hover .maeknit-sticky-product {
+  background-color: #f0f0f0;
+}
+tr.o_selected_row .maeknit-sticky-product {
+  background-color: #e8f4ff;
+}
+
+/* Workorder attachment wizard: issue type select */
+.note-issue-field .o_select_menu_toggler,
+.note-issue-field .o_select_menu,
+.note-issue-field select {
+  border: 1.5px solid #ced4da !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  background-color: #fff !important;
+  width: 100% !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.note-issue-field .o_select_menu_toggler:hover,
+.note-issue-field select:hover {
+  border-color: #adb5bd !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* spacing below the issue type row */
+.note-issue-field {
+  margin-bottom: 10px;
+}
+
+/* Workorder attachment wizard: note textarea */
+.note-text-field textarea {
+  border: 1.5px solid #ced4da !important;
+  border-radius: 6px !important;
+  padding: 10px 14px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  min-height: 90px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.note-text-field textarea:focus {
+  border-color: #6c757d !important;
+  box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  outline: none;
+}
+
+/* (product/partner/lead columns are covered by the global rule above) */
+
+@media (max-width: 1200px) {
+  .o_main_navbar {
+    width: 190px;
+    min-width: 190px;
+  }
+  .o_main_navbar .o_main_navbar_footer,
+  .o_main_navbar .o_main_navbar_menu,
+  .o_main_navbar .o_main_navbar_content {
+    width: 190px;
+  }
+  body {
+    --o-main-width: 190px;
+  }
+  .maeknit-mrp-list .o_list_table th,
+  .maeknit-mrp-list .o_list_table td {
+    padding: 0.25rem 0.45rem;
+  }
+}

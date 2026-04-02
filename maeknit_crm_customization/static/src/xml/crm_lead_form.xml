@@ -1,0 +1,1837 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="crm_lead_widget.CrmLeadWidget" owl="1">
+    <div class="o_crm_lead_owl_form">
+        <!-- Title -->
+        <div class="p-3 bg-light border-bottom">
+            <h3 class="mb-0">CRM Lead</h3>
+        </div>
+        
+        <!-- Loading indicator -->
+        <div t-if="state.isLoading" class="d-flex justify-content-center p-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        
+        <!-- Main Form -->
+        <t t-if="!state.isLoading">
+            <t t-call="crm_owl_example.TopSection"/>
+            <t t-call="crm_owl_example.TabsSection"/>
+        </t>
+
+        <!-- Bottom Section with save/cancel buttons -->
+        <div class="p-4 border-top">
+            <div class="d-flex justify-content-between">
+                <button class="btn btn-warning" t-on-click="manualReset">
+                        Clear Form
+                </button>
+            </div>
+        </div>
+    </div>
+    </t>
+
+    <!-- Top Section Template -->
+    <t t-name="crm_owl_example.TopSection">
+    <div class="o_crm_top_section p-4">
+        <!-- Row 1 -->
+        <div class="form-row mb-3">
+            <!-- Left Column -->
+            <div class="form-col">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Project Type</label>
+                    <div class="o_project_type_toggle">
+                        <label class="o_project_type_label">
+                            <input 
+                                type="radio" 
+                                name="project_type" 
+                                value="collection" 
+                                t-att-checked="state.formData.x_project_type === 'collection'" 
+                                t-on-change="onProjectTypeChange" 
+                                class="o_project_type_radio"
+                            />
+                            Collection
+                        </label>
+                        <label class="o_project_type_label o_disabled_option">
+                            <input 
+                                type="radio" 
+                                name="project_type" 
+                                value="style" 
+                                t-att-checked="state.formData.x_project_type === 'style'" 
+                                t-on-change="onProjectTypeChange" 
+                                class="o_project_type_radio"
+                                disabled="disabled"
+                            />
+                            Style
+                        </label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="project_name"> Collection Name <span class="text-danger">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        t-att-class="{'is-invalid': !state.formData.name &amp;&amp; state.isDirty}"
+                        id="project_name"
+                        t-att-value="state.formData.name"
+                        t-on-input="onInputChange"
+                        t-on-blur="onNameBlur"
+                        data-field="name"
+                        required="required"
+                    />
+                    <div t-if="!state.formData.name &amp;&amp; state.isDirty" class="invalid-feedback">
+                        Collection Name is required
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="client_brand">
+                        Client <span class="text-danger">*</span>
+                    </label>
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Input - 80% -->
+                        <div class="flex-grow-1" style="flex-basis: 85%;">
+                            <div class="position-relative">
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    t-att-class="{'is-invalid': !state.formData.partner_id &amp;&amp; state.isDirty}"
+                                    id="client_brand"
+                                    t-ref="partner_input"
+                                    t-att-value="state.searchState.partnerSearch || (state.formData.partner_id ? state.formData.partner_id[1] : '')"
+                                    placeholder="Search for a company..."
+                                    t-on-input="onPartnerSearchChange"
+                                    t-on-focus="onPartnerFocus"
+                                    t-on-keydown="onPartnerKeyDown"
+                                    t-on-blur="onPartnerBlur"
+                                    autocomplete="off"
+                                    required="required"
+                                />
+                                <div 
+                                    t-if="state.searchState.showPartnerDropdown &amp;&amp; state.searchState.filteredPartners.length > 0" 
+                                    class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm z-index-dropdown"
+                                    style="z-index: 1000;"
+                                >
+                                    <ul class="list-group list-group-flush">
+                                        <t t-foreach="state.searchState.filteredPartners" t-as="partner" t-key="partner[0]">
+                                            <li 
+                                                class="list-group-item list-group-item-action"
+                                                t-att-class="{'active': state.searchState.selectedPartnerIndex === partner_index}"
+                                                t-on-click="() => this.onPartnerSelect(partner[0], partner[1])"
+                                                t-on-mouseenter="() => this.onPartnerItemHover(partner_index)"
+                                                t-att-data-partner-id="partner[0]"
+                                                t-att-data-partner-name="partner[1]"
+                                            >
+                                                <span t-esc="partner[1]"/>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <!-- Button - 20% -->
+                        <div style="flex-basis: 15%; min-width: 20px;">
+                            <button type="button" class="btn btn-sm w-100" style="background-color: #28a745; color: #ffffff" t-on-click="createContactInline">
+                                New 
+                            </button>
+                        </div>
+                    </div>
+                    <div t-if="!state.formData.partner_id &amp;&amp; state.isDirty" class="invalid-feedback d-block">
+                        Client is required
+                    </div>
+                </div>
+                
+
+                <div class="mb-3 email-field" style="margin-top: 1.5rem;">
+                    <label class="form-label fw-bold" for="partner_email">Email</label>
+                    <input 
+                        type="email" 
+                        class="form-control" 
+                        id="partner_email" 
+                        t-att-value="state.formData.email" 
+                        t-on-input="onEmailChange" 
+                        placeholder="Contact email address"
+                        readonly="readonly"
+                    />
+                
+                </div>
+                
+
+                <t t-if="state.formData.x_project_type === 'style'">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="parent_id">Parent Lead</label>
+                        <div class="position-relative">
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="parent_id"
+                                t-ref="parent_lead_input"
+                                t-att-value="state.searchState.parentLeadSearch || (state.formData.parent_id ? state.formData.parent_id[1] : '')"
+                                placeholder="Search for a parent lead..."
+                                t-on-input="onParentLeadSearchChange"
+                                t-on-focus="onParentLeadFocus"
+                                t-on-keydown="onParentLeadKeyDown"
+                                t-on-blur="onParentLeadBlur"
+                                autocomplete="off"
+                            />
+                            <div 
+                                t-if="state.searchState.showParentLeadDropdown &amp;&amp; state.searchState.filteredLeads.length > 0" 
+                                class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm z-index-dropdown"
+                                style="z-index: 1000;"
+                            >
+                                <ul class="list-group list-group-flush">
+                                    <t t-foreach="state.searchState.filteredLeads" t-as="lead" t-key="lead[0]">
+                                        <li 
+                                            class="list-group-item list-group-item-action" 
+                                            t-att-class="{'active': state.searchState.selectedParentLeadIndex === lead_index}"
+                                            t-on-click="() => this.onParentLeadSelect(lead[0], lead[1])"
+                                            t-on-mouseenter="() => this.onParentLeadItemHover(lead_index)"
+                                            t-att-data-lead-id="lead[0]"
+                                            t-att-data-lead-name="lead[1]"
+                                        >
+                                            <span t-esc="lead[1]"/>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+                    
+                
+                <!-- Add Season/Drop Date field -->
+                <div class="mb-3" t-if="state.formData.x_project_type !== 'collection'">
+                    <label class="form-label fw-bold" for="season_drop_date"> Season/ Drop Date
+                    </label>
+                    <input type="date" class="form-control" id="season_drop_date" t-att-value="state.formData.season_drop_date" t-on-input="onInputChange" data-field="season_drop_date" />
+                </div>
+                
+                <!-- Expected Revenue and Priority in left column -->
+                <div class="form-row mb-3" t-if="state.formData.x_project_type !== 'collection'">
+                    <!-- Expected Revenue -->
+                    <div class="form-col">
+                        <div class="mb-2">
+                            <label class="form-label fw-bold">Expected Revenue</label>
+                            <div class="form-control bg-light d-flex align-items-center">
+                                <span class="fw-bold" t-esc="formattedRevenue"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Priority -->
+                    <div class="form-col" t-if="state.formData.x_project_type !== 'collection'">
+                        <div class="mb-2">
+                            <label class="form-label fw-bold" for="priority">Priority</label>
+                            <select class="form-select" id="priority" t-att-value="state.formData.priority.toString()" t-on-change="onPriorityChange">
+                                <t t-foreach="priorityOptions" t-as="option" t-key="option.value">
+                                    <option t-att-value="option.value" t-att-selected="state.formData.priority.toString() === option.value">
+                                        <t t-esc="option.label"/>
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div class="form-col">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Interested In
+                    </label>
+                    <div class="form-control p-3" style="height: auto; min-height: 40px;">
+                        <!-- Select All checkbox -->
+                        <div class="form-check mb-2 border-bottom pb-2">
+                            <input type="checkbox" 
+                                class="form-check-input" 
+                                id="select_all_services" 
+                                t-att-checked="areAllServicesSelected()" 
+                                t-on-change="onToggleSelectAllServices" />
+                            <label class="form-check-label fw-bold" for="select_all_services">Select All Services</label>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <t t-foreach="state.availableTags" t-as="tag" t-key="tag[0]">
+                                <div class="form-check me-2">
+                                    <input type="checkbox" class="form-check-input" t-att-id="'tag_' + tag[0]" t-att-checked="isTagSelected(tag[0])" t-on-change="onTagChange" t-att-data-tag-id="tag[0]" />
+                                    <label class="form-check-label" t-att-for="'tag_' + tag[0]" t-esc="tag[1]"/>
+                                </div>
+                            </t>
+                        </div>
+                        <t t-if="state.availableTags.length === 0">
+                            <small class="text-muted">
+                                (No services available or still loading...)
+                            </small>
+                        </t>
+                    </div>
+                </div>
+
+                
+                <!-- Add the Company field to the template. Add this after the Sales Person field -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="company">Lab</label>
+                    <div class="position-relative">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="company"
+                            t-ref="company_input"
+                            t-att-value="state.searchState.companySearch || (state.formData.company_id ? state.formData.company_id[1] : '')"
+                            placeholder="Search for a company..."
+                            t-on-input="onCompanySearchChange"
+                            t-on-focus="onCompanyFocus"
+                            t-on-keydown="onCompanyKeyDown"
+                            t-on-blur="onCompanyBlur"
+                            autocomplete="off"
+                        />
+                        <div 
+                            t-if="state.searchState.showCompanyDropdown &amp;&amp; state.searchState.filteredCompanies.length > 0" 
+                            class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm"
+                            style="z-index: 1000;"
+                        >
+                            <ul class="list-group list-group-flush">
+                                <t t-foreach="state.searchState.filteredCompanies" t-as="company" t-key="company[0]">
+                                    <li 
+                                        class="list-group-item list-group-item-action" 
+                                        t-att-class="{'active': state.searchState.selectedCompanyIndex === company_index}"
+                                        t-on-click="() => this.onCompanySelect(company[0], company[1])"
+                                        t-on-mouseenter="() => this.onCompanyItemHover(company_index)"
+                                        t-att-data-company-id="company[0]"
+                                        t-att-data-company-name="company[1]"
+                                    >
+                                        <span t-esc="company[1]"/>
+                                    </li>
+                                </t>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="sales_person">Sales Person</label>
+                    <div class="position-relative">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="sales_person"
+                            t-ref="user_input"
+                            t-att-value="state.searchState.userSearch || (state.formData.user_id ? state.formData.user_id[1] : '')"
+                            placeholder="Search for a sales person..."
+                            t-on-input="onUserSearchChange"
+                            t-on-focus="onUserFocus"
+                            t-on-keydown="onUserKeyDown"
+                            t-on-blur="onUserBlur"
+                            autocomplete="off"
+                        />
+                        <div 
+                            t-if="state.searchState.showUserDropdown &amp;&amp; state.searchState.filteredUsers.length > 0" 
+                            class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm"
+                            style="z-index: 1000;"
+                        >
+                            <ul class="list-group list-group-flush">
+                                <t t-foreach="state.searchState.filteredUsers" t-as="user" t-key="user[0]">
+                                    <li 
+                                        class="list-group-item list-group-item-action" 
+                                        t-att-class="{'active': state.searchState.selectedUserIndex === user_index}"
+                                        t-on-click="() => this.onUserSelect(user[0], user[1])"
+                                        t-on-mouseenter="() => this.onUserItemHover(user_index)"
+                                        t-att-data-user-id="user[0]"
+                                        t-att-data-user-name="user[1]"
+                                    >
+                                        <span t-esc="user[1]"/>
+                                    </li>
+                                </t>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Email field in right column, aligned with Expected Revenue -->
+                
+            </div>
+        </div>
+        
+        <!-- Service-specific Revenue Section with white background - 6x1 layout -->
+        <div t-if="state.formData.tag_ids &amp;&amp; state.formData.tag_ids.length > 0 &amp;&amp; state.formData.x_project_type !== 'collection'"  
+            class="mb-3 p-3 border rounded bg-white">
+            <h5 class="mb-2">Service-specific Revenue</h5>
+            <div class="row g-2">
+                <t t-foreach="state.formData.tag_ids" t-as="tag" t-key="tag[0]">
+                    <div class="col-md-2 mb-2">
+                        <label class="form-label mb-1" t-att-for="'service_revenue_' + tag[0]" t-esc="tag[1]"></label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text" t-esc="state.formData.currency_symbol || '$'"></span>
+                            <input type="number" class="form-control" t-att-id="'service_revenue_' + tag[0]" t-att-value="getServiceRevenue(tag[0])" t-on-input="(e) => this.onServiceRevenueChange(e, tag[0])" placeholder="0" />
+                        </div>
+                    </div>
+                </t>
+            </div>
+            <div class="d-flex justify-content-end mt-2">
+                <span class="fw-bold">Total: <span t-esc="formattedTotalServiceRevenue"></span></span>
+            </div>
+        </div>
+        
+    </div>
+    </t>
+
+    <!-- Tabs Section Template -->
+    <t t-name="crm_owl_example.TabsSection">
+    <div class="o_crm_bottom_section p-4">
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs o_crm_tabs mb-3">
+            <t t-if="state.formData.x_project_type === 'collection'">
+                <li class="nav-item">
+                    <!-- Added data-tab attribute for product repository tab -->
+                    <a class="nav-link" 
+                        data-tab="children"
+                        t-att-class="{'active': state.formData.activeTab === 'children'}"
+                        t-on-click="() => this.switchTab('children')">
+                        Products
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <!-- Added data-tab attribute for swatching service tab -->
+                    <a class="nav-link" 
+                        data-tab="swatching"
+                        t-att-class="{'active': state.formData.activeTab === 'swatching'}"
+                        t-on-click="() => this.switchTab('swatching')">
+                        Swatching
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <!-- Added data-tab attribute for development service tab -->
+                    <a class="nav-link" 
+                        data-tab="development"
+                        t-att-class="{'active': state.formData.activeTab === 'development'}"
+                        t-on-click="() => this.switchTab('development')">
+                        Development
+                    </a>
+                </li>
+                <!--
+                <li class="nav-item">
+                     Added data-tab attribute for reverse engineering service tab 
+                    <a class="nav-link" 
+                        data-tab="reverse"
+                        t-att-class="{'active': state.formData.activeTab === 'reverse'}"
+                        t-on-click="() => this.switchTab('reverse')">
+                        Reverse Eng.
+                    </a>
+                </li>
+                -->
+                <li class="nav-item">
+                    <!-- Added data-tab attribute for grading service tab -->
+                    <a class="nav-link" 
+                        data-tab="grading"
+                        t-att-class="{'active': state.formData.activeTab === 'grading'}"
+                        t-on-click="() => this.switchTab('grading')">
+                        Grading
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <!-- Added data-tab attribute for production service tab -->
+                    <a class="nav-link" 
+                        data-tab="production"
+                        t-att-class="{'active': state.formData.activeTab === 'production'}"
+                        t-on-click="() => this.switchTab('production')">
+                        Production
+                    </a>
+                </li>
+            </t>
+            <t t-if="state.formData.x_project_type != 'collection'">
+                <li class="nav-item">
+                    <!-- Added data-tab attribute for onboarding tab -->
+                    <a class="nav-link" 
+                        data-tab="onboarding"
+                        t-att-class="{'active': state.formData.activeTab === 'onboarding'}"
+                        t-on-click="() => this.switchTab('onboarding')">
+                        Onboarding
+                    </a>                
+                </li>
+            </t>
+            <li class="nav-item">
+                <!-- Added data-tab attribute for internal notes tab -->
+                <a class="nav-link" 
+                    data-tab="gemini"
+                    t-att-class="{'active': state.formData.activeTab === 'gemini'}"
+                    t-on-click="() => this.switchTab('gemini')">
+                    Internal Notes
+                </a>
+            </li>
+        </ul>
+        
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Onboarding Tab -->
+            <t t-if="state.formData.activeTab === 'onboarding'" t-call="crm_owl_example.OnboardingTab"/>
+            
+            <!-- Child Opportunities Tab -->
+            <t t-if="state.formData.activeTab === 'children'" t-call="crm_owl_example.ChildOpportunitiesTab"/>
+            
+            <!-- Gemini Notes Tab -->
+            <t t-if="state.formData.activeTab === 'gemini'" t-call="crm_owl_example.GeminiTab"/>
+
+            <!-- Swatching Tab -->
+            <t t-if="state.formData.activeTab === 'swatching'" t-call="crm_owl_example.SwatchingTab"/>
+
+            <!-- Development Tab -->
+            <t t-if="state.formData.activeTab === 'development'" t-call="crm_owl_example.DevelopmentTab"/>
+
+            <!-- Reverse Engineering Tab 
+            <t t-if="state.formData.activeTab === 'reverse'" t-call="crm_owl_example.ReverseEngTab"/>
+            -->
+            <!-- Grading Tab -->
+            <t t-if="state.formData.activeTab === 'grading'" t-call="crm_owl_example.GradingTab"/>
+
+            <!-- Production Tab -->
+            <t t-if="state.formData.activeTab === 'production'" t-call="crm_owl_example.ProductionTab"/>
+        </div>
+    </div>
+    </t>
+
+    <!-- Child Opportunities Tab Template -->
+    <t t-name="crm_owl_example.ChildOpportunitiesTab">
+        <div class="tab-pane active">
+            <div class="card">
+                <div class="card-body">
+                    <t t-if="state.childOpportunitiesRows &amp;&amp; state.childOpportunitiesRows.length > 0">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Style</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Saved (with ID), newest last -->
+                                    <t t-foreach="state.childOpportunitiesRows" t-as="child" t-key="child.tempId">
+                                        <tr>
+                                            <td>
+                                                <input type="text" 
+                                                    class="form-control form-control-sm" 
+                                                    t-att-value="child.name" 
+                                                    t-on-input="(e) => this.onChildFieldChange(e, child.tempId, 'name')"
+                                                    placeholder="Garment Name"/>
+                                            </td>
+                                            <td>
+                                                <input type="text" 
+                                                    class="form-control form-control-sm" 
+                                                    t-att-value="child.style_family" 
+                                                    readonly="readonly"
+                                                    placeholder="LP-001"/>
+                                            </td>
+                                            <td>
+                                                <a t-att-href="'/web#id=' + child.id + '&amp;model=crm.lead&amp;view_type=form'" class="btn btn-sm btn-outline-primary me-2">
+                                                    View
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-danger" t-on-click="() => this.deleteChildOpportunity(child.tempId, child.id)">
+                                                    <i class="fa fa-trash"/>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                
+                                    <!-- Unsaved (no ID), always at bottom -->
+                                    <t t-foreach="state.childOpportunitiesRows.filter(o => !o.id)" t-as="child" t-key="child.tempId">
+                                        <tr>
+                                            <td>
+                                                <input type="text" 
+                                                    class="form-control form-control-sm" 
+                                                    t-att-value="child.name" 
+                                                    t-on-input="(e) => this.onChildFieldChange(e, child.tempId, 'name')"
+                                                    placeholder="Garment Name"/>
+                                            </td>
+                                            <td>
+                                                <input type="text" 
+                                                    class="form-control form-control-sm" 
+                                                    t-att-value="child.style_family" 
+                                                    readonly="readonly"
+                                                    placeholder="LP-001"/>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-danger" t-on-click="() => this.deleteChildOpportunity(child.tempId, child.id)">
+                                                    <i class="fa fa-trash"/>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                
+                            </table>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="alert alert-info">
+                            No child opportunities found. Click the '+' button below to add a new row.
+                        </div>
+                    </t>
+                    <!-- Added Generate button to the right of Add Products button -->
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-sm btn-primary" t-on-click="addChildOpportunityRow">
+                            <i class="fa fa-plus me-1"></i> Add Products
+                        </button>
+                        <button type="button" class="btn btn-sm btn-success" t-on-click="generateStyles">
+                            Update Styles
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Onboarding Tab Template -->
+    <t t-name="crm_owl_example.OnboardingTab">
+    <div class="tab-pane active">
+        <div class="o_sections_container">
+            <!-- Column 1: General Information (Always visible) -->
+            <t t-call="crm_owl_example.GeneralSection"/>
+            
+            <!-- Column 2: Swatch Service (visible if service is selected) -->
+            <t t-if="isServiceSelected('Swatch Service')" t-call="crm_owl_example.SwatchSection"/>
+            
+            <!-- Column 3: Production (visible if service is selected) -->
+            <t t-if="isServiceSelected('Production')" t-call="crm_owl_example.ProductionSection"/>
+            
+            <!-- If a column is not visible, add an empty column to maintain the 3-column layout -->
+            <div t-if="!isServiceSelected('Swatch Service')" class="o_section_column"></div>
+            <div t-if="!isServiceSelected('Production')" class="o_section_column"></div>
+        </div>
+    </div>
+    </t>
+
+    <!-- General Section Template -->
+    <t t-name="crm_owl_example.GeneralSection">
+    <div class="o_section_column">
+        <div class="o_general_section bg-white p-3 border rounded mt-0">
+            <h5>General Information</h5>
+            
+            <!-- Silhouette (single field) -->
+            <div class="o_service_field">
+                <label for="silhouette">Silhouette</label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="silhouette" 
+                    t-att-value="state.formData.onboardingData.general.silhouette"
+                    t-on-input="(e) => this.onGeneralFieldChange(e, 'silhouette')"
+                />
+            </div>
+            
+            <!-- Raw Materials (multiple fields with + button) -->
+            <div class="o_field_group">
+                <div class="o_field_group_header">
+                    <label>Raw Material</label>
+                    <button type="button" class="o_add_button" t-on-click="() => this.addArrayItem('rawMaterials')">+</button>
+                </div>
+                <t t-foreach="state.formData.onboardingData.general.rawMaterials" t-as="material" t-key="material_index">
+                    <div class="o_field_item">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            t-att-value="material"
+                            t-on-input="(e) => this.onArrayFieldChange(e, 'rawMaterials', material_index)"
+                        />
+                        <button 
+                            t-if="state.formData.onboardingData.general.rawMaterials.length > 1" 
+                            type="button" 
+                            class="o_remove_button" 
+                            t-on-click="() => this.removeArrayItem('rawMaterials', material_index)"
+                        >-</button>
+                    </div>
+                </t>
+            </div>
+            
+            <!-- Colors (multiple fields with + button) -->
+            <div class="o_field_group">
+                <div class="o_field_group_header">
+                    <label>Color</label>
+                    <button type="button" class="o_add_button" t-on-click="() => this.addArrayItem('colors')">+</button>
+                </div>
+                <t t-foreach="state.formData.onboardingData.general.colors" t-as="color" t-key="color_index">
+                    <div class="o_field_item">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            t-att-value="color"
+                            t-on-input="(e) => this.onArrayFieldChange(e, 'colors', color_index)"
+                        />
+                        <button 
+                            t-if="state.formData.onboardingData.general.colors.length > 1" 
+                            type="button" 
+                            class="o_remove_button" 
+                            t-on-click="() => this.removeArrayItem('colors', color_index)"
+                        >-</button>
+                    </div>
+                </t>
+            </div>
+            
+            <!-- Gauge (single field) -->
+            <div class="o_service_field">
+                <label for="gauge">Gauge</label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="gauge" 
+                    t-att-value="state.formData.onboardingData.general.gauge"
+                    t-on-input="(e) => this.onGeneralFieldChange(e, 'gauge')"
+                />
+            </div>
+            
+            <!-- Stitch Constructions (multiple fields with + button) -->
+            <div class="o_field_group">
+                <div class="o_field_group_header">
+                    <label>Stitch Construction</label>
+                    <button type="button" class="o_add_button" t-on-click="() => this.addArrayItem('stitchConstructions')">+</button>
+                </div>
+                <t t-foreach="state.formData.onboardingData.general.stitchConstructions" t-as="stitch" t-key="stitch_index">
+                    <div class="o_field_item">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            t-att-value="stitch"
+                            t-on-input="(e) => this.onArrayFieldChange(e, 'stitchConstructions', stitch_index)"
+                        />
+                        <button 
+                            t-if="state.formData.onboardingData.general.stitchConstructions.length > 1" 
+                            type="button" 
+                            class="o_remove_button" 
+                            t-on-click="() => this.removeArrayItem('stitchConstructions', stitch_index)"
+                        >-</button>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </div>
+    </t>
+
+    <!-- Swatch Section Template -->
+    <t t-name="crm_owl_example.SwatchSection">
+    <div class="o_section_column">
+        <div class="o_swatch_section bg-white p-3 border rounded mt-0">
+            <h5>Swatch Service</h5>
+            
+            <div class="o_swatch_controls mb-3">
+                <label for="numberOfSwatches">Number of Swatches:</label>
+                <select 
+                    class="form-select" 
+                    id="numberOfSwatches"
+                    t-att-value="state.formData.onboardingData.swatchPackage.numberOfSwatches"
+                    t-on-change="onSwatchCountChange"
+                    style="width: auto;"
+                >
+                    <t t-foreach="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 
+                    25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+                    ]" t-as="num" t-key="num">
+                        <option 
+                            t-att-value="num" 
+                            t-att-selected="state.formData.onboardingData.swatchPackage.numberOfSwatches === num"
+                        >
+                            <t t-esc="num"/>
+                        </option>
+                    </t>
+                </select>
+                <button type="button" class="o_add_button ms-2" t-on-click="addSwatch">+</button>
+            </div>
+            
+            <!-- Collapsible Swatch containers -->
+            <div class="accordion" id="swatchAccordion">
+                <t t-foreach="state.formData.onboardingData.swatchPackage.swatches" t-as="swatch" t-key="swatch_index">
+                    <div class="accordion-item mb-2">
+                        <h2 class="accordion-header" t-att-id="'swatchHeading' + swatch_index">
+                            <button 
+                                class="accordion-button" 
+                                t-att-class="{'collapsed': !isSwatchExpanded(swatch_index)}"
+                                type="button" 
+                                data-bs-toggle="collapse" 
+                                t-att-data-bs-target="'#swatchCollapse' + swatch_index" 
+                                aria-expanded="true" 
+                                t-att-aria-controls="'swatchCollapse' + swatch_index"
+                                t-on-click="(e) => this.toggleSwatch(e, swatch_index)"
+                            >
+                                Swatch <t t-esc="swatch_index + 1"/>
+                            </button>
+                        </h2>
+                        <div 
+                            t-att-id="'swatchCollapse' + swatch_index" 
+                            class="accordion-collapse collapse" 
+                            t-att-class="{'show': isSwatchExpanded(swatch_index)}"
+                            t-att-aria-labelledby="'swatchHeading' + swatch_index" 
+                            data-bs-parent="#swatchAccordion"
+                        >
+                            <div class="accordion-body">
+                                <div class="o_service_field">
+                                    <label t-att-for="'material_' + swatch_index">Material</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        t-att-id="'material_' + swatch_index" 
+                                        t-att-value="swatch.material"
+                                        t-on-input="(e) => this.onSwatchFieldChange(e, swatch_index, 'material')"
+                                    />
+                                </div>
+                                <div class="o_service_field">
+                                    <label t-att-for="'gauge_swatch_' + swatch_index">Gauge</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        t-att-id="'gauge_swatch_' + swatch_index" 
+                                        t-att-value="swatch.gauge"
+                                        t-on-input="(e) => this.onSwatchFieldChange(e, swatch_index, 'gauge')"
+                                    />
+                                </div>
+                                <div class="o_service_field">
+                                    <label t-att-for="'stitch_' + swatch_index">Stitch</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        t-att-id="'stitch_' + swatch_index" 
+                                        t-att-value="swatch.stitch"
+                                        t-on-input="(e) => this.onSwatchFieldChange(e, swatch_index, 'stitch')"
+                                    />
+                                </div>
+                                <div class="o_service_field">
+                                    <label t-att-for="'colorway_' + swatch_index">Colorway</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        t-att-id="'colorway_' + swatch_index" 
+                                        t-att-value="swatch.colorway"
+                                        t-on-input="(e) => this.onSwatchFieldChange(e, swatch_index, 'colorway')"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </div>
+    </t>
+
+    <!-- Production Section Template -->
+    <t t-name="crm_owl_example.ProductionSection">
+    <div class="o_section_column">
+        <div class="o_production_section bg-white p-3 border rounded mt-0">
+            <h5>Production</h5>
+            
+            <!-- Colorways -->
+            <div class="o_production_array_field">
+                <div class="o_production_array_header">
+                    <label>Colorways</label>
+                    <button type="button" class="o_add_button" t-on-click="addColorway">+</button>
+                </div>
+                <t t-foreach="state.formData.onboardingData.production.colorways" t-as="colorway" t-key="colorway_index">
+                    <div class="o_production_array_item">
+                        <span class="index"><t t-esc="colorway_index + 1"/>.</span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            t-att-value="colorway"
+                            t-on-input="(e) => this.onProductionFieldChange(e, 'colorways', colorway_index)"
+                        />
+                        <button 
+                            type="button" 
+                            class="o_remove_button" 
+                            t-on-click="() => this.removeColorway(colorway_index)"
+                        >-</button>
+                    </div>
+                </t>
+            </div>
+            
+            <!-- Sizes -->
+            <div class="o_production_array_field">
+                <div class="o_production_array_header">
+                    <label>Sizes</label>
+                    <button type="button" class="o_add_button" t-on-click="addSize">+</button>
+                </div>
+                <t t-foreach="state.formData.onboardingData.production.sizes" t-as="size" t-key="size_index">
+                    <div class="o_production_array_item">
+                        <span class="index"><t t-esc="size_index + 1"/>.</span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            t-att-value="size"
+                            t-on-input="(e) => this.onProductionFieldChange(e, 'sizes', size_index)"
+                        />
+                        <button 
+                            type="button" 
+                            class="o_remove_button" 
+                            t-on-click="() => this.removeSize(size_index)"
+                        >-</button>
+                    </div>
+                </t>
+            </div>
+            
+            <!-- Budget per Style -->
+            <div class="o_production_field">
+                <label for="budgetPerStyle">Budget per Style</label>
+                <div class="input-group">
+                    <span class="input-group-text" t-esc="state.formData.currency_symbol || '$'"></span>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="budgetPerStyle" 
+                        t-att-value="state.formData.onboardingData.production.budgetPerStyle"
+                        t-on-input="(e) => this.onProductionFieldChange(e, 'budgetPerStyle')"
+                    />
+                </div>
+            </div>
+            
+            <!-- Units -->
+            <div class="o_production_field">
+                <label for="units">Units</label>
+                <input 
+                    type="number" 
+                    class="form-control" 
+                    id="units" 
+                    t-att-value="state.formData.onboardingData.production.units"
+                    t-on-input="(e) => this.onProductionFieldChange(e, 'units')"
+                />
+            </div>
+            
+            <!-- Country of Production -->
+            <div class="o_production_field">
+                <label for="countryOfProduction">Country of Production</label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="countryOfProduction" 
+                    t-att-value="state.formData.onboardingData.production.countryOfProduction"
+                    t-on-input="(e) => this.onProductionFieldChange(e, 'countryOfProduction')"
+                />
+            </div>
+        </div>
+    </div>
+    </t>
+
+    <!-- Gemini Tab Template -->
+    <t t-name="crm_owl_example.GeminiTab">
+    <div class="tab-pane active">
+        <div class="form-group">
+            <label for="geminiNotes" class="form-label fw-bold">Notes</label>
+            <textarea 
+                class="form-control" 
+                id="geminiNotes" 
+                style="height: auto; min-height: 240px;" 
+                rows="10" 
+                t-att-value="state.formData.geminiNotes"
+                t-on-input="onGeminiNotesChange"
+                placeholder="Enter notes here..."
+            ></textarea>
+        </div>
+    </div>
+    </t>
+
+    <!-- Simplified Swatching Tab -->
+    <t t-name="crm_owl_example.SwatchingTab">
+    <div class="tab-pane active">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Items to include in quote</h5>
+                        
+                    </div>
+                    <div class="card-body">
+                        <t t-if="getSwatchItems().length > 0">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 30px;">
+                                                <input type="checkbox"
+                                                    t-att-checked="areAllSwatchesSelected()"
+                                                    t-on-change="onToggleSelectAllSwatches"/>
+                                            </th>
+                                            <th>Name</th>
+                                            <th>Style code</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                        <tbody>
+                                            <t t-foreach="getSwatchItems()" t-as="swatch" t-key="swatch.tempId">
+                                                <!-- Added quoted item CSS classes to swatch items -->
+                                                <tr t-att-class="getItemCssClasses(swatch.tempId, swatch.styleCode, 'swatch')">
+                                                    <td>
+                                                        <input type="checkbox" 
+                                                            t-att-checked="isSwatchItemSelected(swatch.tempId)" 
+                                                            t-on-change="(e) => this.onSwatchItemSelect(e, swatch.tempId)"/>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" 
+                                                            class="form-control form-control-sm" 
+                                                            t-att-value="swatch.name" 
+                                                            t-on-input="(e) => this.onSwatchFieldChange(e, swatch.tempId, 'name')"
+                                                            placeholder="Swatch name"/>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-secondary" t-esc="swatch.styleCode"/>
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-sm btn-danger" t-on-click="() => this.removeSwatchItem(swatch.tempId)">
+                                                            <i class="fa fa-trash"/>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                </table>
+                                
+                            </div>
+                            <!-- Service Price section at bottom right -->
+                            <div class="d-flex justify-content-end mt-3">
+                                <div class="d-flex align-items-center">
+                                    <label class="form-label me-2 mb-0 fw-bold">Service Price</label>
+                                        <div class="input-group" style="width: 140px;">
+                                            <span class="input-group-text" t-esc="state.formData.currency_symbol || '$'"></span>
+                                            <input type="text" 
+                                                class="form-control" 
+                                                inputmode="decimal"
+                                                t-att-value="getSwatchServicePrice()" 
+                                                t-on-input="onSwatchServicePriceInput"
+                                                t-on-blur="onSwatchServicePriceCommit"
+                                                placeholder="250"/>
+                                        </div>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-info">
+                                No swatch items available. Click "Add Swatch" to create swatch items for quoting.
+                            </div>
+                        </t>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-sm btn-primary" t-on-click="addSwatchItem">
+                                <i class="fa fa-plus me-1"></i> Add Swatch
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success" t-on-click="generateSwatchQuote">
+                                Generate Quote
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Related Sales Orders</h5>
+                    </div>
+                    <div class="card-body">
+                        <t t-if="state.relatedSalesOrders &amp;&amp; state.relatedSalesOrders.length > 0">
+                            <ul class="list-group list-group-flush">
+                                <t t-foreach="state.relatedSalesOrders" t-as="order" t-key="order.id">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                        <div class="d-flex flex-column">
+                                            <a t-att-href="'/web#id=' + order.id + '&amp;model=sale.order&amp;view_type=form'" 
+                                               target="_blank" 
+                                               class="text-decoration-none fw-bold">
+                                                <t t-esc="order.name"/>
+                                            </a>
+                                            <small class="text-muted">
+                                                <t t-esc="order.state_display"/> • <t t-esc="order.date_order"/>
+                                                <t t-if="order.x_quoted_style_families">
+                                                    <br/>Styles: <t t-esc="order.x_quoted_style_families"/>
+                                                </t>
+                                            </small>
+                                        </div>
+                                    </li>
+                                    <div class="d-flex justify-content-end">
+                                        <span class="badge rounded-pill"  style="max-width: 100px; margin-top: 5px; background-color: rgba(111, 66, 193, 0.2); color: #6f42c1;">
+                                            <t t-esc="formatCurrency(order.amount_total)"/>
+                                        </span>
+                                    </div>
+                                    
+                                </t>
+                            </ul>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-info mb-0">
+                                <i class="fa fa-info-circle me-2"></i>
+                                No swatching quotes found for this CRM lead.
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</t>
+
+    <!-- Development Tab -->
+    <t t-name="crm_owl_example.DevelopmentTab">
+        <div class="tab-pane active">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Items to include in quote</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="getProductItems().length > 0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 30px;">
+                                                    <input type="checkbox"
+                                                        t-att-checked="areAllDevItemsSelected()"
+                                                        t-on-change="onToggleSelectAllDevItems"/>
+                                                </th>
+                                                <th>Name</th>
+                                                <th>Style</th>
+                                                <th>Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Saved development items in reverse order -->
+                                            <t t-foreach="getProductItems()" t-as="item" t-key="item.tempId">
+                                                <!-- Added quoted item CSS classes to development items -->
+                                                <t t-set="priceKey" t-value="item.id || item.tempId"/>
+                                                <tr t-att-class="getItemCssClasses(item.id, item.style_family, 'development')">
+                                                    <td>
+                                                        <input type="checkbox" 
+                                                            t-att-checked="isDevelopmentItemSelected(item.id)" 
+                                                            t-on-change="(e) => this.onDevelopmentItemSelect(e, item.id)"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-esc="item.name"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-esc="item.style_family"/>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text" t-esc="state.formData.currency_symbol || '$'"></span>
+                                                            <input type="text" 
+                                                                class="form-control" 
+                                                                inputmode="decimal"
+                                                                t-att-value="getDevelopmentPrice(priceKey)" 
+                                                                t-on-input="(e) => this.onDevelopmentPriceInput(e, priceKey)"
+                                                                t-on-blur="() => this.onDevelopmentPriceCommit(priceKey)"
+                                                                placeholder="0"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        
+                                            <!-- Unsaved development items at the bottom -->
+                                            <t t-foreach="getProductItems().filter(i => !i.id)" t-as="item" t-key="item.tempId">
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" 
+                                                            t-att-checked="isDevelopmentItemSelected(item.id)" 
+                                                            t-on-change="(e) => this.onDevelopmentItemSelect(e, item.id)"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-esc="item.name"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-esc="item.style_family"/>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text" t-esc="state.formData.currency_symbol || '$'"></span>
+                                                            <input type="text" 
+                                                                class="form-control" 
+                                                                inputmode="decimal"
+                                                                t-att-value="getDevelopmentPrice(item.id || item.tempId)" 
+                                                                t-on-input="(e) => this.onDevelopmentPriceInput(e, item.id || item.tempId)"
+                                                                t-on-blur="() => this.onDevelopmentPriceCommit(item.id || item.tempId)"
+                                                                placeholder="0"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>                                        
+                                    </table>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-info">
+                                    No items available for development quote.
+                                    <t t-if="state.formData.x_project_type === 'collection'">
+                                        Add child opportunities in the "Products" tab.
+                                    </t>
+                                </div>
+                            </t>
+                            <div class="d-flex justify-content-end mt-3">
+                                <button type="button" class="btn btn-success" t-on-click="generateDevelopmentQuote">
+                                    Generate Quote
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Related Sales Orders</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="state.relatedSalesOrders &amp;&amp; state.relatedSalesOrders.length > 0">
+                                <ul class="list-group list-group-flush">
+                                    <t t-foreach="state.relatedSalesOrders" t-as="order" t-key="order.id">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                            <div class="d-flex flex-column">
+                                                <a t-att-href="'/web#id=' + order.id + '&amp;model=sale.order&amp;view_type=form'" 
+                                                   target="_blank" 
+                                                   class="text-decoration-none fw-bold">
+                                                    <t t-esc="order.name"/>
+                                                </a>
+                                                <small class="text-muted">
+                                                    <t t-esc="order.state_display"/> • <t t-esc="order.date_order"/>
+                                                    <t t-if="order.x_quoted_style_families">
+                                                        <br/>Styles: <t t-esc="order.x_quoted_style_families"/>
+                                                    </t>
+                                                </small>
+                                            </div>
+                                            
+                                        </li>
+                                        <div class="d-flex justify-content-end">
+                                            <span class="badge rounded-pill"  style="max-width: 100px; margin-top: 5px; background-color: rgba(111, 66, 193, 0.2); color: #6f42c1;">
+                                                <t t-esc="formatCurrency(order.amount_total)"/>
+                                            </span>
+                                        </div>
+                                        
+                                    </t>
+                                </ul>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-info mb-0">
+                                    <i class="fa fa-info-circle me-2"></i>
+                                    No development quotes found for this CRM lead.
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Reverse Engineering Tab -->
+    <t t-name="crm_owl_example.ReverseEngTab">
+        <div class="tab-pane active">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Items to include in quote</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="getReverseItems().length > 0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 30px;">
+                                                    <input type="checkbox"
+                                                        t-att-checked="areAllReverseItemsSelected()"
+                                                        t-on-change="onToggleSelectAllReverseItems"/>
+                                                </th>
+                                                <th>Name</th>
+                                                <th>Style</th>
+                                                <th>Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Saved reverse items in reverse order -->
+                                            <t t-foreach="getReverseItems()" t-as="item" t-key="item.tempId">
+                                                <!-- Added quoted item CSS classes to reverse engineering items -->
+                                                <t t-set="priceKey" t-value="item.id || item.tempId"/>
+                                                <tr t-att-class="getItemCssClasses(item.id, item.style_family, 'reverse')">
+                                                    <td>
+                                                        <input type="checkbox" 
+                                                            t-att-checked="isReverseItemSelected(item.id)" 
+                                                            t-on-change="(e) => this.onReverseItemSelect(e, item.id)"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-esc="item.name"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-esc="item.style_family"/>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text" t-esc="state.formData.currency_symbol || '$'"></span>
+                                                            <input type="text" 
+                                                                class="form-control" 
+                                                                inputmode="decimal"
+                                                                t-att-value="getReversePrice(priceKey)" 
+                                                                t-on-input="(e) => this.onReversePriceInput(e, priceKey)"
+                                                                t-on-blur="() => this.onReversePriceCommit(priceKey)"
+                                                                placeholder="0"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        
+                                            <!-- Unsaved reverse items at bottom -->
+                                            <t t-foreach="getReverseItems().filter(i => !i.id)" t-as="item" t-key="item.tempId">
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" 
+                                                            t-att-checked="isReverseItemSelected(item.id)" 
+                                                            t-on-change="(e) => this.onReverseItemSelect(e, item.id)"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-esc="item.name"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-esc="item.style_family"/>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text" t-esc="state.formData.currency_symbol || '$'"></span>
+                                                            <input type="text" 
+                                                                class="form-control" 
+                                                                inputmode="decimal"
+                                                                t-att-value="getReversePrice(item.id || item.tempId)" 
+                                                                t-on-input="(e) => this.onReversePriceInput(e, item.id || item.tempId)"
+                                                                t-on-blur="() => this.onReversePriceCommit(item.id || item.tempId)"
+                                                                placeholder="0"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-info">
+                                    No items available for reverse engineering quote.
+                                    <t t-if="state.formData.x_project_type === 'collection'">
+                                        Add child opportunities in the "Products" tab.
+                                    </t>
+                                </div>
+                            </t>
+                            <div class="d-flex justify-content-end mt-3">
+                                <button type="button" class="btn btn-success" t-on-click="generateReverseQuote">
+                                    Generate Quote
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Related Sales Orders</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="state.relatedSalesOrders &amp;&amp; state.relatedSalesOrders.length > 0">
+                                <ul class="list-group list-group-flush">
+                                    <t t-foreach="state.relatedSalesOrders" t-as="order" t-key="order.id">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                            <div class="d-flex flex-column">
+                                                <a t-att-href="'/web#id=' + order.id + '&amp;model=sale.order&amp;view_type=form'" 
+                                                   target="_blank" 
+                                                   class="text-decoration-none fw-bold">
+                                                    <t t-esc="order.name"/>
+                                                </a>
+                                                <small class="text-muted">
+                                                    <t t-esc="order.state_display"/> • <t t-esc="order.date_order"/>
+                                                    <t t-if="order.x_quoted_style_families">
+                                                        <br/>Styles: <t t-esc="order.x_quoted_style_families"/>
+                                                    </t>
+                                                </small>
+                                            </div>
+                                            
+                                        </li>
+                                        <div class="d-flex justify-content-end">
+                                            <span class="badge rounded-pill"  style="max-width: 100px; margin-top: 5px; background-color: rgba(111, 66, 193, 0.2); color: #6f42c1;">
+                                                <t t-esc="formatCurrency(order.amount_total)"/>
+                                            </span>
+                                        </div>
+                                    </t>
+                                </ul>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-info mb-0">
+                                    <i class="fa fa-info-circle me-2"></i>
+                                    No reverse engineering quotes found for this CRM lead.
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Grading Tab -->
+    <t t-name="crm_owl_example.GradingTab">
+        <div class="tab-pane active">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Items to include in quote</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="getProductItems().length > 0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 30px;">
+                                                    <input type="checkbox"
+                                                        t-att-checked="areAllGradesSelected()"
+                                                        t-on-change="onToggleSelectAllGrades"/>
+                                                </th>
+                                                <th>Name</th>
+                                                <th>Style</th>
+                                                <th>Sizes</th>
+                                            </tr>
+                                        </thead>
+                                            <tbody>
+                                                <!-- Saved grading items in reverse order -->
+                                                <t t-foreach="getGradingItems().filter(i => i.id)" t-as="item" t-key="item.tempId">
+                                                  <!-- Added quoted item CSS classes to grading items -->
+                                                  <tr t-att-class="getItemCssClasses(item.id, item.style_family, 'grading')">
+                                                    <td>
+                                                      <input type="checkbox"
+                                                             t-att-checked="isGradingItemSelected(item.id)"
+                                                             t-on-change="(e) => this.onGradingItemSelect(e, item.id)"/>
+                                                    </td>
+                                                    <td>
+                                                      <span t-esc="item.name"/>
+                                                    </td>
+                                                    <td>
+                                                      <span t-esc="item.style_family"/>
+                                                    </td>
+                                                    <td>
+                                                      <div class="d-flex align-items-center flex-wrap gap-1">
+                                                        <t t-set="tempId" t-value="item.id"/>
+                                                        <t t-set="sizes" t-value="getGradingSizes(tempId)"/>
+                                              
+                                                        <!-- Render each size input -->
+                                                        <t t-foreach="sizes" t-as="size" t-foreach-index="size_index" t-key="size_index">
+                                                          <div class="input-group input-group-sm" style="width: 60px;">
+                                                            <input type="text"
+                                                                   class="form-control"
+                                                                   t-att-value="size"
+                                                                   t-on-input="(e) => this.onGradingSizeChange(e, tempId, size_index)"
+                                                                   placeholder=""/>
+                                                          </div>
+                                                        </t>
+                                              
+                                                        <!-- Remove last size -->
+                                                        <t t-if="sizes.length > 1">
+                                                          <button type="button" class="btn btn-sm btn-danger"
+                                                                  t-on-click="() => this.removeGradingSize(tempId, sizes.length - 1)">
+                                                            <i class="fa fa-trash"/>
+                                                          </button>
+                                                        </t>
+                                              
+                                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                                                t-on-click="() => this.addGradingSize(tempId)">
+                                                          <i class="fa fa-plus"/>
+                                                        </button>
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                </t>
+                                              
+                                                <!-- Unsaved grading items -->
+                                                <t t-foreach="getGradingItems().filter(i => !i.id)" t-as="item" t-key="item.tempId">
+                                                  <tr>
+                                                    <td>
+                                                      <input type="checkbox"
+                                                             t-att-checked="isGradingItemSelected(item.id)"
+                                                             t-on-change="(e) => this.onGradingItemSelect(e, item.id)"/>
+                                                    </td>
+                                                    <td>
+                                                      <span t-esc="item.name"/>
+                                                    </td>
+                                                    <td>
+                                                      <span t-esc="item.style_family"/>
+                                                    </td>
+                                                    <td>
+                                                      <div class="d-flex align-items-center flex-wrap gap-1">
+                                                        <t t-set="tempId" t-value="item.tempId"/>
+                                                        <t t-set="sizes" t-value="getGradingSizes(tempId)"/>
+                                              
+                                                        <!-- Render each size input -->
+                                                        <t t-foreach="sizes" t-as="size" t-foreach-index="size_index" t-key="size_index">
+                                                          <div class="input-group input-group-sm" style="width: 60px;">
+                                                            <input type="text"
+                                                                   class="form-control"
+                                                                   t-att-value="size"
+                                                                   t-on-input="(e) => this.onGradingSizeChange(e, tempId, size_index)"
+                                                                   placeholder=""/>
+                                                          </div>
+                                                        </t>
+                                              
+                                                        <!-- Remove last size -->
+                                                        <t t-if="sizes.length > 1">
+                                                          <button type="button" class="btn btn-sm btn-danger"
+                                                                  t-on-click="() => this.removeGradingSize(tempId, sizes.length - 1)">
+                                                            <i class="fa fa-trash"/>
+                                                          </button>
+                                                        </t>
+                                              
+                                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                                                t-on-click="() => this.addGradingSize(tempId)">
+                                                          <i class="fa fa-plus"/>
+                                                        </button>
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                </t>                                              
+                                            </tbody>
+                                    </table>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-info">
+                                    No items available for grading quote.
+                                    <t t-if="state.formData.x_project_type === 'collection'">
+                                        Add child opportunities in the "Products" tab.
+                                    </t>
+                                </div>
+                            </t>
+                            <div class="d-flex justify-content-end mt-3">
+                                <button type="button" class="btn btn-success" t-on-click="generateGradingQuote">
+                                    Generate Quote
+                                </button>
+                            </div>
+                        </div>
+                            <div class="d-flex justify-content-end mt-3">
+                                <div class="d-flex align-items-center">
+                                    <label class="form-label me-2 mb-0 fw-bold">Price per Grade</label>
+                                    <div class="input-group" style="width: 140px;">
+                                        <span class="input-group-text" t-esc="state.formData.currency_symbol || '$'"></span>
+                                        <input type="text" 
+                                            class="form-control" 
+                                            inputmode="decimal"
+                                            t-att-value="getGradingPricePerGrade()" 
+                                            t-on-input="onGradingPricePerGradeInput"
+                                            t-on-blur="onGradingPricePerGradeCommit"
+                                            placeholder="300"/>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Related Sales Orders</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="state.relatedSalesOrders &amp;&amp; state.relatedSalesOrders.length > 0">
+                                <ul class="list-group list-group-flush">
+                                    <t t-foreach="state.relatedSalesOrders" t-as="order" t-key="order.id">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                            <div class="d-flex flex-column">
+                                                <a t-att-href="'/web#id=' + order.id + '&amp;model=sale.order&amp;view_type=form'" 
+                                                   target="_blank" 
+                                                   class="text-decoration-none fw-bold">
+                                                    <t t-esc="order.name"/>
+                                                </a>
+                                                <small class="text-muted">
+                                                    <t t-esc="order.state_display"/> • <t t-esc="order.date_order"/>
+                                                    <t t-if="order.x_quoted_style_families">
+                                                        <br/>Styles: <t t-esc="order.x_quoted_style_families"/>
+                                                    </t>
+                                                </small>
+                                            </div>
+                                            
+                                        </li>
+                                        <div class="d-flex justify-content-end">
+                                            <span class="badge rounded-pill"  style="max-width: 100px; margin-top: 5px; background-color: rgba(111, 66, 193, 0.2); color: #6f42c1;">
+                                                <t t-esc="formatCurrency(order.amount_total)"/>
+                                            </span>
+                                        </div>
+                                        
+                                    </t>
+                                </ul>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-info mb-0">
+                                    <i class="fa fa-info-circle me-2"></i>
+                                    No grading quotes found for this CRM lead.
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Production Tab -->
+    <t t-name="crm_owl_example.ProductionTab">
+        <div class="tab-pane active">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Production Quote</h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Manual product search (always visible) -->
+                        <div class="position-relative">
+                            <input type="text"
+                                class="form-control form-control-sm"
+                                style="width: 200px"
+                                placeholder="Add product manually..."
+                                t-att-value="state.searchState.manualProductSearch"
+                                t-on-input="onManualProductSearchInput"
+                                t-on-blur="onManualProductSearchBlur"/>
+                            <t t-if="state.searchState.showManualProductDropdown">
+                                <ul class="dropdown-menu show position-absolute w-100" style="top:100%;left:0;z-index:1050;max-height:200px;overflow-y:auto">
+                                    <t t-foreach="state.searchState.filteredManualProducts" t-as="mp" t-key="mp.id">
+                                        <li>
+                                            <a class="dropdown-item"
+                                               t-att-class="{'active': mp_index === state.searchState.selectedManualProductIndex}"
+                                               t-on-mouseenter="() => this.onManualProductHover(mp_index)"
+                                               t-on-mousedown="() => this.selectManualProduct(mp.id, mp.name)">
+                                                <t t-esc="mp.name"/>
+                                            </a>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </t>
+                        </div>
+                        <t t-if="hasProductionGridData()">
+                            <button type="button" class="btn btn-sm btn-secondary" t-on-click="saveProductionGrid">
+                                <i class="fa fa-save me-1"></i> Save
+                            </button>
+                        </t>
+                        <button type="button" class="btn btn-sm btn-warning" t-on-click="generatePricesFromCost">
+                            <i class="fa fa-usd me-1"></i> Generate Prices from Cost
+                        </button>
+                        <button type="button" class="btn btn-sm btn-success" t-on-click="generateQuoteFromProductionGrid">
+                            <i class="fa fa-file-text me-1"></i> Generate Quote
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <t t-if="hasProductionGridData()">
+                        <div class="table-responsive" style="overflow-x: auto;">
+                            <table class="table table-bordered table-sm production-grid-table">
+                                <colgroup>
+                                    <col style="width: 120px"/>
+                                    <col style="width: 80px"/>
+                                    <t t-foreach="state.formData.productionGrid.all_sizes" t-as="size" t-key="'colgroup_' + size">
+                                        <col style="width: 70px"/>
+                                    </t>
+                                    <col style="width: 90px"/>
+                                    <col style="width: 50px"/>
+                                </colgroup>
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="align-middle">Product</th>
+                                        <th class="align-middle text-center">Colorway</th>
+                                        <t t-foreach="state.formData.productionGrid.all_sizes" t-as="size" t-key="'header_' + size">
+                                            <th class="text-center">
+                                                <t t-esc="size"/>
+                                            </th>
+                                        </t>
+                                        <th class="text-center">Price</th>
+                                        <th class="text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.formData.productionGrid.products" t-as="product" t-key="product.id">
+                                        <!-- Product without variants: single row -->
+                                        <t t-if="!product.has_variants">
+                                            <tr>
+                                                <td class="align-middle fw-bold">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span t-esc="product.name"/>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-primary"
+                                                                t-on-click="() => this.openVariantWizard(product.id)"
+                                                                title="Add Size/Colorway Variants">
+                                                            <i class="fa fa-plus"></i> Add Variants
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">-</td>
+                                                <t t-foreach="state.formData.productionGrid.all_sizes" t-as="size" t-key="'cell_' + product.id + '_' + size">
+                                                    <td>
+                                                        <input type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                            min="0"
+                                                            t-att-value="getProductionGridCellValue(product.id, 0, 0, 'quantity')"
+                                                            t-on-input="(e) => this.onProductionGridCellChange(product.id, 0, 0, 'quantity', e)"
+                                                            placeholder="0"/>
+                                                    </td>
+                                                </t>
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text" t-esc="state.formData.productionGrid.currency_symbol || '$'"></span>
+                                                        <input type="number"
+                                                            class="form-control form-control-sm"
+                                                            min="0"
+                                                            step="0.01"
+                                                            t-att-value="getProductionGridCellValue(product.id, 0, 0, 'price')"
+                                                            t-on-input="(e) => this.onProductionGridCellChange(product.id, 0, 0, 'price', e)"
+                                                            placeholder="0.00"/>
+                                                    </div>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            t-on-click="() => this.removeProductFromProduction(product.id)"
+                                                            title="Remove from production">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </t>
+
+                                        <!-- Product with variants: multiple rows with merged product name -->
+                                        <t t-if="product.has_variants and product.colorways and product.colorways.length > 0">
+                                            <t t-foreach="product.colorways" t-as="colorway" t-key="colorway.id">
+                                                <tr>
+                                                    <!-- Product name cell (merged) -->
+                                                    <t t-if="colorway_index === 0">
+                                                        <td t-att-rowspan="product.colorways.length" class="align-middle fw-bold">
+                                                            <div class="d-flex flex-column gap-1">
+                                                                <span t-esc="product.name"/>
+                                                                <button type="button"
+                                                                        class="btn btn-sm btn-outline-primary"
+                                                                        t-on-click="() => this.openVariantWizard(product.id)"
+                                                                        title="Add Size/Colorway Variants">
+                                                                    <i class="fa fa-plus"></i> Add Variants
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </t>
+
+                                                    <!-- Colorway cell -->
+                                                    <td class="align-middle text-center">
+                                                        <t t-esc="colorway.name"/>
+                                                    </td>
+
+                                                    <!-- Size cells (quantities) - iterate through ALL sizes in order -->
+                                                    <t t-foreach="state.formData.productionGrid.all_sizes" t-as="allSize" t-key="'cell_' + product.id + '_' + colorway.id + '_' + allSize">
+                                                        <t t-set="matchingSize" t-value="product.sizes ? product.sizes.find(s => s.name === allSize) : null"/>
+                                                        <t t-if="matchingSize">
+                                                            <!-- Size exists in product - render input -->
+                                                            <td>
+                                                                <input type="number"
+                                                                    class="form-control form-control-sm text-center"
+                                                                    min="0"
+                                                                    t-att-value="getProductionGridCellValue(product.id, matchingSize.id, colorway.id, 'quantity')"
+                                                                    t-on-input="(e) => this.onProductionGridCellChange(product.id, matchingSize.id, colorway.id, 'quantity', e)"
+                                                                    placeholder="0"/>
+                                                            </td>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <!-- Size doesn't exist in product - render empty cell -->
+                                                            <td class="bg-light"></td>
+                                                        </t>
+                                                    </t>
+
+                                                    <!-- Price cell (one per colorway row) -->
+                                                    <td>
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text" t-esc="state.formData.productionGrid.currency_symbol || '$'"></span>
+                                                            <input type="number"
+                                                                class="form-control form-control-sm"
+                                                                min="0"
+                                                                step="0.01"
+                                                                t-att-value="getProductionGridCellValue(product.id, 0, colorway.id, 'price')"
+                                                                t-on-input="(e) => this.onProductionGridCellChange(product.id, 0, colorway.id, 'price', e)"
+                                                                placeholder="0.00"/>
+                                                        </div>
+                                                    </td>
+
+                                                    <!-- Delete cell (merged, first row only) -->
+                                                    <t t-if="colorway_index === 0">
+                                                        <td t-att-rowspan="product.colorways.length" class="align-middle text-center">
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger"
+                                                                    t-on-click="() => this.removeProductFromProduction(product.id)"
+                                                                    title="Remove from production">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </t>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fa fa-info-circle me-1"></i>
+                                Enter quantities and prices for each variant. Only items with quantity &gt; 0 will be added to the quote.
+                            </small>
+                        </div>
+                    </t>
+
+                    <t t-else="">
+                        <div class="d-flex flex-column align-items-center justify-content-center py-5 gap-3">
+                            <i class="fa fa-inbox fa-3x text-muted"></i>
+                            <p class="text-muted mb-0">No products found for this lead.</p>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary" t-on-click="createProductsForProduction">
+                                    <i class="fa fa-magic me-1"></i> Create Products from Products Tab
+                                </button>
+                            </div>
+                            <small class="text-muted">
+                                Or use the search box above to add any product manually.
+                            </small>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <!-- Sales Orders Section -->
+            <t t-if="state.relatedSalesOrders &amp;&amp; state.relatedSalesOrders.length > 0">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Related Quotations (<t t-esc="state.relatedSalesOrders.length"/>)</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Quote #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.relatedSalesOrders" t-as="order" t-key="order.id">
+                                    <tr>
+                                        <td><strong><t t-esc="order.name || 'N/A'"/></strong></td>
+                                        <td><t t-esc="order.date_order || ''"/></td>
+                                        <td><t t-esc="order.partner_id &amp;&amp; order.partner_id[1] ? order.partner_id[1] : 'N/A'"/></td>
+                                        <td>$<t t-esc="order.amount_total ? order.amount_total.toFixed(2) : '0.00'"/></td>
+                                        <td>
+                                            <span t-attf-class="badge bg-{{order.state === 'sale' ? 'success' : order.state === 'cancel' ? 'danger' : 'secondary'}}">
+                                                <t t-esc="order.state || 'draft'"/>
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-primary"
+                                                    t-on-click="() => this.openSalesOrder(order.id)">
+                                                <i class="fa fa-external-link"></i> View
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

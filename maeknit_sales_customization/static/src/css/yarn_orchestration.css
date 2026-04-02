@@ -1,0 +1,67 @@
+
+.o_form_view .yarn-orchestration-page {
+    background-color: #fafbfc !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+  }
+  
+  .o_form_view .yarn-orchestration-table {
+    border-collapse: separate !important;
+    border-spacing: 0 6px;
+    width: 100%;
+  }
+  
+  .o_form_view .yarn-orchestration-table th {
+    background-color: #f5f6f8 !important;
+    color: #333 !important;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #d1d5db !important;
+  }
+  
+  .o_form_view .yarn-orchestration-table td {
+    background: #fff !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 6px 10px !important;
+    border-radius: 4px !important;
+  }
+  
+  .o_form_view .yarn-orchestration-table tr:nth-child(odd) td {
+    background: #f9fafb !important;
+  }
+  
+  .o_form_view .yarn-orchestration-table tr:hover td {
+    background: #eef2f7 !important;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  /* optional: emphasize first column */
+  .o_form_view .yarn-orchestration-table td:nth-child(1) {
+    font-weight: 600;
+    color: #000000;
+  }
+
+  /* Compact column widths for Yarn Orchestration table */
+.o_form_view .yarn-orchestration-table th[data-name="name"],
+.o_form_view .yarn-orchestration-table td[data-name="name"] {
+  width: 180px !important;   /* adjust as needed */
+  max-width: 180px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.o_form_view .yarn-orchestration-table th[data-name="yarn_carrier"],
+.o_form_view .yarn-orchestration-table td[data-name="yarn_carrier"] {
+  width: 80px !important;
+  text-align: center !important;
+}
+
+.o_form_view .yarn-orchestration-table th[data-name="left_ply"],
+.o_form_view .yarn-orchestration-table th[data-name="right_ply"],
+.o_form_view .yarn-orchestration-table td[data-name="left_ply"],
+.o_form_view .yarn-orchestration-table td[data-name="right_ply"] {
+  width: 100px !important;
+  text-align: center !important;
+}

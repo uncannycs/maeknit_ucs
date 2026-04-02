@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List view for yarn.programming -->
+    <record id="view_yarn_programming_list" model="ir.ui.view">
+        <field name="name">yarn.programming.list</field>
+        <field name="model">yarn.programming</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" class="o_list_view_ungrouped">
+                <field name="machine" placeholder="Machine"/>
+                <field name="knit_structure" placeholder="Knit Structure"/>
+                <field name="yarn_ends" placeholder="Yarn Ends"/>
+                <field name="stitch_density" placeholder="NP/Stitch Density"/>
+                <field name="rows" placeholder="Rows"/>
+                <field name="needles" placeholder="Needles"/>
+                <field name="notes" placeholder="Notes"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view for yarn.programming -->
+    <record id="view_yarn_programming_form" model="ir.ui.view">
+        <field name="name">yarn.programming.form</field>
+        <field name="model">yarn.programming</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="product_tmpl_id" invisible="1"/>
+                            <field name="machine" placeholder="Machine"/>
+                            <field name="knit_structure" placeholder="Knit Structure"/>
+                            <field name="yarn_ends" placeholder="Yarn Ends"/>
+                        </group>
+                        <group>
+                            <field name="stitch_density" placeholder="NP/Stitch Density"/>
+                            <field name="rows" placeholder="Rows"/>
+                            <field name="needles" placeholder="Needles"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Additional notes..." nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

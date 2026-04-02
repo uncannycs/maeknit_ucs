@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="maeknit_mfg_customization.WorkorderChatterWidget">
+        <Chatter
+            t-if="workorderId"
+            threadModel="'mrp.workorder'"
+            threadId="workorderId"
+        />
+    </t>
+</templates>

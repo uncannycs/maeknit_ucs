@@ -1,0 +1,143 @@
+<odoo>
+    <data>
+        <record id="view_stock_picking_form_view" model="ir.ui.view">
+            <field name="name">stock.picking.view</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/header/button[last()]" position="after">
+                    <button type="object" name="generate_label_from_shipstation"
+                            string="Generate Shipstation Label"
+                            invisible="1"/>
+                    <button type="object" name="action_download_latest_label"
+                            string="Download Label"
+                            class="btn-secondary"
+                            invisible="not shipstation_shipment_id"/>
+                </xpath>
+
+                <xpath expr="//field[@name='location_id']" position="after">
+                    <field name="carrier_id"/>
+                </xpath>
+                <xpath expr="//field[@name='carrier_id']" position="after">
+                    <field name="shipstation_carrier_id" invisible ="not show_shipstation_carrier"/>
+                </xpath>
+                <xpath expr="//field[@name='shipstation_carrier_id']" position="after" >
+                    <field name="delivery_package_id" invisible ="not show_shipstation_carrier"/>
+                </xpath>
+
+                <xpath expr="//field[@name='delivery_package_id']" position="after" invisible="not delivery_package_id">
+                    <field name="height" />
+                </xpath>
+                <xpath expr="//field[@name='delivery_package_id']" position="after" invisible="not delivery_package_id">
+                    <field name="width" />
+                </xpath>
+                <xpath expr="//field[@name='delivery_package_id']" position="after" invisible="not delivery_package_id">
+                    <field name="length" />
+                </xpath>
+
+                
+                <xpath expr="//field[@name='height']" position="after" invisible="not delivery_package_id">
+                    <button type="object"
+                            name="button_check_shipstation_rates"
+                            string="Generate the Label"
+                            class="btn-primary"
+                            invisible="not carrier_id"/>
+                </xpath>
+
+                <xpath expr="//page[last()]" position="after">
+                    <!--<page string="Shipstation Packages"
+                          invisible="delivery_type == False">
+                        <field name="package_ids" readonly="1">
+                            <list>
+                                <field name="name"/>
+                                <field name="shipstation_shipment_id"/>
+                                <field name="shipping_weight"/>
+                                <field name="custom_tracking_number"/>
+                                <field name="is_generate_label_in_shipstation"/>
+                                <field name="carrier_id"/>
+                                <field name="response_message"/>
+                                <button type='object' class="fa fa-arrow-right oe_link"
+                                        name="shipstation_cancel_shipment"
+                                        string="Cancel Shipment In Shipstation"/>
+                            </list>
+                        </field>
+                        <group>
+                            <field name="weight_bulk" invisible="weight_bulk &lt; 0.1"/>
+                        </group>
+                    </page>&ndash;&gt;-->
+                    <page string="ShipStation Rates">
+                        <field name="shipstation_shipping_charge_ids" readonly="1">
+                            <list readonly="1">
+                                <field name="shipstation_provider"/>
+                                <field name="shipstation_service_code"/>
+                                <field name="shipstation_service_name"/>
+                                <field name="shipping_cost"/>
+                                <field name="other_cost"/>
+                                <button type="object"
+                                        name="set_picking_service"
+                                        class="fa fa-arrow-right oe_link"
+                                        string="Use Service"/>
+                            </list>
+                        </field>
+                    
+                        <group>
+                            <field name="shipstation_shipping_charge_id" readonly="1"/>
+                        </group>
+                    </page>
+                    
+                    <page string="Packed Items" invisible="state in ('draft', 'cancel')">
+                        <field name="move_line_ids" readonly="1"
+                               domain="[('result_package_id', '!=', False)]">
+                            <list readonly="1">
+                                <field name="product_id" string="Product"/>
+                                <field name="quantity" string="Qty"/>
+                                <field name="product_uom_id" string="UOM"/>
+                                <field name="result_package_id" string="Package"/>
+                            </list>
+                        </field>
+                    </page>
+
+                    <page name="shipstation_detail" string="Shipment Info">
+                        <group>
+                            <group string="Shipstation Info">
+                                <field name="shipstation_order_id" readonly="1"/>
+                                <field name="shipstation_sale_order_number" readonly="1"/>
+                                <field name="shipstation_insurance_provider" />
+                                <field name="shipstation_shipment_id" readonly="1"/>
+                                <field name="shipstation_carrier_code" readonly="1"/>
+                                <field name="shipstation_service_code" readonly="1"/>
+                                <field name="shipstation_configuration_id" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="carrier_price"/>
+                                <field name="insureshipment" />
+                                <field name="insuredvalue" />
+                                <field name="shipstation_batch_number"/>
+                                <field name="shipstation_weight"/>
+                                <field name="shipstation_unit_of_measure"/>
+                                <field name="is_order_imported_in_shipstation" readonly="1"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_picking_form_shipping_weight" model="ir.ui.view">
+            <field name="name">stock.picking.form.shipping.weight</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+        
+              <!-- Insert after the Demand column in the embedded moves list -->
+              <xpath expr="//field[@name='move_ids_without_package']/list/field[@name='product_uom_qty']" position="after">
+                <field name="shipping_weight"
+                       string="Shipping Weight"
+                       optional="show"
+                       readonly="parent.state in ['done','cancel']"/>
+              </xpath>
+        
+            </field>
+          </record>
+    </data>
+</odoo>

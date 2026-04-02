@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Stitch Library Form View -->
+    <record id="view_stitch_library_form" model="ir.ui.view">
+        <field name="name">stitch.library.form</field>
+        <field name="model">stitch.library</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Add buttons here if needed -->
+                    </div>
+                    <field name="image" widget="image" class="oe_avatar" options="{'preview_image': 'image'}"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Stitch Name"/>
+                        </h1>
+                        <h3>
+                            <field name="display_name" readonly="1" invisible="1"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="stitch_type" placeholder="E.g., Jersey, Rib, Cable, etc."/>
+                            <field name="stitch_type_selection" invisible="1"/>
+                            <field name="body_part" placeholder="E.g., Body, Sleeve, Collar, etc."/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="stitch_density" placeholder="e.g. 7 stitches per inch"/>
+                            <field name="tension" placeholder="e.g. Medium"/>
+                            <field name="image_filename" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Enter stitch description..."/>
+                        </page>
+                        <page string="Technical Notes">
+                            <field name="notes" placeholder="Enter technical notes..."/>
+                        </page>
+                        <page string="Compatibility">
+                            <group>
+                                <field name="gauge_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                <field name="machine_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Stitch Library List View -->
+    <record id="view_stitch_library_list" model="ir.ui.view">
+        <field name="name">stitch.library.list</field>
+        <field name="model">stitch.library</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="stitch_type"/>
+                <field name="body_part"/>
+                <field name="stitch_density"/>
+                <field name="tension"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Stitch Library Search View -->
+    <record id="view_stitch_library_search" model="ir.ui.view">
+        <field name="name">stitch.library.search</field>
+        <field name="model">stitch.library</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="stitch_type"/>
+                <field name="body_part"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Stitch Type" name="groupby_stitch_type" context="{'group_by': 'stitch_type'}"/>
+                    <filter string="Body Part" name="groupby_body_part" context="{'group_by': 'body_part'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Stitch Library Action -->
+    <record id="action_stitch_library" model="ir.actions.act_window">
+        <field name="name">Stitch Library</field>
+        <field name="res_model">stitch.library</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new stitch pattern
+            </p>
+            <p>
+                Define stitch patterns that can be used in your garment and swatch BOMs.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_stitch_library"
+              name="Stitch Library"
+              parent="mrp.menu_mrp_configuration"
+              action="action_stitch_library"
+              sequence="32"/>
+</odoo>

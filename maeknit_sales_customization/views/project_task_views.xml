@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<record id="view_task_tree_open_button" model="ir.ui.view">
+    <field name="name">project.task.tree.open.button</field>
+    <field name="model">project.task</field>
+    <field name="inherit_id" ref="project.view_task_tree2"/>
+    <field name="arch" type="xml">
+        <!-- Add a new column with a button to open the task -->
+        <xpath expr="//field[@name='tag_ids']" position="after">
+          <field name="bom_request_id" invisible="1"/>
+
+            <button name="action_open_bom_request" string="View" type="object" class="btn btn-link" 
+              icon="fa-external-link" invisible="not bom_request_id"/>
+        </xpath>
+
+        <xpath expr="//list" position="attributes">
+          <attribute name="default_group_by">state</attribute>
+      </xpath>
+        
+        <xpath expr="//list" position="attributes">
+            <attribute name="editable">bottom</attribute>
+          </xpath>
+          
+        <!-- Make user_ids field editable -->
+        <xpath expr="//field[@name='user_ids']" position="attributes">
+            <attribute name="widget">many2many_avatar_user</attribute>
+            <attribute name="options">{'no_create': True}</attribute>
+        </xpath>
+        
+        <!-- Hide stage_id field in tree view -->
+        <xpath expr="//field[@name='stage_id']" position="attributes">
+          <attribute name="invisible">1</attribute>
+          <attribute name="column_invisible">1</attribute>
+      </xpath>
+        <!-- Add state to the tree view and make it visible with kanban_state_selection widget -->
+        <xpath expr="//field[@name='name']" position="after">
+            <field name="state" widget="kanban_state_selection" optional="show"/>
+        </xpath>
+
+        <xpath expr="//list" position="attributes">
+          <attribute name="expand">1</attribute>
+      </xpath>
+    </field>
+</record>
+</odoo>

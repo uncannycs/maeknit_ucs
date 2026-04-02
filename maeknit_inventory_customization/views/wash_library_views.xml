@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wash Library Form View -->
+    <record id="view_wash_library_form" model="ir.ui.view">
+        <field name="name">wash.library.form</field>
+        <field name="model">wash.library</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Wash Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wash Library List View -->
+    <record id="view_wash_library_list" model="ir.ui.view">
+        <field name="name">wash.library.list</field>
+        <field name="model">wash.library</field>
+        <field name="arch" type="xml">
+            <list string="Wash Library" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Wash Library Search View -->
+    <record id="view_wash_library_search" model="ir.ui.view">
+        <field name="name">wash.library.search</field>
+        <field name="model">wash.library</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Wash Library Action -->
+    <record id="action_wash_library" model="ir.actions.act_window">
+        <field name="name">Wash Library</field>
+        <field name="res_model">wash.library</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new wash entry
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_wash_library"
+              name="Wash Library"
+              parent="mrp.menu_mrp_configuration"
+              action="action_wash_library"
+              sequence="32"/>
+</odoo>

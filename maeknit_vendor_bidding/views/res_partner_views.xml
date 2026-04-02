@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_partner_filter_bidding_list_inherit" model="ir.ui.view">
+        <field name="name">res.partner.filter.bidding.list.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='city']" position="after">
+                <button name="action_generate_rfq_from_selection" 
+                        string="Generate RFQ" 
+                        type="object" 
+                        icon="fa-truck"
+                        class="o_replenish_buttons"
+                        invisible="not context.get('show_bidding_buttons')"
+                        help="Generate RFQ for this factory immediately."/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Server Action for Bulk Generation -->
+    <record id="action_generate_rfq_bulk_from_selection" model="ir.actions.server">
+        <field name="name">Bidding: Generate RFQ (Bulk)</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_generate_rfq_from_selection()
+        </field>
+    </record>
+</odoo>

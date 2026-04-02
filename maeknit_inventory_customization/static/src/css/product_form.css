@@ -1,0 +1,234 @@
+/* Main form styling */
+.maeknit-form {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
+.maeknit-form .form-section {
+  padding: 24px;
+  margin-bottom: 16px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  width: 100%;               /* constrain within column */
+  overflow-x: auto;          /* allow scroll if Odoo table overflows */
+  box-sizing: border-box;
+}
+
+.maeknit-form .section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+/* Two-column layout */
+.maeknit-form .two-col-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .maeknit-form .two-col-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Custom styling for one2many fields */
+.maeknit-form .custom-table {
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  width: 100% !important;
+  max-width: 100%;
+}
+
+.maeknit-form .custom-table thead th {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  font-weight: 600;
+  padding: 12px 16px;
+  padding-top: 24px;
+  padding-bottom: 12px;
+  padding-left: 16px;
+  padding-right: 16px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Header cell */
+th[data-name="fiber_type"] {
+  width: 182px !important;
+  max-width: 182px !important;
+  min-width: 182px !important;
+  text-align: left;
+
+}
+
+/* Body cell */
+td[data-name="fiber_type"] {
+  width: 182px !important;
+  max-width: 182px !important;
+  min-width: 182px !important;
+  text-align: left;
+}
+
+.maeknit-form .custom-table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.maeknit-form .custom-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.maeknit-form .custom-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Custom buttons */
+.maeknit-form .maeknit-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.maeknit-form .maeknit-btn-primary {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+}
+
+.maeknit-form .maeknit-btn-primary:hover {
+  background-color: #4338ca;
+}
+
+.maeknit-form .maeknit-btn-secondary {
+  background-color: white;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.maeknit-form .maeknit-btn-secondary:hover {
+  background-color: #f9fafb;
+}
+
+/* Form fields styling */
+.maeknit-form .form-control {
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  padding: 8px 12px;
+  width: 100%;
+}
+
+.maeknit-form .form-control:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.maeknit-form label {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Card-style fiber and color items */
+.maeknit-form .card-item {
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.maeknit-form .card-item:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.maeknit-form .card-item .item-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.maeknit-form .card-item .item-percentage {
+  font-weight: 600;
+  color: #4f46e5;
+  min-width: 40px;
+}
+
+.maeknit-form .card-item .item-type {
+  color: #4b5563;
+}
+
+.maeknit-form .card-item .item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Color item specific styling */
+.maeknit-form .color-item .color-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Add item button */
+.maeknit-form .add-item-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border: 1px dashed #d1d5db;
+  border-radius: 6px;
+  background-color: #f9fafb;
+  color: #4f46e5;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.maeknit-form .add-item-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #4f46e5;
+}
+
+/* Custom styling for many2many_tags widget */
+.o_field_many2manytags {
+  min-height: 36px;
+}
+
+/* Make dropdown scrollable with max height */
+.ui-autocomplete {
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Style for tags */
+.o_field_many2manytags .badge {
+  margin: 2px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Style for tag input */
+.o_field_many2manytags input {
+  border: none !important;
+  padding: 4px 8px !important;
+  min-width: 100px;
+}

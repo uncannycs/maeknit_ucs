@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="maeknit_mfg_customization.CalibrationWidget">
+        <div class="calibration-widget" style="padding: 20px; background: #f9f9f9;">
+            
+            <!-- Conditionally show swatch selection section based on hideSwatchSelection prop -->
+            <t t-if="!hideSwatchSelection">
+                <!-- Pre-existing calibration swatch section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <label class="fw-bold mb-2">Pre-Existing Swatch On Parent MO</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="form-check">
+                                <input 
+                                    class="form-check-input" 
+                                    type="radio" 
+                                    name="preExisting" 
+                                    id="preExistingYes" 
+                                    value="yes"
+                                    t-att-checked="state.hasPreExistingSwatch"
+                                    t-on-change="onPreExistingChange"
+                                />
+                                <label class="form-check-label" for="preExistingYes">
+                                    Yes
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input 
+                                    class="form-check-input" 
+                                    type="radio" 
+                                    name="preExisting" 
+                                    id="preExistingNo" 
+                                    value="no"
+                                    t-att-checked="!state.hasPreExistingSwatch"
+                                    t-on-change="onPreExistingChange"
+                                />
+                                <label class="form-check-label" for="preExistingNo">
+                                    No
+                                </label>
+                            </div>
+                            
+                            <button 
+                                t-if="!state.hasPreExistingSwatch"
+                                class="btn btn-primary ms-3"
+                                t-on-click="generateCalibrationSwatch"
+                            >
+                                Generate Swatch
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calibration swatch selection -->
+                <div class="row mb-4" t-if="state.hasPreExistingSwatch">
+                    <div class="col-md-6">
+                        <label class="fw-bold mb-2">Swatch</label>
+                        <select 
+                            class="form-select"
+                            t-on-change="onSwatchChange"
+                            t-model="state.calibrationSwatchId"
+                        >
+                            <option value="">Select a swatch...</option>
+                            <!-- Options will be populated dynamically -->
+                            <t t-foreach="state.availableSwatches" t-as="swatch" t-key="swatch.id">
+                                <option t-att-value="swatch.id" t-att-selected="swatch.id === state.calibrationSwatchId">
+                                    <t t-esc="swatch.productName || swatch.name"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+            </t>
+
+            <!-- Added global unit toggle switch -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex align-items-center gap-3">
+                        <label class="fw-bold mb-0">Measurement Unit:</label>
+                        <div class="btn-group" role="group">
+                            <button 
+                                type="button" 
+                                class="btn btn-sm"
+                                t-att-class="state.measurementUnit === 'inches' ? 'btn-primary' : 'btn-outline-primary'"
+                                t-on-click="toggleUnit"
+                            >
+                                Inches
+                            </button>
+                            <button 
+                                type="button" 
+                                class="btn btn-sm"
+                                t-att-class="state.measurementUnit === 'cm' ? 'btn-primary' : 'btn-outline-primary'"
+                                t-on-click="toggleUnit"
+                            >
+                                CM
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body and Cuff sections -->
+            <div class="row mb-4">
+                <!-- Body Section -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Body</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Swatch Specs -->
+                            <div class="mb-3">
+                                <label class="fw-bold mb-2">Swatch Specs</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div>
+                                        <input 
+                                            type="number" 
+                                            class="form-control" 
+                                            style="width: 80px;"
+                                            t-model.number="state.bodySwatchSpecsX"
+                                            t-on-change="() => this.calculateCalibrationValues()"
+                                        />
+                                        <small class="text-muted">Width (wales)</small>
+                                    </div>
+                                    <span>by</span>
+                                    <div>
+                                        <input 
+                                            type="number" 
+                                            class="form-control" 
+                                            style="width: 80px;"
+                                            t-model.number="state.bodySwatchSpecsY"
+                                            t-on-change="() => this.calculateCalibrationValues()"
+                                        />
+                                        <small class="text-muted">Height (courses)</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Removed individual unit selectors, showing global unit -->
+                            <!-- Measurement X Axis -->
+                            <div class="mb-3">
+                                <label class="fw-bold mb-2">Measurement Width (<t t-esc="state.measurementUnit"/>)</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input 
+                                        type="number" 
+                                        class="form-control" 
+                                        style="width: 120px;"
+                                        t-model.number="state.bodyMeasurementX"
+                                        t-on-change="() => this.calculateCalibrationValues()"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Measurement Y Axis -->
+                            <div class="mb-3">
+                                <label class="fw-bold mb-2">Measurement Height (<t t-esc="state.measurementUnit"/>)</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input 
+                                        type="number" 
+                                        class="form-control" 
+                                        style="width: 120px;"
+                                        t-model.number="state.bodyMeasurementY"
+                                        t-on-change="() => this.calculateCalibrationValues()"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Calibration Values -->
+                            <div class="mb-2">
+                                <label class="fw-bold mb-2">Body Calibration value Height</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control bg-success bg-opacity-25" 
+                                    t-att-value="state.bodyCalibrationY"
+                                    readonly="readonly"
+                                />
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="fw-bold mb-2">Body Calibration value Width</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control bg-success bg-opacity-25" 
+                                    t-att-value="state.bodyCalibrationX"
+                                    readonly="readonly"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cuff Section -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Cuff</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Swatch Specs -->
+                            <div class="mb-3">
+                                <label class="fw-bold mb-2">Swatch Specs</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div>
+                                        <input 
+                                            type="number" 
+                                            class="form-control" 
+                                            style="width: 80px;"
+                                            t-model.number="state.cuffSwatchSpecsX"
+                                            t-on-change="() => this.calculateCalibrationValues()"
+                                        />
+                                        <small class="text-muted">Width (wales)</small>
+                                    </div>
+                                    <span>by</span>
+                                    <div>
+                                        <input 
+                                            type="number" 
+                                            class="form-control" 
+                                            style="width: 80px;"
+                                            t-model.number="state.cuffSwatchSpecsY"
+                                            t-on-change="() => this.calculateCalibrationValues()"
+                                        />
+                                        <small class="text-muted">Height (courses)</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Removed individual unit selectors, showing global unit -->
+                            <!-- Measurement X Axis -->
+                            <div class="mb-3">
+                                <label class="fw-bold mb-2">Measurement Width (<t t-esc="state.measurementUnit"/>)</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input 
+                                        type="number" 
+                                        class="form-control" 
+                                        style="width: 120px;"
+                                        t-model.number="state.cuffMeasurementX"
+                                        t-on-change="() => this.calculateCalibrationValues()"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Measurement Y Axis -->
+                            <div class="mb-3">
+                                <label class="fw-bold mb-2">Measurement Height (<t t-esc="state.measurementUnit"/>)</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input 
+                                        type="number" 
+                                        class="form-control" 
+                                        style="width: 120px;"
+                                        t-model.number="state.cuffMeasurementY"
+                                        t-on-change="() => this.calculateCalibrationValues()"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Calibration Values -->
+                            <div class="mb-2">
+                                <label class="fw-bold mb-2">Cuff Calibration value Height</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control bg-success bg-opacity-25" 
+                                    t-att-value="state.cuffCalibrationY"
+                                    readonly="readonly"
+                                />
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="fw-bold mb-2">Cuff Calibration value Width</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control bg-success bg-opacity-25" 
+                                    t-att-value="state.cuffCalibrationX"
+                                    readonly="readonly"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Width and Height Images -->
+            <div class="row">
+                <!-- Width Image -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Width (Body)</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="state.widthImage">
+                                <div 
+                                    class="zoom-container-width calibration-zoom-container"
+                                    t-on-wheel.prevent="(e) => this.handleWheel(e, 'width')"
+                                    t-on-mousedown="(e) => this.handleMouseDown(e, 'width')"
+                                >
+                                    <div class="image-wrapper-width calibration-image-wrapper">
+                                        <img t-att-src="state.widthImage" class="calibration-zoomable-image" />
+                                    </div>
+                                </div>
+                                <div class="zoom-controls d-flex justify-content-center gap-2 mt-2">
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom('width', -0.1)">-</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.fitToContainer('width')">Fit</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.resetZoom('width')">Reset</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom('width', 0.1)">+</button>
+                                </div>
+                                <div class="mt-2 text-center d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-outline-primary" t-on-click="() => this.triggerFileInput('width')">
+                                        Replace Image
+                                    </button>
+                                    <a
+                                        t-if="getCalibrationDownloadUrl('width')"
+                                        class="btn btn-sm btn-outline-success"
+                                        t-att-href="getCalibrationDownloadUrl('width')"
+                                        target="_blank"
+                                    >
+                                        <i class="fa fa-download"/>
+                                    </a>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div 
+                                    class="border border-2 border-dashed rounded p-4 text-center"
+                                    style="min-height: 200px; cursor: pointer;"
+                                    t-on-click="() => this.triggerFileInput('width')"
+                                    t-on-drop="(e) => this.handleDrop(e, 'width')"
+                                    t-on-dragover.prevent=""
+                                >
+                                    <p class="text-muted mb-0">Drag and Drop image</p>
+                                </div>
+                            </t>
+                            <input 
+                                type="file" 
+                                accept="image/*" 
+                                class="d-none" 
+                                t-ref="widthFileInput"
+                                t-on-change="(e) => this.handleImageUpload(e, 'width')"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Width Image 2 -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Width (Cuff)</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="state.widthImage2">
+                                <div 
+                                    class="zoom-container-width2 calibration-zoom-container"
+                                    t-on-wheel.prevent="(e) => this.handleWheel(e, 'width2')"
+                                    t-on-mousedown="(e) => this.handleMouseDown(e, 'width2')"
+                                >
+                                    <div class="image-wrapper-width2 calibration-image-wrapper">
+                                        <img t-att-src="state.widthImage2" class="calibration-zoomable-image" />
+                                    </div>
+                                </div>
+                                <div class="zoom-controls d-flex justify-content-center gap-2 mt-2">
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom('width2', -0.1)">-</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.fitToContainer('width2')">Fit</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.resetZoom('width2')">Reset</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom('width2', 0.1)">+</button>
+                                </div>
+                                <div class="mt-2 text-center d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-outline-primary" t-on-click="() => this.triggerFileInput('width2')">
+                                        Replace Image
+                                    </button>
+                                    <a
+                                        t-if="getCalibrationDownloadUrl('width2')"
+                                        class="btn btn-sm btn-outline-success"
+                                        t-att-href="getCalibrationDownloadUrl('width2')"
+                                        target="_blank"
+                                    >
+                                        <i class="fa fa-download"/>
+                                    </a>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div 
+                                    class="border border-2 border-dashed rounded p-4 text-center"
+                                    style="min-height: 200px; cursor: pointer;"
+                                    t-on-click="() => this.triggerFileInput('width2')"
+                                    t-on-drop="(e) => this.handleDrop(e, 'width2')"
+                                    t-on-dragover.prevent=""
+                                >
+                                    <p class="text-muted mb-0">Drag and Drop image</p>
+                                </div>
+                            </t>
+                            <input 
+                                type="file" 
+                                accept="image/*" 
+                                class="d-none" 
+                                t-ref="width2FileInput"
+                                t-on-change="(e) => this.handleImageUpload(e, 'width2')"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+
+            <!-- Second Row: Width Image 2 and Height Image 2 -->
+            <div class="row mt-4">
+                <!-- Height Image -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Height (Body)</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="state.heightImage">
+                                <div 
+                                    class="zoom-container-height calibration-zoom-container"
+                                    t-on-wheel.prevent="(e) => this.handleWheel(e, 'height')"
+                                    t-on-mousedown="(e) => this.handleMouseDown(e, 'height')"
+                                >
+                                    <div class="image-wrapper-height calibration-image-wrapper">
+                                        <img t-att-src="state.heightImage" class="calibration-zoomable-image" />
+                                    </div>
+                                </div>
+                                <div class="zoom-controls d-flex justify-content-center gap-2 mt-2">
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom('height', -0.1)">-</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.fitToContainer('height')">Fit</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.resetZoom('height')">Reset</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom('height', 0.1)">+</button>
+                                </div>
+                                <div class="mt-2 text-center d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-outline-primary" t-on-click="() => this.triggerFileInput('height')">
+                                        Replace Image
+                                    </button>
+                                    <a
+                                        t-if="getCalibrationDownloadUrl('height')"
+                                        class="btn btn-sm btn-outline-success"
+                                        t-att-href="getCalibrationDownloadUrl('height')"
+                                        target="_blank"
+                                    >
+                                        <i class="fa fa-download"/>
+                                    </a>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div 
+                                    class="border border-2 border-dashed rounded p-4 text-center"
+                                    style="min-height: 200px; cursor: pointer;"
+                                    t-on-click="() => this.triggerFileInput('height')"
+                                    t-on-drop="(e) => this.handleDrop(e, 'height')"
+                                    t-on-dragover.prevent=""
+                                >
+                                    <p class="text-muted mb-0">Drag and Drop image</p>
+                                </div>
+                            </t>
+                            <input 
+                                type="file" 
+                                accept="image/*" 
+                                class="d-none" 
+                                t-ref="heightFileInput"
+                                t-on-change="(e) => this.handleImageUpload(e, 'height')"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Height Image 2 -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Height (Cuff)</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="state.heightImage2">
+                                <div 
+                                    class="zoom-container-height2 calibration-zoom-container"
+                                    t-on-wheel.prevent="(e) => this.handleWheel(e, 'height2')"
+                                    t-on-mousedown="(e) => this.handleMouseDown(e, 'height2')"
+                                >
+                                    <div class="image-wrapper-height2 calibration-image-wrapper">
+                                        <img t-att-src="state.heightImage2" class="calibration-zoomable-image" />
+                                    </div>
+                                </div>
+                                <div class="zoom-controls d-flex justify-content-center gap-2 mt-2">
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom('height2', -0.1)">-</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.fitToContainer('height2')">Fit</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.resetZoom('height2')">Reset</button>
+                                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.adjustZoom('height2', 0.1)">+</button>
+                                </div>
+                                <div class="mt-2 text-center d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-outline-primary" t-on-click="() => this.triggerFileInput('height2')">
+                                        Replace Image
+                                    </button>
+                                    <a
+                                        t-if="getCalibrationDownloadUrl('height2')"
+                                        class="btn btn-sm btn-outline-success"
+                                        t-att-href="getCalibrationDownloadUrl('height2')"
+                                        target="_blank"
+                                    >
+                                        <i class="fa fa-download"/>
+                                    </a>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div 
+                                    class="border border-2 border-dashed rounded p-4 text-center"
+                                    style="min-height: 200px; cursor: pointer;"
+                                    t-on-click="() => this.triggerFileInput('height2')"
+                                    t-on-drop="(e) => this.handleDrop(e, 'height2')"
+                                    t-on-dragover.prevent=""
+                                >
+                                    <p class="text-muted mb-0">Drag and Drop image</p>
+                                </div>
+                            </t>
+                            <input 
+                                type="file" 
+                                accept="image/*" 
+                                class="d-none" 
+                                t-ref="height2FileInput"
+                                t-on-change="(e) => this.handleImageUpload(e, 'height2')"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </t>
+</templates>

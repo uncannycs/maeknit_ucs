@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Actions ──────────────────────────────────────────────────────────── -->
+
+    <record id="action_mrp_production_all_services" model="ir.actions.act_window">
+        <field name="name">All Services</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_mode">list,form,kanban,calendar,pivot,graph</field>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_todo': 1}</field>
+    </record>
+
+    <record id="action_mrp_production_development" model="ir.actions.act_window">
+        <field name="name">Development</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_mode">list,form,kanban,calendar,pivot,graph</field>
+        <field name="domain">[('rel_service.name', '=', 'Development Service')]</field>
+        <field name="context">{'search_default_todo': 1}</field>
+    </record>
+
+    <record id="action_mrp_production_swatch" model="ir.actions.act_window">
+        <field name="name">Swatch</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_mode">list,form,kanban,calendar,pivot,graph</field>
+        <field name="domain">[('rel_service.name', '=', 'Swatch Service')]</field>
+        <field name="context">{'search_default_todo': 1}</field>
+    </record>
+
+    <record id="action_mrp_production_toile" model="ir.actions.act_window">
+        <field name="name">Toile</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_mode">list,form,kanban,calendar,pivot,graph</field>
+        <field name="domain">[('rel_service.name', '=', 'Toile Service')]</field>
+        <field name="context">{'search_default_todo': 1}</field>
+    </record>
+
+    <record id="action_mrp_production_grading" model="ir.actions.act_window">
+        <field name="name">Grading</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_mode">list,form,kanban,calendar,pivot,graph</field>
+        <field name="domain">[('rel_service.name', '=', 'Grading Service')]</field>
+        <field name="context">{'search_default_todo': 1}</field>
+    </record>
+
+    <record id="action_mrp_production_production" model="ir.actions.act_window">
+        <field name="name">Production</field>
+        <field name="res_model">mrp.production</field>
+        <field name="view_mode">list,form,kanban,calendar,pivot,graph</field>
+        <field name="domain">[('rel_service.name', '=', 'Production Service')]</field>
+        <field name="context">{'search_default_todo': 1}</field>
+    </record>
+
+    <!-- ── Menu: Services (sequence 7 = between Overview(5) and Operations(10)) -->
+
+    <menuitem
+        id="menu_mrp_services_root"
+        name="Services"
+        parent="mrp.menu_mrp_root"
+        sequence="7"/>
+
+    <menuitem
+        id="menu_mrp_services_all"
+        name="All Services"
+        parent="menu_mrp_services_root"
+        action="action_mrp_production_all_services"
+        sequence="1"/>
+
+    <menuitem
+        id="menu_mrp_services_development"
+        name="Development"
+        parent="menu_mrp_services_root"
+        action="action_mrp_production_development"
+        sequence="2"/>
+
+    <menuitem
+        id="menu_mrp_services_swatch"
+        name="Swatch"
+        parent="menu_mrp_services_root"
+        action="action_mrp_production_swatch"
+        sequence="3"/>
+
+    <menuitem
+        id="menu_mrp_services_toile"
+        name="Toile"
+        parent="menu_mrp_services_root"
+        action="action_mrp_production_toile"
+        sequence="4"/>
+
+    <menuitem
+        id="menu_mrp_services_grading"
+        name="Grading"
+        parent="menu_mrp_services_root"
+        action="action_mrp_production_grading"
+        sequence="5"/>
+
+    <menuitem
+        id="menu_mrp_services_production"
+        name="Production"
+        parent="menu_mrp_services_root"
+        action="action_mrp_production_production"
+        sequence="6"/>
+
+</odoo>

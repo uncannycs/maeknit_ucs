@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whole_cad_measurement_wizard_line_tree" model="ir.ui.view">
+        <field name="name">whole.cad.measurement.wizard.line.tree</field>
+        <field name="model">whole.cad.measurement.wizard.line</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="0" delete="0">
+                <field name="point" readonly="1" optional="show"/>
+                <field name="name" readonly="1"/>
+                <field name="tolerance" readonly="1" optional="hide"/>
+                <field name="expected_value" readonly="1"/>
+                <field name="actual_value" required="1"/>
+                <field name="variance" readonly="1" 
+                       decoration-danger="is_out_of_tolerance"/>
+                <field name="variance_percentage" readonly="1" 
+                       decoration-danger="is_out_of_tolerance"/>
+                <field name="is_out_of_tolerance" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_whole_cad_measurement_wizard_form" model="ir.ui.view">
+        <field name="name">whole.cad.measurement.wizard.form</field>
+        <field name="model">whole.cad.measurement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Enter Whole CAD Actual Measurements">
+                <field name="workorder_id" invisible="1"/>
+                <field name="production_id" invisible="1"/>
+                
+                <group>
+                    <group>
+                        <field name="unit" readonly="1"/>
+                    </group>
+                    <group>
+                        <div class="alert alert-info" role="alert">
+                            <strong>Instructions:</strong> Enter the actual measurements taken from the finished garment. 
+                            Values highlighted in <span class="text-warning">yellow</span> have variance &gt; 2%. 
+                            Values highlighted in <span class="text-danger">red</span> are out of tolerance.
+                        </div>
+                    </group>
+                </group>
+                
+                <notebook>
+                    <page string="Measurements">
+                        <field name="measurement_line_ids" nolabel="1" 
+                               context="{'tree_view_ref': 'maeknit_mfg_customization.view_whole_cad_measurement_wizard_line_tree'}"/>
+                    </page>
+                </notebook>
+                
+                <footer>
+                    <button string="Submit and Increment Version" type="object" name="action_submit_measurements" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

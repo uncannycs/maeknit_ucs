@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="shipstation_shipping_odoo_integration.ShipstationPutInPackWizard" owl="1">
+        <div class="shipstation-put-in-pack-wizard">
+            <div t-if="state.loading" class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+            <div t-else="">
+                <div t-if="state.error" class="alert alert-danger d-flex flex-column" role="alert">
+                    <div>
+                        <strong>Error:</strong>
+                        <span t-esc="state.error"/>
+                    </div>
+                    <div class="mt-2">
+                        <button
+                            type="button"
+                            class="btn btn-danger btn-sm me-2"
+                            t-on-click="this.goBack">
+                            <i class="fa fa-arrow-left"/> Back
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-warning btn-sm"
+                            t-att-disabled="!(state.wizard?.picking_id?.length || this.pickingId)"
+                            t-on-click="this.goToPicking">
+                            <i class="fa fa-arrow-right"/> Return to Picking
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Back Button -->
+                <div class="mb-3">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        t-on-click="this.goBack">
+                        <i class="fa fa-arrow-left"/> Back
+                    </button>
+                </div>
+
+                <div t-if="state.deliveryPackage" class="card mb-4 border-info">
+                    <div class="card-header bg-light">
+                        <strong>ShipStation Delivery Package</strong>
+                    </div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-1" t-esc="state.deliveryPackage.name"/>
+                            <p class="mb-0 text-muted">
+                                Code:<span class="ms-1" t-esc="state.deliveryPackage.package_code or '—'"/>
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <div>
+                                <strong>L:</strong> <span t-esc="state.deliveryPackage.length || 0"/>
+                            </div>
+                            <div>
+                                <strong>W:</strong> <span t-esc="state.deliveryPackage.width || 0"/>
+                            </div>
+                            <div>
+                                <strong>H:</strong> <span t-esc="state.deliveryPackage.height || 0"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Items Section -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Available Items for Packing</h5>
+                    </div>
+                    <div class="card-body">
+                        <div t-if="state.availableItems.length === 0" class="alert alert-info">
+                            No items available to pack
+                        </div>
+                        <div t-else="" class="row">
+                            <t t-foreach="state.availableItems" t-as="item" t-key="item.id">
+                                <t t-set="availableQty" t-value="this.getAvailableQtyForPackage(item, state.currentPackageNum)"/>
+                                <t t-set="isUnavailable" t-value="availableQty === 0"/>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card item-card" t-att-style="isUnavailable ? 'opacity: 0.5; background-color: #f5f5f5;' : ''">
+                                        <div class="card-body">
+                                            <h6 class="card-title" t-att-style="isUnavailable ? 'color: #999;' : ''" t-esc="item.product_id[1]"/>
+                                            <p class="card-text mb-2" t-att-style="isUnavailable ? 'color: #999;' : ''">
+                                                <strong>Available: </strong>
+                                                <span t-esc="availableQty"/>
+                                                <span> </span>
+                                                <span t-esc="item.product_uom_id[1]"/>
+                                            </p>
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-primary"
+                                                t-on-click="() => this.selectItemForPackage(item, state.currentPackageNum)"
+                                                t-att-disabled="isUnavailable"
+                                            >
+                                                <i class="fa fa-plus"/> Add to Package <t t-esc="state.currentPackageNum"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Packages Section -->
+                <div class="row">
+                    <t t-foreach="this.Object.entries(state.selectedItemsByPackage)" t-as="package_entry" t-key="package_entry[0]">
+                        <t t-set="packageNum" t-value="this.parseInt(package_entry[0])"/>
+                        <t t-set="packageItems" t-value="package_entry[1]"/>
+                        
+                        <div class="col-lg-6 mb-4" t-if="packageNum === state.currentPackageNum or packageItems.length > 0">
+                            <div class="card">
+                                <div class="card-header" t-attf-class="bg-{{ packageNum === state.currentPackageNum and 'info' or 'secondary' }} text-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Package <t t-esc="packageNum"/></h5>
+                                        <div class="d-flex align-items-center">
+                                            <span t-if="packageItems.length > 0" class="badge badge-light me-2">
+                                                <t t-esc="packageItems.length"/> items
+                                            </span>
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-light"
+                                                t-on-click="() => this.deletePackage(packageNum)"
+                                                title="Delete Package">
+                                                <i class="fa fa-trash"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Package Items List -->
+                                    <div t-if="packageItems.length === 0" class="alert alert-info mb-3">
+                                        No items selected yet
+                                    </div>
+                                    <div t-else="" class="package-items-list mb-3">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th>Qty</th>
+                                                    <th>UOM</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="packageItems" t-as="item" t-key="item.id">
+                                                    <t t-set="availableForOthers" t-value="this.getAvailableQtyForPackage(item, packageNum)"/>
+                                                    <t t-set="maxQty" t-value="availableForOthers + item.pack_quantity"/>
+                                                    <tr>
+                                                        <td t-esc="item.product_id[1]"/>
+                                                        <td>
+                                                            <input
+                                                                type="number"
+                                                                class="form-control form-control-sm"
+                                                                t-att-value="item.pack_quantity"
+                                                                t-att-max="maxQty"
+                                                                min="0"
+                                                                step="1"
+                                                                t-on-input="(ev) => this.updatePackageItemQty(item, packageNum, ev.target.value)"
+                                                            />
+                                                            
+                                                        </td>
+                                                        <td t-esc="item.product_uom_id[1]"/>
+                                                        <td>
+                                                            <button
+                                                                type="button"
+                                                                class="btn btn-sm btn-danger"
+                                                                t-on-click="() => this.removeItemFromPackage(item, packageNum)"
+                                                            >
+                                                                <i class="fa fa-trash"/>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <t t-set="packageDims" t-value="state.packages[packageNum] || {}"/>
+                                    <t t-set="lengthValue" t-value="packageDims.length ? parseFloat(packageDims.length).toFixed(2) : '0.00'"/>
+                                    <t t-set="widthValue" t-value="packageDims.width ? parseFloat(packageDims.width).toFixed(2) : '0.00'"/>
+                                    <t t-set="heightValue" t-value="packageDims.height ? parseFloat(packageDims.height).toFixed(2) : '0.00'"/>
+                                    <div class="row text-center mb-3 text-muted package-dims">
+                                        <div class="col border-end">
+                                            <small class="d-block">Length (in)</small>
+                                            <strong t-esc="lengthValue"/>
+                                        </div>
+                                        <div class="col border-end">
+                                            <small class="d-block">Width (in)</small>
+                                            <strong t-esc="widthValue"/>
+                                        </div>
+                                        <div class="col">
+                                            <small class="d-block">Height (in)</small>
+                                            <strong t-esc="heightValue"/>
+                                        </div>
+                                    </div>
+
+                                    <!-- Package Configuration -->
+                                    <div class="row" t-if="packageNum === state.currentPackageNum">
+                                        <!-- Package Type Selection -->
+                                        <div class="col-12 mb-3">
+                                            <div class="form-group">
+                                                <label><strong>Package Type</strong></label>
+                                                <select
+                                                    class="form-control"
+                                                    t-att-value="state.packages[packageNum]?.package_type_id || ''"
+                                                    t-on-change="(ev) => this.onPackageTypeSelect(packageNum, this.parseInt(ev.target.value))">
+                                                    <option value="">-- Select Package Type --</option>
+                                                    <t t-foreach="state.packageTypes" t-as="pkgType" t-key="pkgType.id">
+                                                        <option t-att-value="pkgType.id" t-esc="pkgType.name"/>
+                                                    </t>
+                                                </select>
+                                                <small class="form-text text-muted">
+                                                    Selecting a package type will auto-fill dimensions
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Dimensions Row -->
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label><strong>Length (in)</strong> <span class="text-danger">*</span></label>
+                                                <input
+                                                    type="number"
+                                                    class="form-control"
+                                                    placeholder="0.00"
+                                                    step="0.01"
+                                                    min="0"
+                                                    t-att-value="state.packages[packageNum]?.length || 0"
+                                                    t-on-input="(ev) => this.updatePackageDimension(packageNum, 'length', ev.target.value)"
+                                                    required="required"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label><strong>Width (in)</strong> <span class="text-danger">*</span></label>
+                                                <input
+                                                    type="number"
+                                                    class="form-control"
+                                                    placeholder="0.00"
+                                                    step="0.01"
+                                                    min="0"
+                                                    t-att-value="state.packages[packageNum]?.width || 0"
+                                                    t-on-input="(ev) => this.updatePackageDimension(packageNum, 'width', ev.target.value)"
+                                                    required="required"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label><strong>Height (in)</strong> <span class="text-danger">*</span></label>
+                                                <input
+                                                    type="number"
+                                                    class="form-control"
+                                                    placeholder="0.00"
+                                                    step="0.01"
+                                                    min="0"
+                                                    t-att-value="state.packages[packageNum]?.height || 0"
+                                                    t-on-input="(ev) => this.updatePackageDimension(packageNum, 'height', ev.target.value)"
+                                                    required="required"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Weight Row -->
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <t t-set="minWeight" t-value="this.calculateMinimumWeight(packageNum)"/>
+                                                <label><strong>Shipping Weight (lbs)</strong> <span class="text-danger">*</span></label>
+                                                <input
+                                                    type="number"
+                                                    class="form-control"
+                                                    placeholder="0.00"
+                                                    step="0.01"
+                                                    min="0.01"
+                                                    t-att-value="state.packages[packageNum]?.shipping_weight || 0"
+                                                    t-on-input="(ev) => this.updatePackageDimension(packageNum, 'shipping_weight', ev.target.value)"
+                                                    required="required"/>
+                                                <small class="form-text text-muted">
+                                                    <t t-if="minWeight > 0">
+                                                        Minimum weight: <strong t-esc="minWeight.toFixed(2)"/> lbs (based on product weights). You can enter a higher weight if needed.
+                                                    </t>
+                                                    <t t-else="">
+                                                        Enter the shipping weight for this package.
+                                                    </t>
+                                                </small>
+                                                <t t-set="weightWarning" t-value="this.getWeightWarning(packageNum)"/>
+                                                <div t-if="weightWarning" class="alert alert-warning mt-2 mb-0 py-2">
+                                                    <i class="fa fa-exclamation-triangle"/> <span t-esc="weightWarning"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Package Actions -->
+                                    <div class="card-footer" t-if="packageNum === state.currentPackageNum" style="background-color: #f8f9fa; padding: 15px; margin-top: 20px;">
+                                        <button
+                                            type="button"
+                                            class="btn btn-success btn-lg"
+                                            t-on-click="this.createPackages"
+                                            t-att-disabled="packageItems.length === 0 || state.loading">
+                                            <t t-if="state.loading">
+                                                <i class="fa fa-spinner fa-spin"/> Creating Packages...
+                                            </t>
+                                            <t t-else="">
+                                                <i class="fa fa-check"/> Create All Packages
+                                            </t>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn btn-info"
+                                            t-on-click="this.addNewPackage"
+                                            t-att-disabled="state.loading">
+                                            <i class="fa fa-plus"/> Add Another Package
+                                        </button>
+
+                                    </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

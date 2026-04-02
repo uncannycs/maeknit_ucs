@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Inherit the sale order form view to add the lead field and QUOTE Builder tab -->
+    <record id="view_order_form_inherit_swatch" model="ir.ui.view">
+        <field name="name">sale.order.form.swatch.add</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="generate_mo_button_visible" invisible="1"/>
+                <field name="use_generate_mo_label" invisible="1"/>
+                <button name="action_open_variant_wizard"
+                        string="Create Variants"
+                        type="object"
+                        class="btn-secondary"/>
+                <button name="action_sync_so_variants"
+                        string="Sync Variants"
+                        type="object"
+                        class="btn-secondary"
+                        confirm="This will re-link all garment SO lines to their specific size/colorway variants. Continue?"/>
+                <button name="action_add_next_swatch"
+                        string="Add Next Swatch"
+                        type="object"
+                        class="oe_highlight"
+                        invisible="not is_swatch_service"/>
+                <button name="action_generate_bom_queue"
+                    string="Generate BOM QUEUE"
+                    type="object"
+                    class="oe_highlight btn-secondary"
+                    invisible="button_generate_bom_queue_visible == False or direct_mo_mode"
+                />
+                <button name="action_generate_all_mos"
+                    string="Generate MO"
+                    type="object"
+                    class="oe_highlight btn-warning"
+                    confirm="Generate Manufacturing Orders/RFQ for this Sales Order?"
+                    invisible="not use_generate_mo_label"
+                />
+                <button name="action_generate_all_mos"
+                    string="Generate RFQ"
+                    type="object"
+                    class="oe_highlight btn-warning"
+                    confirm="Generate Manufacturing Orders/RFQ for this Sales Order?"
+                    invisible="use_generate_mo_label"
+                />
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="view_order_form_custom_leadname" model="ir.ui.view">
+        <field name="name">sale.order.form.custom.leadname</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Add the lead field after the partner_id field in the header -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="lead_id"
+                string="Collection Name ★"
+                options="{'no_create_edit': True}"
+                       placeholder="Search or create lead"
+                       context="{
+                                    'default_partner_id': partner_id,
+                                    'default_type': 'opportunity',
+                                    'default_x_project_type': 'collection',
+                                }"
+                       required="1"
+
+                />
+            </xpath>
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="manufacturing_due_date" invisible="1"/>
+                <field name="region" string="Region"/>
+                <field name="quotation_date" readonly="1"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                <field name="x_rel_service_id" options="{'no_create': True}" required="1" help="Select the main service for this order. Order lines will be readonly until this is set."/>
+                <field name="x_rel_services" invisible="1"/>
+                <field name="x_grading_data" invisible="1"/>
+                <field name="direct_mo_mode" invisible="1"/>
+                <field name="is_production_service" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='sale_order_template_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>       
+            <!-- Add the QUOTE Builder tab -->
+            <xpath expr="//notebook/page[@name='order_lines']" position="after">
+                <!-- Add Grading tab for Grading Service -->
+                <page string="Grading" name="grading_tab" invisible="x_rel_service_id.name != 'Grading Service'">
+                    <group string="Grading Configuration">
+                        <button name="action_add_grading_sizes" string="Add Product with Sizes" type="object" class="btn-primary"/>
+                    </group>
+                    <group string="Grading Data" invisible="not x_grading_data">
+                        <field name="x_grading_data" readonly="1" widget="text"/>
+                    </group>
+                </page>
+                <!--
+                <page string="Quote Builder" name="quote_builder" invisible="not lead_id">
+                    <group string="SELECT Leads FOR QUOTE GENERATION">
+                    </group>
+                    <div class="row mt-6">
+                        <field name="selected_child_leads" nolabel="1" widget="many2many_checkboxes" domain="[('id', 'in', child_crm_leads_to_quote)]" options="{'no_create': True, 'columns': 2}"/>
+                    </div>
+
+                    <group string="SELECTED LEADS DETAILS" invisible="not selected_child_leads">
+                        <field name="selected_child_leads" mode="list" nolabel="1">
+                            <list>
+                                <field name="name"/>
+                                <field name="style_family"/>
+                            </list>
+                        </field>
+                    </group>
+
+                    <div class="row mt-6">
+                        <div class="col-md-4">
+                            <button name="action_select_all_leads" string="Select All Available Leads" type="object" class="btn-secondary"/>
+                        </div>
+                        <div class="col-md-4">
+                            <button name="action_clear_selection" string="Clear Selection" type="object" class="btn-secondary"/>
+                        </div>
+                        <div class="col-md-4">
+                            <button name="action_generate_quote_lines" string="Generate Quote Lines" type="object" class="btn-primary" confirm="Are you sure you want to generate quote lines for the selected leads?"/>
+                        </div>
+                    </div>
+                </page>
+                -->
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_sale_order_form_opportunity_btn" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.opportunity.button</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button"
+                        type="object"
+                        name="action_open_opportunity"
+                        icon="fa-briefcase"
+                        invisible="not opportunity_id"
+                        >
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Opportunity</span>
+                        <span class="o_stat_value">
+                            <field name="opportunity_id" readonly="1"/>
+                        </span>
+                    </div>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <!-- Hide Recorded Hours (timesheet) button from sale_timesheet module -->
+    <record id="view_sale_order_hide_timesheet_button" model="ir.ui.view">
+        <field name="name">sale.order.form.hide.timesheet.button</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_timesheet.view_order_form_inherit_sale_timesheet"/>
+        <field name="arch" type="xml">
+            <button name="action_view_timesheet" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </button>
+        </field>
+    </record>
+
+    <!-- Hide core Projects and Tasks buttons from sale_project module -->
+    <record id="view_sale_order_hide_project_task_buttons" model="ir.ui.view">
+        <field name="name">sale.order.form.hide.project.task.buttons</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_project.view_order_form_inherit_sale_project"/>
+        <field name="arch" type="xml">
+            <button name="action_view_project_ids" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </button>
+            <button name="action_view_task" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </button>
+        </field>
+    </record>
+
+    <!-- Hide default Odoo Manufacturing button from sale_mrp module -->
+    <record id="view_sale_order_hide_default_mrp_button" model="ir.ui.view">
+        <field name="name">sale.order.form.hide.default.mrp.button</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_mrp.sale_order_form_mrp"/>
+        <field name="arch" type="xml">
+            <button name="action_view_mrp_production" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </button>
+        </field>
+    </record>
+
+    <record id="view_sale_order_form_project_btn" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.project.button</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                
+                
+                <button class="oe_stat_button"
+                        type="object"
+                        name="action_view_manufacturing_orders"
+                        icon="fa-wrench"
+                        invisible="manufacturing_order_count == 0"
+                        >
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Manufacturing Orders</span>
+                        <span class="o_stat_value">
+                            <field name="manufacturing_order_count" readonly="1"/>
+                        </span>
+                    </div>
+                </button>
+            </div>
+        </field>
+    </record>    
+
+    
+</odoo>

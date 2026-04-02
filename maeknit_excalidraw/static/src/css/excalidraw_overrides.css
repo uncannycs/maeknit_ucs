@@ -1,0 +1,18 @@
+/* Fix Excalidraw dropdowns hidden behind Odoo layers.
+ *
+ * The "extra tools" dropdown (triangle/rect/circle icon) ships with a very low
+ * z-index, which can make it appear like it "does nothing" inside Odoo.
+ */
+.excalidraw .App-toolbar__extra-tools-dropdown {
+    z-index: 2000 !important;
+}
+
+/* Bootstrap sets display:none on .dropdown-menu globally.
+ * Excalidraw conditionally mounts/unmounts the element via React, so it
+ * only exists in the DOM when open — safe to force display:block here.
+ */
+.excalidraw .dropdown-menu {
+    display: block !important;
+    position: absolute !important;
+    z-index: 2000 !important;
+}

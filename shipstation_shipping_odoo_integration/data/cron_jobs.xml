@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cron job to automatically fetch emails every 5 minutes -->
+    <record id="ir_cron_fetch_shipping_emails" model="ir.cron">
+        <field name="name">Fetch Shipping Emails</field>
+        <field name="model_id" ref="model_maeknit_shipping_mail"/>
+        <field name="state">code</field>
+        <field name="code">model.action_fetch_emails()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <!-- Removed numbercall and doall fields - not valid in Odoo 18 -->
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- Cron job to automatically update tracking status every 30 minutes -->
+    <record id="ir_cron_update_tracking_status" model="ir.cron">
+        <field name="name">Update Shipping Tracking Status</field>
+        <field name="model_id" ref="model_maeknit_shipping_tracking"/>
+        <field name="state">code</field>
+        <field name="code">model.action_fetch_tracking_status()</field>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <!-- Removed numbercall and doall fields - not valid in Odoo 18 -->
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

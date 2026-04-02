@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="stock_picking_view_shipstation_put_in_pack" model="ir.ui.view">
+            <field name="name">stock.picking.form.shipstation.put.in.pack</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_put_in_pack']" position="attributes">
+                    <attribute name="name">action_open_put_in_pack_wizard</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_open_put_in_pack_wizard']" position="after">
+                    <button class="btn-primary float-end"
+                            name="action_open_generate_all_labels"
+                            type="object"
+                            string="Generate All Labels"
+                            invisible="state in ('draft', 'done', 'cancel')"
+                            groups="stock.group_tracking_lot"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

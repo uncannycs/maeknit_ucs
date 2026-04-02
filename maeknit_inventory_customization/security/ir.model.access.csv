@@ -1,0 +1,28 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_fiber_user,product.fiber.user,model_product_fiber,base.group_user,1,1,1,1
+access_product_fiber_manager,product.fiber.manager,model_product_fiber,stock.group_stock_manager,1,1,1,1
+access_product_color_user,product.color.user,model_product_color,base.group_user,1,1,1,1
+access_product_color_manager,product.color.manager,model_product_color,stock.group_stock_manager,1,1,1,1
+access_machine_library_user,machine.library.user,model_machine_library,base.group_user,1,0,0,0
+access_machine_library_manager,machine.library.manager,model_machine_library,mrp.group_mrp_manager,1,1,1,1
+access_gauge_library_user,gauge.library.user,model_gauge_library,base.group_user,1,0,0,0
+access_gauge_library_manager,gauge.library.manager,model_gauge_library,mrp.group_mrp_manager,1,1,1,1
+access_stitch_library_user,stitch.library.user,model_stitch_library,base.group_user,1,0,0,0
+access_stitch_library_manager,stitch.library.manager,model_stitch_library,mrp.group_mrp_manager,1,1,1,1
+access_yarn_stock_user,yarn.stock user,model_yarn_stock,base.group_user,1,1,1,1
+access_yarn_programming_user,yarn.programming user,model_yarn_programming,base.group_user,1,1,1,1
+access_fiber_type_user,fiber.type user,model_fiber_type,base.group_user,1,1,1,1
+access_fiber_type_manager,fiber.type manager,model_fiber_type,stock.group_stock_manager,1,1,1,1
+access_fiber_category_user,fiber.category user,model_fiber_category,base.group_user,1,1,1,1
+access_fiber_category_manager,fiber.category manager,model_fiber_category,stock.group_stock_manager,1,1,1,1
+access_maeknit_sync_categories,maeknit.sync.categories,model_maeknit_sync_categories,stock.group_stock_manager,1,1,1,1
+access_style_colorway_user,style.colorway.user,model_style_colorway,base.group_user,1,1,1,1
+access_style_colorway_manager,style.colorway.manager,model_style_colorway,mrp.group_mrp_manager,1,1,1,1
+access_style_size_user,style.size.user,model_style_size,base.group_user,1,1,1,1
+access_style_size_manager,style.size.manager,model_style_size,mrp.group_mrp_manager,1,1,1,1
+access_style_yarn_variant_user,style.yarn.variant.user,model_style_yarn_variant,base.group_user,1,1,1,1
+access_style_yarn_variant_manager,style.yarn.variant.manager,model_style_yarn_variant,mrp.group_mrp_manager,1,1,1,1
+access_wash_library_user,wash.library.user,model_wash_library,base.group_user,1,0,0,0
+access_wash_library_manager,wash.library.manager,model_wash_library,mrp.group_mrp_manager,1,1,1,1
+access_dry_library_user,dry.library.user,model_dry_library,base.group_user,1,0,0,0
+access_dry_library_manager,dry.library.manager,model_dry_library,mrp.group_mrp_manager,1,1,1,1

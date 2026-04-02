@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Override the product quick create form -->
+    <record id="product_template_form_view_quick_create" model="ir.ui.view">
+        <field name="name">product.template.form.quick.create</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="mode">primary</field>
+        <field name="priority" eval="1000"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="product_category" required="1" widget="radio" options="{'horizontal': true}"/>
+            </xpath>
+        </field>
+        </record>
+    
+    <!-- Override the product kanban quick create -->
+    <record id="product_template_kanban_view_quick_create" model="ir.ui.view">
+        <field name="name">product.template.kanban.quick.create</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//templates//field[@name='name']" position="after">
+                <field name="product_category" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

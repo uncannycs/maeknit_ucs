@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List view for yarn.stock -->
+    <record id="view_yarn_stock_list" model="ir.ui.view">
+        <field name="name">yarn.stock.list</field>
+        <field name="model">yarn.stock</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" class="o_list_view_ungrouped">
+                <field name="technical_color" placeholder="Technical color"/>
+                <field name="generic_color" placeholder="Generic color"/>
+                <field name="lot_number" placeholder="Lot #"/>
+                <field name="cost" placeholder="Cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="mk_us_stock" placeholder="MK-US"/>
+                <field name="mk_uk_stock" placeholder="MK-UK"/>
+                <field name="lf_stock" placeholder="L AND F"/>
+                <field name="kadri_stock" placeholder="Kadri"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view for yarn.stock -->
+    <record id="view_yarn_stock_form" model="ir.ui.view">
+        <field name="name">yarn.stock.form</field>
+        <field name="model">yarn.stock</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="product_tmpl_id" invisible="1"/>
+                            <field name="technical_color" placeholder="Technical color"/>
+                            <field name="generic_color" placeholder="Generic color"/>
+                            <field name="lot_number" placeholder="Lot #"/>
+                            <field name="cost" placeholder="Cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                        <group>
+                            <field name="mk_us_stock" placeholder="MK-US"/>
+                            <field name="mk_uk_stock" placeholder="MK-UK"/>
+                            <field name="lf_stock" placeholder="L AND F"/>
+                            <field name="kadri_stock" placeholder="Kadri"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Module category so the group appears as a section on the user form -->
+    <record id="module_category_contacts_access" model="ir.module.category">
+        <field name="name">Contacts</field>
+        <field name="sequence">100</field>
+        <field name="visible">1</field>
+    </record>
+
+    <record id="group_contacts_access" model="res.groups">
+        <field name="name">Can Access Contacts Module</field>
+        <field name="category_id" ref="module_category_contacts_access"/>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_purchase_access" model="res.groups">
+        <field name="name">Can Access Purchase Module</field>
+        <field name="category_id" ref="module_category_contacts_access"/>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]"/>
+    </record>
+</odoo>

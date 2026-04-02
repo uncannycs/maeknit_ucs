@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Grading Wizard Form View -->
+    <record id="view_grading_wizard_form" model="ir.ui.view">
+        <field name="name">grading.wizard.form</field>
+        <field name="model">grading.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add to Grading">
+                <group>
+                    <group>
+                        <field name="bom_request_id" invisible="1"/>
+                        <field name="product_tmpl_id" string="Product Template"/>
+                        <field name="original_size_id" string="Size (Development)"/>
+                        <field name="original_colorway_id" string="Original Colorway (Development)"/>
+                    </group>
+                    <group>
+                        <field name="partner_id" string="Customer"/>
+                        <field name="grading_service_id" string="Grading Service"/>
+                    </group>
+                </group>
+                
+                <separator string="Available Colorways"/>
+                <group>
+                    <field name="available_colorway_ids" widget="many2many_tags" 
+                           options="{'color_field': 'color', 'no_create_edit': True}"
+                           readonly="1"/>
+                </group>
+                
+                <separator string="Select Colorways for Grading"/>
+                <group>
+                    <field name="selected_colorway_ids" widget="many2many_tags"
+                           context="{'default_attribute_id': %(maeknit_inventory_customization.attr_colorway)d}"
+                           options="{'no_create': False, 'no_create_edit': True}"/>
+                </group>
+                
+                <separator string="Available Sizes"/>
+                <group>
+                    <field name="available_size_ids" widget="many2many_tags"
+                           options="{'color_field': 'color', 'no_create_edit': True}"
+                           readonly="1"/>
+                </group>
+                
+                <separator string="Select Sizes for Grading"/>
+                <group>
+                    <field name="selected_size_ids" widget="many2many_tags"
+                           context="{'default_attribute_id': %(maeknit_inventory_customization.attr_size)d}"
+                           options="{'no_create': False, 'no_create_edit': True}"/>
+                </group>
+                
+                <!-- Added price per grade field -->
+                <group>
+                    <field name="price_per_grade"/>
+                </group>
+                
+                <footer>
+                    <!-- Updated button text to reflect Sales Order creation -->
+                    <button string="Create Sales Order" name="action_create_grading_boms" 
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Action to open Grading Wizard -->
+    <record id="action_grading_wizard" model="ir.actions.act_window">
+        <field name="name">Add to Grading</field>
+        <field name="res_model">grading.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="maeknit_sales_customization.model_maeknit_bom_request"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="maeknit_program_files_templates" xml:space="preserve">
+  <t t-name="maeknit_mfg_customization.MrpProgramFilesDialog" owl="1">
+    <div class="o_mrp_program_files_dialog">
+      <DocumentViewer
+        resModel="'ir.attachment'"
+        resId="props.attachmentIDs[0]"
+        activeAttachmentID="props.activeAttachmentID"
+        attachmentIDs="props.attachmentIDs"
+      />
+    </div>
+  </t>
+</templates>

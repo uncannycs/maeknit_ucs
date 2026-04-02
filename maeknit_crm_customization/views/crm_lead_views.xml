@@ -1,0 +1,179 @@
+<odoo>
+  <!-- Original CRM Lead Form Customization -->
+  <record id="crm_lead_form_custom_content" model="ir.ui.view">
+    <field name="name">crm.lead.form.custom.content</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+    <field name="priority" eval="1000"/>
+    <field name="arch" type="xml">
+
+      <xpath expr="//div[@class='oe_title']" position="replace">
+          <group>
+            <widget name="crm_lead_owl_widget"
+                    tag_ids_widget="many2many_checkboxes"
+                    show_all_fields="true"/>
+          </group>
+        </xpath>
+
+    <!-- Hide unwanted groups -->
+    <xpath expr="//group[@name='lead_partner']" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+    <xpath expr="//group[@name='opportunity_partner']" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+    <xpath expr="//group[@name='lead_info']" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+
+    <!-- Hide entire notebook -->
+    <xpath expr="//notebook" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+
+    <!-- Hide notebook pages individually (extra safe) -->
+    <xpath expr="//page[@name='lead']" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+    <xpath expr="//page[@name='extra']" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+
+    <!-- Hide group containing Salesperson, Deadline, Priority, Tags -->
+    <xpath expr="//group[.//field[@name='date_deadline']]" position="attributes">
+      <attribute name="invisible">1</attribute>
+    </xpath>
+
+    </field>
+  </record>
+
+  <!-- Inventory Customization -->
+  <record id="crm_lead_view_form_inherit" model="ir.ui.view">
+      <field name="name">crm.lead.view.form.inherit</field>
+      <field name="model">crm.lead</field>
+      <field name="inherit_id" ref="crm.crm_lead_view_form" />
+      <field name="arch" type="xml">
+          <xpath expr="//field[@name='expected_revenue']" position="attributes">
+              <attribute name="readonly">child_ids</attribute>
+          </xpath>
+          <xpath expr="//group[@name='opportunity_partner']/field[@name='partner_id']"
+              position="before">
+              <field name="parent_id" />
+          </xpath>
+          <xpath expr="//group[@name='lead_partner']/field[@name='partner_id']" position="before">
+              <field name="parent_id" />
+          </xpath>
+          <xpath expr="//group[@name='opportunity_partner']" position="inside">
+              <field name="season_drop_date" />
+              <field name="company_id" options="{'no_create': True}"/>
+          </xpath>
+          <xpath expr="//group[@name='lead_partner']" position="inside">
+              <field name="season_drop_date" />
+              <field name="company_id" options="{'no_create': True}"/>
+          </xpath>
+          <xpath expr="//page[@name='extra']" position="after">
+              <page name="child_opportunities" string="Child Opportunities">
+                  <field name="child_ids" invisible="1"/> 
+              </page>
+              <page name="products" string="Products">
+                  <field name="product_ids" />
+              </page>
+          </xpath>
+          <xpath expr="//field[@name='tag_ids']" position="attributes">
+              <attribute name="widget">many2many_checkboxes</attribute>
+          </xpath>
+          <xpath expr="//group[@name='lead_priority']/field[@name='tag_ids']"
+              position="attributes">
+              <attribute name="widget">many2many_checkboxes</attribute>
+          </xpath>
+          <field name="name" position="after">
+              <field name="x_child_style_name" invisible="1"/>
+          </field>
+      </field>
+  </record>
+
+  <!-- CRM Lead Product List View -->
+  <record id="crm_lead_product_view_list" model="ir.ui.view">
+      <field name="name">crm.lead.product.view.list</field>
+      <field name="model">crm.lead.product</field>
+      <field name="arch" type="xml">
+          <list string="Products">
+              <field name="product_id" />
+              <field name="quantity" />
+              <field name="price" />
+              <field name="cost" />
+          </list>
+      </field>
+  </record>
+
+  <record id="crm_lead_form_dynamic_statusbar" model="ir.ui.view">
+    <field name="name">crm.lead.form.dynamic.statusbar</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+    <field name="priority" eval="2000"/>
+    <field name="arch" type="xml">
+
+        <xpath expr="//header/field[@name='stage_id']" position="replace">
+             <field name="stage_id"
+                widget="statusbar_duration"
+                options="{'clickable': '1', 'fold_field': 'fold'}"
+                domain="[('x_stage_type','in',[x_project_type,'both'])]"
+                eval="True"
+              />
+
+        </xpath>
+
+    </field>
+</record>
+
+
+  <record id="crm_lead_view_form_inherit_quote_settings" model="ir.ui.view">
+    <field name="name">crm.lead.view.form.inherit.quote.settings</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+    <field name="arch" type="xml">
+        <!-- Add the new fields to the form view -->
+        <xpath expr="//form//sheet" position="inside">
+            <field name="stage_domain" invisible="1"/>
+        </xpath>
+      
+        <xpath expr="//page[@name='extra']" position="inside">
+            <group string="Quote Settings">
+                <field name="x_include_development_in_quote"/>
+                <field name="x_include_production_in_quote"/>
+                <field name="x_include_swatch_in_quote"/>
+                <field name="x_include_reverse_in_quote"/>
+                <field name="x_include_grading_in_quote"/>
+            </group>
+        </xpath>
+    </field>
+  </record>
+
+  <record id="maeknit_crm_case_kanban_view_leads_inherit" model="ir.ui.view">
+    <field name="name">crm.lead.kanban.inherit.remove_quick_create</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+    <field name="arch" type="xml">
+      <kanban position="attributes">
+        <attribute name="on_create" />
+        <attribute name="quick_create_view" />
+      </kanban>
+    </field>
+  </record>
+
+  <record id="crm.crm_lead_opportunities" model="ir.actions.act_window">
+    <field name="domain">[('x_project_type','=','collection')]</field>
+    <field name="context">{'search_default_project_type_collection': 1}</field>
+  </record>
+
+  <record id="crm.crm_lead_all_leads" model="ir.actions.act_window">
+    <field name="domain">[('x_project_type','=','collection')]</field>
+    <field name="context">{'search_default_project_type_collection': 1}</field>
+  </record>
+
+  <record id="crm.crm_lead_action_pipeline" model="ir.actions.act_window">
+    <field name="domain">[('x_project_type','=','collection')]</field>
+    <field name="context">{'default_type': 'opportunity', 'search_default_assigned_to_me': 1, 'search_default_project_type_collection': 1}</field>
+  </record>
+
+</odoo>

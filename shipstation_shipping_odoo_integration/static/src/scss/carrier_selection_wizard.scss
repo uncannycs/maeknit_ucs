@@ -1,0 +1,295 @@
+.carrier-selection-wizard {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 50px);
+    max-height: calc(100vh - 50px);
+    padding: 24px;
+    background: #f8f9fa;
+    overflow: hidden;
+
+    .wizard-header {
+        text-align: center;
+        margin-bottom: 20px;
+        flex-shrink: 0;
+
+        h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #6c757d;
+        }
+    }
+
+    .shipstation-summary {
+        flex-shrink: 0;
+    }
+
+    .wizard-content {
+        max-width: 1000px;
+        margin: 0 auto;
+        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    // Step 1: Carrier Selection
+    .step-carriers {
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+            color: #333;
+        }
+
+        .carrier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .carrier-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                border-color: #875a7b;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(135, 90, 123, 0.15);
+            }
+
+            &.selected {
+                border-color: #875a7b;
+                background: linear-gradient(135deg, #875a7b 0%, #a0729e 100%);
+                color: white;
+                box-shadow: 0 4px 16px rgba(135, 90, 123, 0.3);
+
+                .carrier-icon {
+                    transform: scale(1.1);
+                }
+
+                .carrier-desc {
+                    color: rgba(255, 255, 255, 0.9);
+                }
+            }
+
+            .carrier-icon {
+                font-size: 48px;
+                margin-bottom: 12px;
+                transition: transform 0.2s ease;
+            }
+
+            .carrier-name {
+                font-size: 18px;
+                font-weight: 600;
+                margin-bottom: 4px;
+            }
+
+            .carrier-desc {
+                font-size: 12px;
+                color: #6c757d;
+            }
+        }
+    }
+
+    // Step 2: Rates Display
+    .step-rates {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .rates-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 8px;
+            margin-bottom: 0;
+
+            // Custom scrollbar styling
+            &::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 4px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: #875a7b;
+                border-radius: 4px;
+
+                &:hover {
+                    background: #724b67;
+                }
+            }
+        }
+
+        .carrier-section {
+            margin-bottom: 32px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        .carrier-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 12px;
+
+            h4 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #333;
+            }
+
+            .badge {
+                background: #e9ecef;
+                color: #495057;
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+        }
+
+        .rates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .rate-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+
+            &:hover {
+                border-color: #875a7b;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(135, 90, 123, 0.15);
+            }
+
+            &.selected {
+                border-color: #875a7b;
+                border-width: 3px;
+                box-shadow: 0 4px 16px rgba(135, 90, 123, 0.25);
+
+                .rate-price {
+                    color: #875a7b;
+                }
+            }
+
+            .rate-service {
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 8px;
+                min-height: 40px;
+            }
+
+            .rate-price {
+                font-size: 24px;
+                font-weight: 700;
+                color: #28a745;
+                margin-bottom: 8px;
+            }
+
+            .rate-details {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                font-size: 12px;
+                color: #6c757d;
+            }
+
+            .rate-selected-badge {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                background: #875a7b;
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                font-weight: 600;
+
+                i {
+                    margin-right: 4px;
+                }
+            }
+        }
+    }
+
+    .wizard-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        padding-top: 16px;
+        padding-bottom: 8px;
+        margin-top: auto;
+        border-top: 1px solid #e0e0e0;
+        flex-shrink: 0;
+        background: #f8f9fa;
+
+        button {
+            min-width: 160px;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+
+            &.btn-primary {
+                background: #875a7b;
+                border-color: #875a7b;
+
+                &:hover:not(:disabled) {
+                    background: #724b67;
+                    border-color: #724b67;
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(135, 90, 123, 0.3);
+                }
+            }
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    .alert {
+        margin-bottom: 20px;
+        padding: 16px;
+        border-radius: 8px;
+        flex-shrink: 0;
+
+        i {
+            margin-right: 8px;
+        }
+    }
+}

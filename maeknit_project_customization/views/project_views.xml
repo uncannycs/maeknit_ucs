@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Override the main project action to be "Client Projects" by default -->
+    <record id="project.open_view_project_all" model="ir.actions.act_window">
+        <field name="name">Client Projects</field> <!-- Rename the action -->
+        <field name="res_model">project.project</field>
+        <field name="view_mode">list,kanban,form,calendar,activity</field>
+        <field name="context">{'display_milestone_deadline': True, 'default_project_type': 'client'}</field>
+        <field name="domain">[('project_type', '=', 'client')]</field> <!-- Add domain -->
+        <field name="search_view_id" ref="project.view_project_project_filter"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No client projects found. Let's create one!
+            </p>
+            <p>
+                Create projects to organize your tasks. Define a different workflow for each project.
+            </p>
+        </field>
+    </record>
+
+    <!-- The menu item project.menu_projects will now point to the renamed action -->
+    <record id="project.menu_projects" model="ir.ui.menu">
+        <field name="name">Client Projects</field> <!-- Rename the menu item -->
+        <field name="action" ref="project.open_view_project_all"/>
+        <field name="sequence">1</field> <!-- Ensure it's first -->
+    </record>
+
+    <!-- Action for Internal Projects -->
+    <record id="action_internal_projects" model="ir.actions.act_window">
+        <field name="name">Internal Projects</field>
+        <field name="res_model">project.project</field>
+        <field name="view_mode">list,kanban,form,calendar,activity</field>
+        <field name="domain">[('project_type', '=', 'internal')]</field>
+        <field name="context">{'default_project_type': 'internal'}</field>
+        <field name="search_view_id" ref="project.view_project_project_filter"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No internal projects found. Let's create one!
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu item for Internal Projects -->
+    <menuitem id="menu_internal_projects"
+            name="Internal Projects"
+            parent="project.menu_main_pm"
+            action="action_internal_projects"
+            sequence="2"/>
+
+    <!-- Also override the view sequence in the action -->
+    <record id="project_list_view_first" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="act_window_id" ref="project.open_view_project_all"/>
+        <field name="view_id" ref="project.view_project"/>
+    </record>
+
+    <record id="project_kanban_view_second" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="act_window_id" ref="project.open_view_project_all"/>
+        <field name="view_id" ref="project.view_project_kanban"/>
+    </record>
+
+    <record id="view_project_list_custom" model="ir.ui.view">
+        <field name="name">project.project.list.custom</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project"/>
+        <field name="arch" type="xml">
+            <!-- Remove the action attribute from the list tag, as JS will handle row clicks -->
+            <xpath expr="//list" position="attributes">
+                <attribute name="action"></attribute> <!-- Set to empty to remove any existing action -->
+            </xpath>
+
+            <!-- Change the "View Tasks" button to open the project form -->
+            <xpath expr="//button[@name='action_view_tasks']" position="attributes">
+                <attribute name="name">action_open_project_form</attribute>
+                <attribute name="string">View Project</attribute>
+            </xpath>
+            <!-- Add project_type to the list view -->
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="project_type" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='stage_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add project_type to the form view -->
+    <record id="view_project_form_custom" model="ir.ui.view">
+        <field name="name">project.project.form.custom</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="project_type"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add project_type to the search view with filters -->
+    <record id="view_project_search_custom" model="ir.ui.view">
+        <field name="name">project.project.search.custom</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_project_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <filter string="Project Type" name="project_type_filter" domain="[]" context="{'group_by':'project_type', 'group_expand': True}"/>
+                <separator/>
+                <filter string="Client Projects" name="client_projects_filter" domain="[('project_type', '=', 'client')]"/>
+                <filter string="Internal Projects" name="internal_projects_filter" domain="[('project_type', '=', 'internal')]"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

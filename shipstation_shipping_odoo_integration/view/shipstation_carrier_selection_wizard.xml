@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Wizard Form View -->
+        <record id="view_shipstation_carrier_selection_wizard_form" model="ir.ui.view">
+            <field name="name">shipstation.carrier.selection.wizard.form</field>
+            <field name="model">shipstation.carrier.selection.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="select,rates"/>
+                    </header>
+                    <sheet>
+                        <field name="picking_id" invisible="1"/>
+                        <field name="carrier_ids" invisible="1"/>
+                        
+                        <!-- Carrier Selection Step -->
+                        <div invisible="state != 'select'">
+                            <div class="oe_title">
+                                <h1>Select Carriers for Rate Lookup</h1>
+                            </div>
+                            
+                            <group>
+                                <field name="fetch_mode" widget="radio"/>
+                            </group>
+                            
+                            <!-- Carrier selection boxes -->
+                            <div class="row mt-3" invisible="fetch_mode != 'specific'">
+                                <div class="col-12">
+                                    <label for="selected_carrier_ids" string="Select Carriers"/>
+                                    <field name="selected_carrier_ids" widget="many2many_tags"/>
+                                </div>
+                            </div>
+                            
+                            <!-- Better styling for info boxes -->
+                            <div class="alert alert-info mt-3" role="alert" invisible="fetch_mode != 'combined'">
+                                <strong>Combined Mode:</strong> Fetches rates from all available carriers and displays the 10 cheapest options.
+                            </div>
+                            
+                            <div class="alert alert-info mt-3" role="alert" invisible="fetch_mode != 'specific'">
+                                <strong>Specific Carriers Mode:</strong> Fetches rates only from your selected carriers.
+                            </div>
+                        </div>
+                        
+                        <!-- Rates Display Step -->
+                        <div invisible="state != 'rates'">
+                            <div class="oe_title">
+                                <h1>Available Rates</h1>
+                            </div>
+                            
+                            <!-- Better error message display -->
+                            <div class="alert alert-warning" role="alert" invisible="not error_messages">
+                                <field name="error_messages" readonly="1" nolabel="1"/>
+                            </div>
+                            
+                            <!-- Better rate display with card-like boxes -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <h3>Select a Shipping Service:</h3>
+                                </div>
+                            </div>
+                            
+                            <!-- Enhanced kanban view with better styling -->
+                            <field name="rate_ids" mode="kanban" nolabel="1">
+                                <kanban class="o_kanban_mobile" create="false" edit="false" delete="false">
+                                    <field name="id"/>
+                                    <field name="shipstation_provider"/>
+                                    <field name="shipstation_service_name"/>
+                                    <field name="shipstation_service_code"/>
+                                    <field name="shipping_cost"/>
+                                    <field name="other_cost"/>
+                                    <field name="total_cost"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div class="oe_kanban_card" style="border: 2px solid #e9ecef; border-radius: 12px; padding: 20px; margin: 10px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                                                <div class="row">
+                                                    <div class="col-7">
+                                                        <strong style="font-size: 18px; color: #212529; display: block; margin-bottom: 8px;">
+                                                            <field name="shipstation_service_name"/>
+                                                        </strong>
+                                                        <div style="color: #6c757d; font-size: 13px; margin-bottom: 4px;">
+                                                            <i class="fa fa-building-o" style="margin-right: 5px;"/> 
+                                                            <field name="shipstation_provider"/>
+                                                        </div>
+                                                        <div style="color: #6c757d; font-size: 12px;">
+                                                            <i class="fa fa-barcode" style="margin-right: 5px;"/> 
+                                                            <field name="shipstation_service_code"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-5 text-right">
+                                                        <div style="font-size: 28px; font-weight: bold; color: #28a745; margin-bottom: 5px;">
+                                                            $<field name="total_cost"/>
+                                                        </div>
+                                                        <div style="font-size: 11px; color: #6c757d;">
+                                                            Shipping: $<field name="shipping_cost"/>
+                                                        </div>
+                                                        <div style="font-size: 11px; color: #6c757d;" invisible="other_cost == 0">
+                                                            Other: $<field name="other_cost"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3">
+                                                    <button name="set_picking_service" 
+                                                            string="Select This Service" 
+                                                            type="object" 
+                                                            class="btn btn-success btn-block"
+                                                            style="font-weight: 600; padding: 10px; border-radius: 8px;"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </div>
+                    </sheet>
+                    
+                    <footer>
+                        <!-- Select step footer -->
+                        <div invisible="state != 'select'">
+                            <button name="action_fetch_rates" 
+                                    string="Fetch Rates" 
+                                    type="object" 
+                                    class="btn-primary"/>
+                            <button string="Cancel" 
+                                    class="btn-secondary" 
+                                    special="cancel"/>
+                        </div>
+                        
+                        <!-- Rates step footer -->
+                        <div invisible="state != 'rates'">
+                            <button name="action_back_to_selection" 
+                                    string="Back" 
+                                    type="object" 
+                                    class="btn-secondary"/>
+                            <button string="Close" 
+                                    class="btn-primary" 
+                                    special="cancel"/>
+                        </div>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Wizard Action -->
+        <record id="action_shipstation_carrier_selection_wizard" model="ir.actions.act_window">
+            <field name="name">Select Carrier</field>
+            <field name="res_model">shipstation.carrier.selection.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        </record>
+    </data>
+</odoo>

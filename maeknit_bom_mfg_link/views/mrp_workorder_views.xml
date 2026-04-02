@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- MFG Sheet section on Program WO form -->
+    <record id="mrp_workorder_form_mfg_sheet" model="ir.ui.view">
+        <field name="name">mrp.workorder.form.mfg.sheet</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp_workorder.mrp_workorder_view_form_inherit_workorder"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='time_tracking']" position="before">
+                <page string="MFG Sheet" name="mfg_sheet_instructions"
+                      invisible="not is_program_workorder">
+                    <div class="o_row mb-3" style="align-items:center; gap:12px;">
+                        <button name="action_update_mfg_sheet"
+                                type="object"
+                                string="Update Now"
+                                class="btn btn-primary"
+                                icon="fa-refresh"/>
+                        <button name="action_download_mfg_sheet"
+                                type="object"
+                                string="Download"
+                                class="btn btn-secondary"
+                                icon="fa-download"/>
+                        <span class="text-muted ms-2" style="font-size:12px;"
+                              invisible="mfg_sheet_last_updated">
+                            Not yet generated
+                        </span>
+                        <div class="d-flex align-items-center gap-2 text-muted ms-2"
+                             style="font-size:12px;"
+                             invisible="not mfg_sheet_last_updated">
+                            <span>Last updated:</span>
+                            <field name="mfg_sheet_last_updated" widget="datetime" readonly="1" nolabel="1"/>
+                        </div>
+                    </div>
+                    <field name="mfg_sheet_last_updated" invisible="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Re-program button to workorder form header for Knit workorders -->
+    <record id="mrp_workorder_form_reprogram_button" model="ir.ui.view">
+        <field name="name">mrp.workorder.form.reprogram.button</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp_workorder.mrp_workorder_view_form_inherit_workorder"/>
+        <field name="arch" type="xml">
+            <!-- Add is_knit_workorder field to the form -->
+            <xpath expr="//field[@name='quality_check_fail']" position="after">
+                <field name="is_knit_workorder" invisible="1"/>
+                <field name="is_program_workorder" invisible="1"/>
+            </xpath>
+
+            <!-- Add Re-program button after Mark as Done button -->
+            <xpath expr="//button[@name='action_mark_as_done']" position="after">
+                <button name="action_request_new_program"
+                        type="object"
+                        string="Re-program"
+                        class="btn-warning"
+                        invisible="not is_knit_workorder or state in ['done', 'cancel', 'progress']"
+                        icon="fa-refresh"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Re-program button to the editable tree view (embedded in MO form) -->
+    <record id="mrp_workorder_tree_reprogram_button" model="ir.ui.view">
+        <field name="name">mrp.workorder.tree.reprogram.button</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_tree_editable_view"/>
+        <field name="arch" type="xml">
+            <!-- Add is_knit_workorder field -->
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="is_knit_workorder" column_invisible="True"/>
+            </xpath>
+
+            <!-- Add Re-program button in the button area -->
+            <xpath expr="//button[@name='button_finish']" position="after">
+                <button name="action_request_new_program"
+                        type="object"
+                        string="Re-program"
+                        class="btn-link text-warning"
+                        invisible="not is_knit_workorder or state not in ['progress']"
+                        icon="fa-refresh"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mrp_workorder_sketch_tab" model="ir.ui.view">
+        <field name="name">mrp.workorder.sketch.tab</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp_workorder.mrp_workorder_view_form_inherit_workorder"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="inside">
+                <field name="show_panel_cad_tab" invisible="1"/>
+                <field name="show_whole_cad_tab" invisible="1"/>
+                <field name="show_sketch_tab" invisible="1"/>
+                <field name="is_uk_company" invisible="1" column_invisible="1"/>
+                <field name="show_stitch_density_tab" invisible="1"/>
+                <field name="show_linking_dial_tab" invisible="1"/>
+                <field name="show_garment_documentation_tab" invisible="1"/>
+                <field name="show_garment_construction_tab" invisible="1"/>
+                <field name="show_swatch_documentation_tab" invisible="1"/>
+                <field name="show_cad_pom_tab" invisible="1"/>
+            </xpath>
+            <xpath expr="//notebook/page[@name='time_tracking']" position="before">
+                <page string="Panel CAD" name="panel_cad" invisible="not show_panel_cad_tab or is_uk_company">
+                    <group col="1">
+                        <field name="measurement_widget_data" widget="measurement_sheet_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="measurement_widget_data_with_images" invisible="1"/>
+                    </group>
+                </page>
+
+                <page string="Whole CAD" name="whole_cad" invisible="not show_whole_cad_tab or is_uk_company">
+                    <group col="1">
+                        <field name="whole_cad_data_with_images" widget="whole_cad_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="whole_cad_data" invisible="1"/>
+                    </group>
+                </page>
+                <page string="Documentation" name="whole_cad_uk" invisible="not show_whole_cad_tab or not is_uk_company">
+                    <group col="1">
+                        <field name="whole_cad_data_with_images" widget="whole_cad_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="whole_cad_data" invisible="1"/>
+                    </group>
+                </page>
+                <page string="CAD &amp; POM" name="cad_pom" invisible="not show_cad_pom_tab">
+                    <group col="1">
+                        <field name="cad_pom_data_with_images" widget="whole_cad_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="cad_pom_data" invisible="1"/>
+                    </group>
+                </page>
+                <page string="Sketch" name="sketch" invisible="not show_sketch_tab or is_uk_company">
+                    <group col="1">
+                        <field name="excalidraw_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                    </group>
+                </page>
+                <page string="Stitch Construction" name="stitch_construction" invisible="not show_sketch_tab or not is_uk_company">
+                    <group col="1">
+                        <field name="excalidraw_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                    </group>
+                </page>
+                <page string="Garment Construction" name="garment_construction" invisible="not show_garment_construction_tab">
+                    <group col="1">
+                        <field name="garment_construction_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                    </group>
+                </page>
+                <page string="Linking Dial" name="linking_dial" invisible="not show_linking_dial_tab">
+                    <group col="1">
+                        <field name="linking_dial_measurements" widget="linking_dial_widget" nolabel="1" class="o_fullwidth_widget"/>
+                    </group>
+                </page>
+                <page string="Stitch Density" name="calibration" invisible="not show_stitch_density_tab">
+                    <group col="1">
+                        <field name="calibration_data_with_images" widget="calibration_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="calibration_data" invisible="1"/>
+                    </group>
+                </page>
+                
+            </xpath>
+            <xpath expr="//notebook/page[@name='components']" position="after">
+                <page string="Documentation" name="garment_doc" invisible="not (show_garment_documentation_tab or show_swatch_documentation_tab)">
+                    <group col="1">
+                        <field name="garment_doc_data" widget="garment_doc_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="product_category" invisible="1"/>
+                    </group>
+                </page>            
+            </xpath>
+            <xpath expr="//notebook/page[@name='time_tracking']" position="replace">
+                <!-- Remove original page -->
+            </xpath>
+            <xpath expr="//notebook/page[@name='garment_doc']" position="after">
+
+                <page string="Time Tracking" name="time_tracking" groups="mrp.group_mrp_manager">
+                    <field name="time_ids" nolabel="1" context="{'default_workcenter_id': workcenter_id, 'default_workorder_id': id}">
+                        <list editable="bottom">
+                            <field name="user_id"/>
+                            <field name="duration" widget="float_time" readonly="id"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="workcenter_id" column_invisible="True"/>
+                            <field name="company_id" column_invisible="True"/>
+                            <field name="loss_id" string="Productivity" optional="show"/>
+                        </list>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="date_start"/>
+                                    <field name="date_end"/>
+                                    <field name="duration" widget="float_time"/>
+                                    <field name="company_id" invisible="1"/>
+                                </group>
+                                <group>
+                                    <field name="user_id"/>
+                                    <field name="workcenter_id"/>
+                                    <field name="company_id" invisible="1"/>
+                                    <field name="loss_id"/>
+                                </group>
+                            </group>
+                        </form>
+                    </field>
+                    <div>
+                        <label for="duration" class="pe-2"/>
+                        <field name="duration" widget="float_time" readonly="1"/>
+                        <span>&amp;nbsp;(minutes)</span>
+                    </div>
+                </page>
+            </xpath>
+            <xpath expr="//notebook/page[@name='components']" position="replace">
+            </xpath>
+            <xpath expr="//notebook/page[@name='garment_doc']" position="after">
+                <page string="Components" name="components_tab">
+                    <field name="comp_move_raw_ids"
+                        widget="stock_move_one2many"
+                        context="{
+                            'default_raw_material_production_id': production_id,
+                            'default_company_id': company_id,
+                            'default_picking_type_id': production_id.picking_type_id,
+                            'parent_id': id
+                        }">
+                        <list default_order="is_done, manual_consumption desc, sequence"
+                                editable="bottom">
+                            <field name="product_id" readonly="True"/>
+                            <field name="x_ply"/>
+                            <field name="left_carrier" invisible="is_uk_company"/>
+                            <field name="right_carrier" invisible="is_uk_company"/>
+                            <field name="structure_id" readonly="True" invisible="is_uk_company" />
+                            <field name="consumed_in_operation_id" string="Consumed in Operation"/>
+                            <field name="quantity" readonly="True"/>
+                            <field name="location_id" readonly="True"/>
+                            <field name="product_uom" readonly="True"/>
+                            <field name="product_uom_qty" string='To Consume' readonly="True"/>
+                            <field name="state"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_quant_tree_editable_inherit_lot_required"
+        model="ir.ui.view">
+    <field name="name">stock.quant.list.editable.lot.required</field>
+    <field name="model">stock.quant</field>
+    <field name="inherit_id" ref="stock.view_stock_quant_tree_editable"/>
+    <field name="arch" type="xml">
+
+        <xpath expr="//field[@name='lot_id']" position="attributes">
+            <attribute name="readonly">False</attribute>
+            <attribute name="required">1</attribute>
+            <attribute name="readonly">False</attribute>
+            <attribute name="force_save">1</attribute>
+        </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_mrp_workorder_tree_inherit" model="ir.ui.view">
+        <field name="name">mrp.production.work.order.list.inherit</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="class">maeknit-workorder-sticky</attribute>
+                <attribute name="default_order">state_sort_order asc, name asc</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position="replace"/>
+            <xpath expr="//field[@name='duration_expected']" position="replace"/>
+            <xpath expr="//list/field[1]" position="before">
+                <field name="product_id"
+                       options="{'tooltip': true}"
+                       class="maeknit-sticky-product"
+                       width="300"
+                       context="{'display_default_code': False}"/>
+            </xpath>
+
+            <xpath expr="//field[@name='workcenter_id']" position="after">
+                 <field name="partner_id" string="Client" width="100"/>
+                 <field name="production_rel_service" string="Service"/>
+            </xpath>
+
+            <!-- Hide play/pause/finish buttons — accessible from inside the MO -->
+            <xpath expr="//button[@name='button_start']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_pending']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_finish']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="column_invisible">True</attribute>
+            </xpath>
+
+            <!-- Hide Instructions buttons (both states) -->
+            <xpath expr="//button[@name='action_upload_instruction_files'][@class='btn btn-sm']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_upload_instruction_files'][@class='btn btn-sm btn-outline-success']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Hide Programs buttons (both states) -->
+            <xpath expr="//button[@name='action_upload_program_files'][@class='btn btn-sm']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_upload_program_files'][@class='btn btn-sm btn-outline-success']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Replace standalone search view with proper inheritance from enterprise view -->
+    <record id="mrp_workorder_search_multi_field" model="ir.ui.view">
+        <field name="name">mrp.workorder.search.multi.field.inherit</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.view_mrp_production_workorder_form_view_filter"/>
+        <field name="arch" type="xml">
+            <!-- Add filter_domain to the name field for multi-field search -->
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="filter_domain">['|', '|', '|', '|', '|', '|', '|',
+                    ('name', 'ilike', self),
+                    ('production_id.name', 'ilike', self),
+                    ('product_id.name', 'ilike', self),
+                    ('product_id.product_tmpl_id.name', 'ilike', self),
+                    ('partner_id.name', 'ilike', self),
+                    ('workcenter_id.name', 'ilike', self),
+                    ('production_id.origin', 'ilike', self),
+                    ('production_id.partner_id.name', 'ilike', self)
+                ]</attribute>
+            </xpath>
+            <!-- Add partner_id field for searching by customer -->
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="partner_id" string="Customer"/>
+            </xpath>
+            <!-- Add group by customer -->
+            <xpath expr="//filter[@name='status']" position="after">
+                <filter string="Customer" name="customer" context="{'group_by': 'partner_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

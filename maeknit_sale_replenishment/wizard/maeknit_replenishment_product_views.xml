@@ -1,0 +1,78 @@
+<odoo>
+    <data>
+        <record id="view_maeknit_replenishment_form_view" model="ir.ui.view">
+            <field name="name">maeknit.replenishment.form.view</field>
+            <field name="model">maeknit.replenishment</field>
+            <field name="arch" type="xml">
+                <form string="Create Procurements">
+                    <group>
+                        <field name="sale_order_id" invisible="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Components">
+                            <header>
+                                <button name="action_select_all_component_procurement" string="Create Procurement" type="object" class="btn btn-primary" invisible="is_component_procurement_done"/>
+                            </header>
+                            <group>
+                                <field name="is_component_procurement_done" invisible="1"/>
+                                <field name="is_parent_procurement_done" invisible="1"/>
+                                <field name="replenishment_component_line_ids" nolabel="1">
+                                    <list editable="bottom" delete="0">
+                                        <field name="replenishment_component_id" column_invisible="1"/>
+                                        <field name="product_id"/>
+                                        <field name="subcontractor_id" readonly="1"/>
+                                        <field name="vendor_id"/>
+                                        <field name="is_bom" column_invisible="1"/>
+                                        <field name="is_component"/>
+                                        <field name="qty"/>
+                                        <field name="onhand_qty" readonly="1" force_save="1"/>
+                                        <field name="add_qty"/>
+                                        <field name="final_qty" readonly="1" force_save="1"/>
+                                        <field name="sale_line_id" column_invisible="1"/>
+                                        <field name="route_id"/>
+                                        <field name="lead_time"/>
+                                        <field name="landed_cost"/>
+                                        <field name="price_unit"/>
+                                        <field name="cost"/>
+                                        <field name="is_subcontracting"/>
+                                        <field name="is_create_procurement"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+<!--                        <page string="BOM Product with COMP">-->
+<!--                            <group>-->
+<!--                                <field name="replenishment_line_ids" nolabel="1">-->
+<!--                                    <list editable="bottom" delete="0">-->
+<!--                                        <field name="replenishment_product_id" column_invisible="1"/>-->
+<!--                                        <field name="product_id"/>-->
+<!--                                        <field name="subcontractor_id" readonly="1"/>-->
+<!--                                        <field name="vendor_id"/>-->
+<!--                                        <field name="is_bom" column_invisible="1"/>-->
+<!--                                        <field name="is_component" column_invisible="1"/>-->
+<!--                                        <field name="qty"/>-->
+<!--                                        <field name="onhand_qty" readonly="1" force_save="1"/>-->
+<!--                                        <field name="add_qty"/>-->
+<!--                                        <field name="final_qty" readonly="1" force_save="1"/>-->
+<!--                                        <field name="sale_line_id" column_invisible="1"/>-->
+<!--                                        <field name="route_id"/>-->
+<!--                                        <field name="is_subcontracting"/>-->
+<!--                                        <field name="is_create_procurement"/>-->
+<!--                                    </list>-->
+<!--                                </field>-->
+<!--                            </group>-->
+<!--                        </page>-->
+
+                    </notebook>
+                    <footer>
+<!--                        <button name="generate_procurements" string="Create Procurements" type="object"-->
+<!--                                class="btn btn-primary" data-hotkey="q"-->
+<!--                                />-->
+                        <button special="cancel" string="Discard" class="btn btn-secondary" data-hotkey="x"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

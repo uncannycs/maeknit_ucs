@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="artwork_widget.ArtworkWidget">
+        <div class="artwork-widget">
+
+            <div t-foreach="state.items" t-as="item" t-key="item_index" class="artwork-item">
+
+                <!-- Left: File -->
+                <div class="artwork-file-col">
+                    <div t-if="item.filename" class="artwork-file-info">
+                        <i class="fa fa-file-o me-2 text-muted"/>
+                        <span class="artwork-filename" t-esc="item.filename"/>
+                        <div class="artwork-file-actions mt-2">
+                            <button class="btn btn-sm btn-outline-primary" t-on-click="() => this.downloadFile(item_index)" title="Download">
+                                <i class="fa fa-download me-1"/> Download
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary ms-1" t-on-click="() => this.triggerFileInput(item_index)" title="Replace">
+                                <i class="fa fa-refresh me-1"/> Replace
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger ms-1" t-on-click="() => this.removeFile(item_index)" title="Remove">
+                                <i class="fa fa-trash"/>
+                            </button>
+                        </div>
+                    </div>
+                    <div t-else="" class="artwork-file-placeholder" t-on-click="() => this.triggerFileInput(item_index)">
+                        <i class="fa fa-upload fa-2x text-muted mb-2"/>
+                        <span class="text-muted small">Click to upload file</span>
+                    </div>
+                    <input
+                        type="file"
+                        class="d-none"
+                        t-att-data-artwork-input="item_index"
+                        t-on-change="(ev) => this.handleFileUpload(item_index, ev)"
+                    />
+                </div>
+
+                <!-- Right: Notes -->
+                <div class="artwork-notes-col">
+                    <textarea
+                        class="form-control artwork-notes"
+                        placeholder="Notes..."
+                        t-att-value="item.notes"
+                        t-on-input="(ev) => this.updateNotes(item_index, ev.target.value)"
+                    />
+                </div>
+
+                <!-- Delete row -->
+                <div class="artwork-delete-col">
+                    <button class="btn btn-sm btn-outline-danger" t-on-click="() => this.removeItem(item_index)" title="Remove row">
+                        <i class="fa fa-times"/>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Add row -->
+            <div class="artwork-add-row">
+                <button class="btn btn-outline-primary btn-sm" t-on-click="addItem">
+                    <i class="fa fa-plus"/> Add
+                </button>
+            </div>
+
+        </div>
+    </t>
+</templates>

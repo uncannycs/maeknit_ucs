@@ -1,0 +1,41 @@
+<templates xml:space="preserve">
+  <t t-name="timer_widget.TimerWidget">
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge px-2 py-1"><t t-esc="displayTime"/></span>
+      <t t-set="hasId" t-value="!!props.record?.resId"/>
+      
+      <!-- Updated to use direct properties instead of state -->
+      <!-- Start button - only show when not running and not paused -->
+      <button t-if="!this.isRunning and !this.isPaused" 
+              class="btn btn-sm btn-outline-success"
+              t-att-disabled="!hasId"
+              t-on-click.stop="startTimer" title="Start">
+        <i class="fa fa-play"></i>
+      </button>
+      
+      <!-- Pause button - only show when running -->
+      <button t-if="this.isRunning and !this.isPaused" 
+              class="btn btn-sm btn-outline-warning"
+              t-att-disabled="!hasId"
+              t-on-click.stop="pauseTimer" title="Pause">
+        <i class="fa fa-pause"></i>
+      </button>
+      
+      <!-- Resume button - only show when paused -->
+      <button t-if="this.isPaused" 
+              class="btn btn-sm btn-outline-info"
+              t-att-disabled="!hasId"
+              t-on-click.stop="resumeTimer" title="Resume">
+        <i class="fa fa-play"></i>
+      </button>
+      
+      <!-- Stop button - show when running or paused -->
+      <button t-if="this.isRunning or this.isPaused" 
+              class="btn btn-sm btn-outline-danger"
+              t-att-disabled="!hasId"
+              t-on-click.stop="stopTimer" title="Stop">
+        <i class="fa fa-stop"></i>
+      </button>
+    </div>
+  </t>
+</templates>

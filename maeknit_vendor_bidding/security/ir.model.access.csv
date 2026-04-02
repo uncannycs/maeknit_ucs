@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_order_factory_breakdown,purchase.order.factory.breakdown,model_purchase_order_factory_breakdown,base.group_user,1,1,1,1
+access_sale_order_rfq_wizard,access.sale.order.rfq.wizard,model_sale_order_rfq_wizard,,1,1,1,1
+access_purchase_shipping_duty_wizard,access.purchase.shipping.duty.wizard,model_purchase_shipping_duty_wizard,,1,1,1,1

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Operation Attachment Wizard Form View -->
+        <record id="view_operation_attachment_wizard_form" model="ir.ui.view">
+            <field name="name">operation.attachment.wizard.form</field>
+            <field name="model">operation.attachment.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Manage Files">
+                    <sheet>
+                        <group>
+                            <field name="bom_request_id" readonly="1"/>
+                            <field name="operation_id" readonly="1"/>
+                            <!-- Removed name and description fields, added attachment type selector -->
+                            <field name="attachment_type" widget="radio" options="{'horizontal': true}" invisible="1"/>
+                        </group>
+                        <!-- Simplified attachments section with drag and drop -->
+                        <group string="Upload Files">
+                            <field name="attachment_ids" widget="many2many_binary" nolabel="1" 
+                                   options="{'accepted_file_extensions': '.pdf,.doc,.docx,.txt,.jpg,.png'}"/>
+                            <div class="text-muted">
+                                <i class="fa fa-info-circle"/> Drag and drop files here or click to browse. Files will be stored with their original names.
+                            </div>
+                        </group>
+                        <!-- Added text input section for shop floor instructions -->
+                        <group string="Text Content (Optional)">
+                            <field name="text_content" widget="text" placeholder="Enter text instructions or program notes..." 
+                                   invisible="not include_text" nolabel="1"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_add_attachments" string="Add Files" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

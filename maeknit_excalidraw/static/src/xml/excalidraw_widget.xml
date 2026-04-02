@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="maeknit_excalidraw.ExcalidrawWidget">
+        <div class="o_excalidraw_widget"
+             t-att-style="state.isFullscreen
+               ? 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:#fff;'
+               : 'width:100%;height:600px;position:relative;'">
+            <!-- Toolbar: comment mode + fullscreen toggle + save button -->
+            <div style="position:absolute;bottom:10px;right:10px;z-index:1001;display:flex;gap:10px;align-items:center;background:white;padding:8px 12px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                <span t-if="state.isSaving" class="badge badge-info">
+                    <i class="fa fa-spinner fa-spin"/> Saving...
+                </span>
+                <button t-on-click="toggleCommentMode"
+                        class="btn btn-sm"
+                        t-att-class="state.commentMode ? 'btn-warning' : 'btn-outline-secondary'"
+                        t-att-title="state.commentMode ? 'Click canvas to place comment (Esc to cancel)' : 'Add a comment'">
+                    <i class="fa fa-comment"/>
+                </button>
+                <button t-on-click="toggleFullscreen"
+                        class="btn btn-outline-secondary btn-sm"
+                        t-att-title="state.isFullscreen ? 'Exit fullscreen (Esc)' : 'Fullscreen'">
+                    <i t-att-class="state.isFullscreen ? 'fa fa-compress' : 'fa fa-expand'"/>
+                </button>
+                <button t-on-click="manualSave"
+                        class="btn btn-primary btn-sm"
+                        t-att-disabled="state.isSaving">
+                    <i class="fa fa-save"/>
+                </button>
+            </div>
+            
+            <div t-if="state.isLoading" 
+                 style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+                <i class="fa fa-spinner fa-spin fa-3x text-muted"/>
+                <p class="mt-3 text-muted">Loading Excalidraw...</p>
+            </div>
+            <div t-ref="canvasRef" 
+                 class="excalidraw-container" 
+                 style="width:100%;height:100%;position:absolute;top:0;left:0;"/>
+        </div>
+    </t>
+</templates>

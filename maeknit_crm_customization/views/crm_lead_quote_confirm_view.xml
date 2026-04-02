@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_crm_lead_quote_confirm_form" model="ir.ui.view">
+        <field name="name">crm.lead.quote.confirm.form</field>
+        <field name="model">crm.lead.quote.confirm</field>
+        <field name="arch" type="xml">
+            <form string="Confirm Quote Creation">
+                <field name="warning_message" readonly="1" widget="html"/>
+                <field name="lead_id" invisible="1"/>
+                <footer>
+                    <button name="action_confirm" string="Create Quotation Anyway" type="object" class="btn-primary"/>
+                    <button name="action_cancel" string="Cancel" type="object" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

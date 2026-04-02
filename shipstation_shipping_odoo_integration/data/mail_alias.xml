@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Email Alias for automatic email processing -->
+        <record id="mail_alias_shipping" model="mail.alias">
+            <field name="alias_name">shipping</field>
+            <field name="alias_model_id" ref="model_maeknit_shipping_mail"/>
+            <field name="alias_force_thread_id">0</field>
+        </record>
+    </data>
+</odoo>

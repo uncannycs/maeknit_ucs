@@ -1,0 +1,105 @@
+<odoo>
+  <!-- Main kanban view override for card layout -->
+  <record id="crm_lead_kanban_lead_override" model="ir.ui.view">
+    <field name="name">crm.lead.kanban.lead.override</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+    <field name="arch" type="xml">
+      <xpath expr="//kanban" position="attributes">
+        <attribute name="default_group_by">stage_id</attribute>
+      </xpath>
+
+      <!-- Override the card template -->
+      <xpath expr="//kanban/templates/t[@t-name='card']" position="replace">
+        <t t-name="card">
+          <field class="fw-bold fs-5" name="name"/>
+          <t t-if="record.expected_revenue.raw_value">
+            <div>
+              <strong>Revenue Estimate: </strong>
+              <field name="expected_revenue"/>
+            </div>
+          </t>
+          <t t-if="record.partner_name.raw_value">
+            <div>
+              <strong>Client/ Brand: </strong>
+              <field name="partner_name"/>
+            </div>
+          </t>
+          <t t-if="record.priority.raw_value">
+            <div>
+              <strong>Priority: </strong>
+              <field name="priority"/>
+            </div>
+          </t>
+          <t t-if="record.season_drop_date.raw_value">
+            <div>
+              <strong>Season/ drop date: </strong>
+              <field name="season_drop_date"/>
+            </div>
+          </t>
+          <t t-if="record.tag_ids.raw_value">
+            <div class="d-flex align-items-center flex-wrap gap-1">
+              <strong class="me-1">Services Chosen:</strong>
+              <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+            </div>
+          </t>
+          <t t-if="record.user_id.raw_value">
+            <div>
+              <strong>Sales Person: </strong>
+              <field name="user_id"/>
+            </div>
+          </t>
+          <t t-if="record.city.raw_value">
+            <div>
+              <strong>City: </strong>
+              <field name="city"/>
+            </div>
+          </t>
+          <t t-if="record.country_id.raw_value">
+            <div>
+              <strong>Country: </strong>
+              <field name="country_id"/>
+            </div>
+          </t>
+          <t t-if="record.parent_id.raw_value">
+            <div>
+              <strong>Parent Lead: </strong>
+              <field name="parent_id"/>
+            </div>
+          </t>
+        </t>
+      </xpath>
+      
+      <!-- Add context to ensure name is empty when creating from kanban -->
+      <xpath expr="//kanban" position="attributes">
+        <attribute name="context">{'default_name': False}</attribute>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Override the quick create form to prevent automatic naming -->
+  <record id="crm_lead_quick_form_no_auto_name" model="ir.ui.view">
+    <field name="name">crm.lead.quick.form.no.auto.name</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.quick_create_opportunity_form"/>
+    <field name="arch" type="xml">
+      <!-- Make the name field not required in the quick create form -->
+      <xpath expr="//field[@name='name']" position="attributes">
+        <attribute name="required">0</attribute>
+        <attribute name="placeholder">e.g. Sweater A</attribute>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Override the opportunity pipeline kanban view -->
+  <record id="crm_case_kanban_view_pipeline_empty_name" model="ir.ui.view">
+    <field name="name">crm.lead.kanban.pipeline.empty.name</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.view_crm_lead_kanban"/>
+    <field name="arch" type="xml">
+      <xpath expr="//kanban" position="attributes">
+        <attribute name="context">{'default_name': False}</attribute>
+      </xpath>
+    </field>
+  </record>
+</odoo>

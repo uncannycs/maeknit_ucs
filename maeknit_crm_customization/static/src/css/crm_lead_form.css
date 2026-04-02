@@ -1,0 +1,886 @@
+/* ========================================
+   GLOBAL ODOO TAB IMPROVEMENTS  
+   Only affects tabs in form views and notebooks
+   Does NOT affect list views or other UI
+   ======================================== */
+
+/* Target only tabs inside notebooks and form views */
+.o_notebook .nav-tabs .nav-link,
+.o_form_view > .o_notebook_headers .nav-link,
+.modal-body .nav-tabs .nav-link {
+  color: #6c757d;
+  background-color: #f8f9fa;
+  transition: all 0.15s ease-in-out;
+}
+
+/* Active tab - very visible */  
+.o_notebook .nav-tabs .nav-link.active,
+.o_form_view > .o_notebook_headers .nav-link.active,
+.modal-body .nav-tabs .nav-link.active {
+  background-color: #ffffff !important;
+  color: #212529 !important;
+  font-weight: 700 !important;
+  border-width: 2px !important;
+  border-bottom-color: #ffffff !important;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.08) !important;
+}
+
+/* Hover state */
+.o_notebook .nav-tabs .nav-link:hover:not(.active),
+.o_form_view > .o_notebook_headers .nav-link:hover:not(.active),
+.modal-body .nav-tabs .nav-link:hover:not(.active) {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+
+.o_crm_lead_owl_form {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.o_crm_lead_owl_form label.form-label {
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.o_crm_lead_owl_form .form-control,
+.o_crm_lead_owl_form .form-select {
+  border: 1px solid #e9ecef;
+  padding: 0.375rem 0.5rem;
+  min-height: 36px;
+}
+
+.o_disabled_option {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+/* Add more vertical spacing between main sections */
+.o_crm_top_section,
+.o_crm_bottom_section {
+  background-color: white;
+  border-radius: 6px;
+  margin: 20px; /* Increased from 10px to 20px */
+}
+
+/* Two-column layout styles */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.form-col {
+  flex: 0 0 50%;
+  max-width: 50%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+@media (max-width: 768px) {
+  .form-col {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+.o_crm_lead_owl_form .btn-primary {
+  background-color: #7c7bad;
+  border-color: #7c7bad;
+}
+
+.o_crm_lead_owl_form .btn-primary:hover {
+  background-color: #6c6a9d;
+  border-color: #6c6a9d;
+}
+
+.o_crm_lead_owl_form .text-warning {
+  color: #f0ad4e !important;
+}
+
+/* Checkbox styles for tags */
+.o_crm_lead_owl_form .form-check {
+  margin-bottom: 0.5rem;
+}
+
+/* Add these styles to improve the tag checkbox layout */
+.o_crm_lead_owl_form .d-flex.flex-wrap.gap-2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem !important;
+  max-height: none;
+}
+
+.o_crm_lead_owl_form .form-check {
+  margin-bottom: 0.5rem;
+  min-width: 120px;
+}
+
+.o_crm_lead_owl_form .form-check-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.o_crm_lead_owl_form .form-check-input:checked {
+  background-color: #7c7bad;
+  border-color: #7c7bad;
+}
+
+/* Dropdown styles */
+.o_crm_lead_owl_form .list-group-item-action:hover,
+.o_crm_lead_owl_form .list-group-item-action.active {
+  background-color: #f0f0f8;
+  cursor: pointer;
+}
+
+.o_crm_lead_owl_form .list-group-item-action:active {
+  background-color: #e9ecef;
+}
+
+/* Make sure the dropdown appears above other elements */
+.o_crm_lead_owl_form .position-absolute {
+  z-index: 1050;
+}
+
+/* Reduced gap between checkboxes */
+.o_crm_lead_owl_form .gap-1 {
+  gap: 0.25rem !important;
+}
+
+/* Service revenue fields styling */
+.o_crm_lead_owl_form .mt-3 {
+  margin-top: 1rem !important;
+  border-top: 1px solid #e9ecef;
+  padding-top: 1rem;
+}
+
+.o_crm_lead_owl_form .mt-3 label {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.o_crm_lead_owl_form .mt-3 input {
+  height: 36px;
+  font-size: 0.9rem;
+}
+
+/* Service-specific revenue section */
+.o_crm_lead_owl_form .form-control-sm {
+  height: 32px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.o_crm_lead_owl_form .col-md-2 {
+  flex: 0 0 16.666667%;
+  max-width: 16.666667%;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+@media (max-width: 992px) {
+  .o_crm_lead_owl_form .col-md-2 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+}
+
+@media (max-width: 576px) {
+  .o_crm_lead_owl_form .col-md-2 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+/* Reverse Engineering Service Styling */
+.service-reverse {
+  background-color: #e8f4fd;
+  border-left: 4px solid #0066cc;
+}
+
+.service-reverse .service-name {
+  color: #0066cc;
+  font-weight: 600;
+}
+
+/* Grading Service Styling */
+.service-grading {
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+}
+
+.service-grading .service-name {
+  color: #856404;
+  font-weight: 600;
+}
+
+/* Tab styling for new services */
+.o_crm_tabs {
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 1rem;
+  overflow-x: unset; /* or 'visible' */
+  flex-wrap: nowrap; /* Prevent tabs from wrapping */
+}
+
+.o_crm_tabs .nav-item {
+  flex-shrink: 0; /* Prevent tabs from shrinking */
+}
+
+.o_crm_tabs .nav-link {
+  border: 1px solid transparent;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  margin-bottom: -1px;
+  transition: all 0.15s ease-in-out;
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+/* General active state for ALL CRM tabs - very visible! */
+.o_crm_tabs .nav-link.active {
+  background-color: #ffffff !important;
+  color: #212529 !important;
+  font-weight: 700 !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-color: #dee2e6 !important;
+  border-bottom-color: #ffffff !important;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.08) !important;
+}
+
+/* General hover state for non-active CRM tabs */
+.o_crm_tabs .nav-link:hover:not(.active) {
+  background-color: #e9ecef;
+  color: #495057;
+  border-color: #dee2e6;
+}
+
+/* Product tab - inactive state only */
+.o_crm_tabs .nav-link[data-tab="children"] {
+  background-color: #f8f9fa;
+}
+
+/* Service tabs - consistent inactive state */
+.o_crm_tabs .nav-link[data-tab="swatching"],
+.o_crm_tabs .nav-link[data-tab="development"],
+.o_crm_tabs .nav-link[data-tab="reverse"],
+.o_crm_tabs .nav-link[data-tab="grading"],
+.o_crm_tabs .nav-link[data-tab="production"],
+.o_crm_tabs .nav-link[data-tab="gemini"],
+.o_crm_tabs .nav-link[data-tab="onboarding"] {
+  background-color: #e9ecef;
+}
+
+/* Note: Active and hover states are handled by the general .o_crm_tabs rules above */
+
+/* Read-only expected revenue styling */
+.o_crm_lead_owl_form .bg-light {
+  background-color: #f8f9fa !important;
+}
+
+/* Service sections styling */
+.o_service_section {
+  border: 1px solid #e9ecef;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.o_service_section h5 {
+  margin-bottom: 1rem;
+  color: #495057;
+  font-weight: 600;
+}
+
+.o_service_field {
+  margin-bottom: 0.5rem;
+}
+
+.o_service_field label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.o_swatch_container {
+  border: 1px solid #e9ecef;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.o_swatch_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+/* Add button styling */
+.o_add_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #7c7bad;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 8px;
+  border: none;
+}
+
+.o_add_button:hover {
+  background-color: #6c6a9d;
+}
+
+/* Field group with add button */
+.o_field_group {
+  margin-bottom: 0.75rem;
+}
+
+.o_field_group_header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.o_field_group_header label {
+  margin-bottom: 0;
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+.o_field_item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.o_field_item .form-control {
+  flex: 1;
+}
+
+/* Consistent remove button styling for all sections */
+.o_remove_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #dc3545;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 8px;
+  border: none;
+}
+
+.o_remove_button:hover {
+  background-color: #c82333;
+}
+
+/* Apply the same styling to production array items */
+.o_production_array_item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.o_production_array_item .form-control {
+  flex: 1;
+}
+
+.o_production_array_item .index {
+  width: 24px;
+  text-align: right;
+  margin-right: 0.5rem;
+}
+
+.o_production_array_item .o_remove_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #dc3545;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 8px;
+  border: none;
+}
+
+.o_production_array_header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.o_production_array_header label {
+  margin-bottom: 0;
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+/* General section styling */
+.o_general_section {
+  border: 1px solid #e9ecef;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  margin-bottom: 0;
+  background-color: #f8f9fa;
+  height: 100%;
+}
+
+.o_general_section h5 {
+  margin-bottom: 1rem;
+  color: #495057;
+  font-weight: 600;
+}
+
+/* Swatch Service styling */
+.o_swatch_section {
+  margin-top: 0;
+  margin-bottom: 0;
+  height: 100%;
+}
+
+.o_swatch_section h5 {
+  margin-bottom: 1rem;
+  color: #495057;
+  font-weight: 600;
+}
+
+.o_swatch_controls {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.o_swatch_controls label {
+  margin-right: 0.5rem;
+  margin-bottom: 0;
+}
+
+.o_swatch_controls select {
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+/* Production section styling */
+.o_production_section {
+  margin-top: 0;
+  height: 100%;
+  margin-bottom: 0;
+}
+
+.o_production_section h5 {
+  margin-bottom: 1rem;
+  color: #495057;
+  font-weight: 600;
+}
+
+.o_production_field {
+  margin-bottom: 1rem;
+}
+
+.o_production_field label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.o_production_array_field {
+  margin-bottom: 1rem;
+}
+
+/* Add these styles for the 3-column layout */
+.o_sections_container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -0.5rem;
+  align-items: flex-start;
+}
+
+/* Add more spacing between section columns */
+.o_section_column {
+  flex: 0 0 33.333333%;
+  max-width: 33.333333%;
+  padding: 0.5rem;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px; /* Added margin bottom for vertical spacing */
+}
+
+/* Improve alignment between fields */
+/* Add spacing between the form sections */
+.o_crm_lead_owl_form .form-row {
+  margin-bottom: 1.25rem; /* Increased from 0.75rem */
+}
+
+.o_crm_lead_owl_form .mb-2 {
+  margin-bottom: 0.5rem !important;
+}
+
+/* Add spacing between the service revenue section and other content */
+.o_crm_lead_owl_form .mb-3 {
+  margin-bottom: 1.25rem !important; /* Increased from 0.75rem */
+}
+
+/* Make all section backgrounds white for consistency */
+/* Add more spacing between sections in the tabs */
+.o_general_section,
+.o_swatch_section,
+.o_production_section {
+  background-color: white;
+  margin-top: 0 !important;
+  margin-bottom: 15px !important; /* Added margin bottom */
+}
+
+/* Ensure consistent padding in sections */
+.o_crm_top_section,
+.o_crm_bottom_section {
+  padding: 1rem !important;
+}
+
+/* Improve alignment of form controls */
+.o_crm_lead_owl_form .form-control,
+.o_crm_lead_owl_form .form-select {
+  height: 36px;
+}
+
+/* Ensure labels are aligned */
+.o_crm_lead_owl_form .form-label {
+  margin-bottom: 0.25rem;
+}
+
+/* Add spacing between accordion items in swatch section */
+.o_swatch_section .accordion-item {
+  margin-bottom: 10px; /* Increased from 2px */
+}
+
+/* Add spacing between the bottom buttons and content */
+.o_crm_lead_owl_form .p-4.border-top {
+  margin-top: 15px; /* Added margin top */
+}
+
+/* Enhanced Kanban card styling */
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record) {
+  margin-bottom: 16px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #e9ecef !important;
+  transition: all 0.2s ease-in-out !important;
+  padding: 12px !important;
+}
+
+/* Hover effect for Kanban cards */
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record):hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Improve typography in Kanban cards */
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record) .fw-bold {
+  font-size: 16px !important;
+  margin-bottom: 8px !important;
+  color: #333 !important;
+  display: block !important;
+}
+
+/* Improve spacing between fields in Kanban cards */
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record) div {
+  margin-bottom: 6px !important;
+}
+
+/* Style the labels in Kanban cards */
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record) strong {
+  color: #666 !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+/* Style the values in Kanban cards */
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record) .o_field_widget {
+  font-size: 13px !important;
+  color: #333 !important;
+}
+
+/* Add a subtle background color to Kanban cards */
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record) {
+  background-color: #ffffff !important;
+}
+
+/* Style the tags in Kanban cards */
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record) .o_field_many2many_tags {
+  margin-top: 4px !important;
+}
+
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record) .o_tag {
+  border-radius: 12px !important;
+  padding: 2px 8px !important;
+  font-size: 11px !important;
+}
+
+/* Add a subtle border at the bottom of each field for better separation */
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record) div:not(:last-child) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
+  padding-bottom: 6px !important;
+}
+
+/* Remove border from the last item */
+.o_kanban_renderer .o_kanban_record:not(.o_legacy_kanban_record) div:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Add a subtle background color to the column headers */
+.o_kanban_renderer .o_column_title {
+  font-weight: 600 !important;
+  color: #495057 !important;
+  padding: 8px 12px !important;
+  background-color: #f8f9fa !important;
+  border-radius: 6px !important;
+  margin-bottom: 12px !important;
+}
+
+/* Style the column counters */
+.o_kanban_renderer .o_column_title .o_kanban_counter {
+  background-color: #e9ecef !important;
+  color: #495057 !important;
+  border-radius: 12px !important;
+  padding: 2px 8px !important;
+  font-size: 12px !important;
+  font-weight: normal !important;
+}
+
+/* Add a subtle hover effect to the column headers */
+.o_kanban_renderer .o_column_title:hover {
+  background-color: #e9ecef !important;
+}
+
+/* Hide ghost cards in kanban views */
+.o_kanban_ghost {
+  visibility: hidden !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+/* Style for non-North American countries */
+.o_kanban_custom .o_kanban_non_north_america {
+  background-color: #e6f2ff !important; /* Light blue background */
+  border-left: 4px solid #3498db !important; /* Blue left border */
+}
+
+/* Email field styling */
+.o_crm_lead_owl_form .email-field {
+  margin-bottom: 0.75rem;
+}
+
+.o_crm_lead_owl_form .email-field label {
+  font-weight: 500;
+}
+
+.o_crm_lead_owl_form .email-field .form-control {
+  border-color: #ced4da;
+}
+
+.o_crm_lead_owl_form .email-field .form-control:focus {
+  border-color: #7c7bad;
+  box-shadow: 0 0 0 0.2rem rgba(124, 123, 173, 0.25);
+}
+
+@media (max-width: 992px) {
+  .o_section_column {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (max-width: 768px) {
+  .o_section_column {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* Required field validation styling */
+.o_crm_lead_owl_form .form-control.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.o_crm_lead_owl_form .invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #dc3545;
+}
+
+.o_crm_lead_owl_form .text-danger {
+  color: #dc3545 !important;
+  font-weight: bold;
+}
+
+/* Highlight required fields that are empty */
+.o_crm_lead_owl_form .form-control:invalid {
+  border-color: #dc3545;
+}
+
+.o_crm_lead_owl_form .form-control:invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* Style/Collection Radio Button Toggle */
+.o_project_type_toggle {
+  display: flex;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  overflow: hidden; /* Ensures rounded corners apply to inner elements */
+  background-color: #e9ecef; /* Grey background for the container */
+}
+
+.o_project_type_label {
+  flex: 1;
+  text-align: center;
+  padding: 0.375rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-weight: 600;
+  color: #495057; /* Default text color */
+  background-color: #ffffff; /* Default background for inactive */
+  border-right: 1px solid #ced4da; /* Separator between buttons */
+}
+
+.o_project_type_label:last-child {
+  border-right: none; /* No border on the last button */
+}
+
+.o_project_type_radio {
+  display: none; /* Hide the actual radio button */
+}
+
+.o_project_type_radio:checked + .o_project_type_label {
+  background-color: #007bff; /* Blue for active state */
+  color: #ffffff; /* White text for active state */
+  border-color: #007bff; /* Blue border for active state */
+}
+
+/* Specific styling for the labels when their radio is checked */
+.o_project_type_label:has(input[type="radio"]:checked) {
+  background-color: #007bff; /* Blue for active state */
+  color: #ffffff; /* White text for active state */
+  border-color: #007bff; /* Blue border for active state */
+}
+
+/* Adjust border radius for the first and last labels */
+.o_project_type_label:first-child {
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.o_project_type_label:last-child {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+/* Ensure the active button's border blends with the container */
+.o_project_type_radio:checked + .o_project_type_label {
+  border-color: transparent; /* Remove individual border when active */
+}
+
+/* Adjust the border between active and inactive states */
+.o_project_type_radio[value="style"]:checked + .o_project_type_label {
+  border-right-color: #007bff; /* Keep right border for 'Style' when active */
+}
+
+.o_project_type_radio[value="collection"]:checked + .o_project_type_label {
+  border-left-color: #007bff; /* Keep left border for 'Collection' when active */
+}
+
+/* Ensure the border between the two segments is visible and consistent */
+.o_project_type_toggle .o_project_type_label:first-child:not(:has(input[type="radio"]:checked)) {
+  border-right: 1px solid #ced4da;
+}
+
+.o_project_type_toggle .o_project_type_label:last-child:not(:has(input[type="radio"]:checked)) {
+  border-left: 1px solid #ced4da;
+}
+
+/* Override default Odoo form-control styling for this specific toggle */
+.o_project_type_toggle .form-control {
+  border: none;
+  box-shadow: none;
+}
+
+/* Select All Services styling */
+.o_crm_lead_owl_form .form-check.border-bottom {
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+.o_crm_lead_owl_form .form-check.border-bottom .form-check-label.fw-bold {
+  color: #495057;
+  font-weight: 600 !important;
+}
+
+.o_crm_lead_owl_form .form-check.border-bottom .form-check-input:checked {
+  background-color: #7c7bad;
+  border-color: #7c7bad;
+}
+
+.o_crm_lead_owl_form .form-check.border-bottom:hover {
+  background-color: #f8f9fa;
+}
+
+/* Added styling for quoted items - light gray text and checkboxes */
+.quoted-item {
+  color: #9ca3af !important;
+  opacity: 0.7;
+}
+
+.quoted-item td {
+  color: #9ca3af !important;
+}
+
+.quoted-item input[type="checkbox"] {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.quoted-item .form-control {
+  color: #9ca3af !important;
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+.quoted-item .badge {
+  background-color: #e5e7eb !important;
+  color: #9ca3af !important;
+}
+
+.quoted-item span {
+  color: #9ca3af !important;
+}
+
+/* Ensure quoted item styling applies to all child elements */
+.quoted-item * {
+  color: #9ca3af !important;
+}

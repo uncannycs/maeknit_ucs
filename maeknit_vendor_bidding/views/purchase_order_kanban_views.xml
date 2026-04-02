@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_order_kanban_bidding" model="ir.ui.view">
+        <field name="name">purchase.order.kanban.bidding</field>
+        <field name="model">purchase.order</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="false" sample="1">
+                <field name="partner_id"/>
+                <field name="state"/>
+                <field name="currency_id"/>
+                <field name="total_garment_cost"/>
+                <field name="total_material_cost"/>
+                <field name="garment_shipping"/>
+                <field name="garment_customs_duties"/>
+                <field name="component_shipping"/>
+                <field name="component_customs_duties"/>
+                <field name="landed_cost"/>
+                <field name="is_winning_bid"/>
+                <field name="bid_partner_id"/>
+                <field name="bid_rfq_type"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click container-fluid p-3 mb-2 rounded-4 shadow-sm border-0 #{record.is_winning_bid.raw_value ? 'border-start border-4 border-success bg-light' : 'bg-white'}">
+                            
+                            <!-- Header: Factory Name and Status -->
+                            <div class="row align-items-center mb-3">
+                                <div class="col-8">
+                                    <h4 class="fw-bold mb-0 text-primary">
+                                        <field name="partner_id"/>
+                                    </h4>
+                                    <!-- Route Identifier for Component RFQs -->
+                                    <t t-if="record.bid_rfq_type.raw_value == 'component' and record.bid_partner_id.raw_value">
+                                        <div class="text-muted small mt-1">
+                                            <i class="fa fa-truck me-1"></i> Route: <field name="bid_partner_id"/>
+                                        </div>
+                                    </t>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <span t-attf-class="badge rounded-pill px-3 py-2 #{record.state.raw_value == 'sent' ? 'text-bg-info' : (record.state.raw_value == 'purchase' ? 'text-bg-success' : 'text-bg-secondary')}">
+                                        <t t-if="record.state.raw_value == 'draft'">Pending</t>
+                                        <t t-else=""><field name="state"/></t>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <hr class="my-2 opacity-25"/>
+
+                            <!-- Side-by-Side Costs -->
+                            <div class="row g-2 text-muted small">
+                                <div class="col-6 border-end pe-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Garment</span>
+                                        <span class="fw-semibold text-dark"><field name="total_garment_cost" widget="monetary"/></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>G. Shipping</span>
+                                        <span class="fw-semibold text-dark"><field name="garment_shipping" widget="monetary"/></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>G. Duty</span>
+                                        <span class="fw-semibold text-dark"><field name="garment_customs_duties" widget="monetary"/></span>
+                                    </div>
+                                </div>
+                                <div class="col-6 ps-3 text-end">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Materials</span>
+                                        <span class="fw-semibold text-dark"><field name="total_material_cost" widget="monetary"/></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1 text-muted">
+                                        <span>M. Shipping</span>
+                                        <span class="fw-semibold text-dark"><field name="component_shipping" widget="monetary"/></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>M. Duty</span>
+                                        <span class="fw-semibold text-dark"><field name="component_customs_duties" widget="monetary"/></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer: Grand Total Landed Cost -->
+                            <div t-attf-class="mt-4 pt-3 border-top text-center #{record.is_winning_bid.raw_value ? 'bg-success text-white' : ''}">
+                                <div class="text-uppercase fw-bold small ls-1 mb-1" style="letter-spacing: 1px;">Total Landed Cost</div>
+                                <div class="h2 fw-bolder mb-0">
+                                    <field name="landed_cost" widget="monetary"/>
+                                </div>
+
+                            </div>
+
+                            <!-- Winner Ribbon Indicator in Kanban -->
+                            <t t-if="record.is_winning_bid.raw_value">
+                                <div class="position-absolute top-0 end-0 mt-2 me-2">
+                                    <i class="fa fa-trophy text-warning fs-3 shadow-sm p-1 rounded bg-white" title="Winning Bid"></i>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+</odoo>

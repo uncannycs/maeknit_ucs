@@ -1,0 +1,185 @@
+.price-calculator-dialog {
+    min-height: 600px;
+  }
+  
+  .price-calculator-container {
+    padding: 24px;
+  }
+  
+  /* Enhanced operations table styling */
+  .operations-table {
+    font-size: 0.9rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .operations-table thead.table-dark th {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    font-weight: 600;
+    color: #ffffff;
+    border: none;
+    padding: 12px 8px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .operations-table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .operations-table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .operations-table td {
+    vertical-align: middle;
+    padding: 10px 8px;
+  }
+  
+  .operations-table input[type="number"],
+  .operations-table select {
+    font-size: 0.875rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .operations-table input[type="number"]:focus,
+  .operations-table select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    transform: scale(1.02);
+  }
+  
+  /* Enhanced card styling */
+  .card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card.border-primary {
+    border-width: 2px;
+  }
+  
+  .card.border-success {
+    border-width: 2px;
+  }
+  
+  .card.border-info {
+    border-width: 2px;
+  }
+  
+  /* Enhanced total section with gradient */
+  .total-section {
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  }
+  
+  .total-section .card-body {
+    padding: 1.5rem;
+  }
+  
+  /* Enhanced button styles */
+  .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .btn-link.text-danger:hover {
+    color: #dc3545 !important;
+    text-decoration: none;
+  }
+  
+  .btn-outline-danger:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Calculator icon in sale order line */
+  .price-calculator-icon {
+    cursor: pointer;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    font-size: 1.1em;
+    padding: 4px;
+    border-radius: 4px;
+  }
+  
+  .price-calculator-icon:hover {
+    color: #667eea;
+    background-color: rgba(102, 126, 234, 0.1);
+    transform: scale(1.2);
+  }
+  
+  .price-calculator-icon.has-pricing {
+    color: #198754;
+  }
+  
+  .price-calculator-icon.has-pricing:hover {
+    color: #146c43;
+    background-color: rgba(25, 135, 84, 0.1);
+  }
+  
+  /* Alert banner styling */
+  .alert-info {
+    border-radius: 10px;
+    border-left: 4px solid #0dcaf0;
+    background: linear-gradient(to right, #e7f5ff, #ffffff);
+  }
+  
+  /* Badge styling for operation totals */
+  .badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  
+  /* Loading spinner center alignment */
+  .text-center.p-5 {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Input group styling */
+  .input-group-text {
+    font-weight: 600;
+    border-radius: 6px 0 0 6px;
+  }
+  
+  .input-group .form-control {
+    border-radius: 0 6px 6px 0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .price-calculator-container {
+      padding: 16px;
+    }
+  
+    .operations-table {
+      font-size: 0.8rem;
+    }
+  
+    .card-body {
+      padding: 1rem;
+    }
+  }
+  

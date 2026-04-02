@@ -1,0 +1,28 @@
+{
+    'name': 'Maeknit Fitting Notes',
+    'description': 'Fitting Notes for Manufacturing Orders — sketch board and text notes attached to each production.',
+    'summary': 'Fitting Notes on MFG Production',
+    'version': '1.0.0',
+    'author': 'Mahimul Islam (Maeknit)',
+    'category': 'Manufacturing',
+    'depends': [
+        'web',
+        'base',
+        'mail',
+        'mrp',
+        'maeknit_mfg_customization',
+        'maeknit_excalidraw',
+        'maeknit_bom_mfg_link',
+        'maeknit_sales_customization',
+    ],
+    'data': [
+        'security/ir.model.access.csv',
+        'views/fitting_notes_views.xml',
+        'views/mrp_production_views.xml',
+    ],
+    'installable': True,
+    'application': False,
+    'auto_install': False,
+    'license': 'LGPL-3',
+    'website': 'https://maeknit.com',
+}

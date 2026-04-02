@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_form_inherit_landed_cost" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.landed.cost</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_get_dhl_quote" string="Get Shipping Rate" type="object"
+                        invisible="state not in ['draft', 'sent'] or is_estimate_frozen" class="oe_highlight"/>
+            </xpath>
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="shipment_purpose"/>
+            </xpath>
+            <xpath expr="//field[@name='notes']" position="before">
+                <group name="total_weight" string="Total Package Weight">
+                    <field name="total_weight" readonly="is_estimate_frozen"/>
+                </group>
+                <group name="landed_costs" string="Landed Cost Estimates">
+                    <field name="dhl_shipping_estimate" readonly="is_estimate_frozen"/>
+                    <field name="duty_tax_estimate" readonly="is_estimate_frozen"/>
+                    <field name="product_subtotal" readonly="is_estimate_frozen"/>
+                    <field name="total_landed_cost" class="oe_subtotal_footer_separator"/>
+                    <field name="is_estimate_frozen" invisible="1"/>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="dhl_account_number" readonly="True"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_id']" position="before">
+                <field name="is_dhl" column_invisible="1"/>
+                <field name="is_generated" column_invisible="1"/>
+                <button name="%(action_product_hs_code_wizard)d" type="action" class="btn-success" string="Generate HS Code" help="Generate HS Code" invisible="not product_id or is_dhl or is_generated"/>
+                <button name="%(action_product_hs_code_wizard)d" type="action"  class="o_generate_hs_btn" string="Re-Generate HS Code" help="Generate HS Code" invisible="not is_generated"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

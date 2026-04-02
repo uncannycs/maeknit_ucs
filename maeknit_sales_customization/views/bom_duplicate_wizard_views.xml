@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Duplicate BOM Request Wizard Form View -->
+        <record id="view_bom_duplicate_wizard_form" model="ir.ui.view">
+            <field name="name">bom.duplicate.wizard.form</field>
+            <field name="model">bom.duplicate.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Create Variant">
+                    <sheet>
+                        <!-- Hidden fields -->
+                        <field name="source_bom_request_id" invisible="1"/>
+                        <field name="source_mo_id" invisible="1"/>
+                        <field name="is_garment_bom" invisible="1"/>
+                        <field name="is_swatch_bom" invisible="1"/>
+                        <field name="is_development_bom" invisible="1"/>
+                        <field name="is_grading_bom" invisible="1"/>
+                        <field name="is_production_bom" invisible="1"/>
+                        <field name="available_colorway_ids" invisible="1"/>
+                        <field name="available_yarn_variant_ids" invisible="1"/>
+
+                        <div class="oe_title mb16">
+                            <h1>Create Variant</h1>
+                            <p class="text-muted">A new Manufacturing Order will be created with Work Orders and Components copied from the source MO.</p>
+                        </div>
+
+                        <field name="source_mo_rel_service" invisible="1"/>
+
+                        <!-- Current Values (read-only context) -->
+                        <group string="COPYING FROM">
+                            <group>
+                                <!-- Prefer service from MO (always populated), fall back to BOM Request -->
+                                <field name="source_mo_rel_service"
+                                       string="Service"
+                                       readonly="1"
+                                       invisible="not source_mo_rel_service"/>
+                                <field name="rel_service"
+                                       string="Service"
+                                       readonly="1"
+                                       invisible="source_mo_rel_service"/>
+                                <field name="partner_id" string="Customer" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="original_colorway_id"
+                                       string="Colorway"
+                                       readonly="1"
+                                       invisible="not original_colorway_id"/>
+                                <!-- Size: garment/dev/grading/production -->
+                                <field name="original_size_id"
+                                       string="Size"
+                                       readonly="1"
+                                       invisible="is_swatch_bom or not original_size_id"/>
+                                <!-- Yarn Variant: swatch only -->
+                                <field name="original_yarn_variant"
+                                       string="Yarn Variant"
+                                       readonly="1"
+                                       invisible="not is_swatch_bom or not original_yarn_variant"/>
+                            </group>
+                        </group>
+
+                        <!-- What's New -->
+                        <group string="WHAT'S NEW?">
+                            <!-- Garment / Development / Grading / Production -->
+                            <group invisible="is_swatch_bom">
+                                <field name="new_colorway_id"
+                                       string="Colorway"
+                                       placeholder="Select new colorway..."
+                                       domain="[('id', 'in', available_colorway_ids)]"
+                                       context="{'default_attribute_id': %(maeknit_inventory_customization.attr_colorway)d}"
+                                       options="{'no_create': False, 'no_create_edit': True}"
+                                       help="Leave blank to keep the current colorway."/>
+                                <field name="new_size_id"
+                                       string="Size"
+                                       placeholder="Select new size..."
+                                       options="{'no_create': False, 'no_create_edit': False}"
+                                       context="{'default_attribute_id': %(maeknit_inventory_customization.attr_size)d}"
+                                       help="Leave blank to keep the current size."/>
+                            </group>
+
+                            <!-- Swatch -->
+                            <group invisible="not is_swatch_bom">
+                                <field name="new_colorway_id"
+                                       string="Colorway"
+                                       placeholder="Select new colorway..."
+                                       domain="[('id', 'in', available_colorway_ids)]"
+                                       context="{'default_attribute_id': %(maeknit_inventory_customization.attr_colorway)d}"
+                                       options="{'no_create': False, 'no_create_edit': True}"
+                                       required="is_swatch_bom"/>
+                                <field name="new_yarn_variant"
+                                       string="Yarn Variant"
+                                       placeholder="Lot / Blend / Supplier / Other notes"
+                                       domain="[('id', 'in', available_yarn_variant_ids)]"
+                                       context="{'default_attribute_id': %(maeknit_inventory_customization.attr_yarn_variant)d}"
+                                       options="{'no_create': False, 'no_create_edit': True}"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    
+                    <footer>
+                        <button name="action_duplicate"
+                                string="Create Variant"
+                                type="object"
+                                class="btn-primary"/>
+                        <button string="Cancel" 
+                                class="btn-secondary" 
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Wizard Action -->
+        <record id="action_bom_duplicate_wizard" model="ir.actions.act_window">
+            <field name="name">Duplicate BOM Request</field>
+            <field name="res_model">bom.duplicate.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="model_maeknit_bom_request"/>
+        </record>
+    </data>
+</odoo>

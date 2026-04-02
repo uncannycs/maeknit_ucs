@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Request New Program Wizard Form View -->
+        <record id="view_request_new_program_wizard_form" model="ir.ui.view">
+            <field name="name">request.new.program.wizard.form</field>
+            <field name="model">request.new.program.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Programming Issue">
+                    <sheet>
+                        <group>
+                            <field name="workorder_id" invisible="1"/>
+                            <field name="production_id" readonly="1"/>
+                            <field name="program_workorder_id" readonly="1"/>
+                        </group>
+
+                        <group string="Please select issue:">
+                            <field name="issue_type" widget="radio" nolabel="1"/>
+                        </group>
+
+                        <group>
+                            <field name="description" placeholder="Description" nolabel="1" colspan="2"/>
+                        </group>
+
+                        <group>
+                            <field name="sketch_data" widget="excalidraw_reprogram" nolabel="1" colspan="2"/>
+                            <field name="sketch_preview" invisible="1"/>
+                        </group>
+
+                        <div class="alert alert-info" role="alert">
+                            <strong>Note:</strong> This will create a Quality Alert and reset the Program work order to Ready state. The programmer will see your note when they restart the program.
+                        </div>
+                    </sheet>
+                    <footer>
+                        <button name="action_submit" string="Submit" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

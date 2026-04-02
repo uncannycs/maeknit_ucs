@@ -1,0 +1,304 @@
+/* Odoo 18 Chatter Button Reordering - OWL Component Approach */
+
+/* Target various possible chatter topbar classes */
+.o-mail-Chatter-topbar,
+.o_ChatterTopbar,
+.o_chatter_topbar {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+}
+
+/* Main action buttons - left side with specific order */
+.o-mail-Chatter-topbar .o-mail-Chatter-logNote,
+.o-mail-Chatter-topbar button[data-hotkey="shift+m"],
+.o_ChatterTopbar .o_chatter_button_log_note {
+  order: 1 !important;
+  margin-right: 0.5rem !important;
+}
+
+.o-mail-Chatter-topbar .o-mail-Chatter-activity,
+.o-mail-Chatter-topbar button[data-hotkey="shift+a"],
+.o_ChatterTopbar .o_chatter_button_schedule_activity {
+  order: 2 !important;
+  margin-right: 0.5rem !important;
+}
+
+.o-mail-Chatter-topbar .o-mail-Chatter-sendMessage,
+.o-mail-Chatter-topbar button[data-hotkey="m"],
+.o_ChatterTopbar .o_chatter_button_send_message {
+  order: 3 !important;
+  margin-right: 0.5rem !important;
+}
+
+/* Spacer to push utility buttons to the right */
+.chatter-spacer,
+.o-mail-Chatter-topbar .o-mail-Chatter-topbarGrow,
+.o-mail-Chatter-topbar .flex-grow-1,
+.o_ChatterTopbar .o_chatter_topbar_grow {
+  order: 10 !important;
+  flex-grow: 1 !important;
+}
+
+/* Utility buttons - right side with higher order numbers */
+.o-mail-Chatter-topbar button[aria-label*="Search"],
+.o-mail-Chatter-topbar .o_chatter_button_search {
+  order: 20 !important;
+  margin-left: 0.25rem !important;
+}
+
+.o-mail-Chatter-topbar .o-mail-Chatter-fileUploader,
+.o-mail-Chatter-topbar .o-mail-Chatter-attachFiles,
+.o-mail-Chatter-topbar .o_chatter_button_attach {
+  order: 21 !important;
+  margin-left: 0.25rem !important;
+}
+
+.o-mail-Chatter-topbar .o-mail-Followers,
+.o-mail-Chatter-topbar .o-mail-Chatter-follow,
+.o-mail-Chatter-topbar .o_followers {
+  order: 22 !important;
+  margin-left: 0.25rem !important;
+}
+
+.o-mail-Chatter-topbar .o-mail-Chatter-close {
+  order: 23 !important;
+  margin-left: 0.25rem !important;
+}
+
+/* CSS-based text replacement for "Send message" -> "Email followers" */
+.o-mail-Chatter-sendMessage span,
+.o_chatter_button_send_message span {
+  font-size: 0 !important;
+}
+
+.o-mail-Chatter-sendMessage span::after,
+.o_chatter_button_send_message span::after {
+  content: "Email followers" !important;
+  font-size: 14px !important;
+  font-weight: normal !important;
+}
+
+/* Fallback for buttons without span elements */
+.o-mail-Chatter-sendMessage:not(:has(span)),
+.o_chatter_button_send_message:not(:has(span)) {
+  font-size: 0 !important;
+}
+
+.o-mail-Chatter-sendMessage:not(:has(span))::after,
+.o_chatter_button_send_message:not(:has(span))::after {
+  content: "Email followers" !important;
+  font-size: 14px !important;
+  font-weight: normal !important;
+}
+
+/* Ensure buttons maintain proper styling */
+.o-mail-Chatter-topbar button,
+.o_ChatterTopbar button {
+  white-space: nowrap !important;
+}
+
+/* Mark customized topbars */
+.maeknit-chatter-customized {
+  position: relative;
+}
+
+/* Additional fallback selectors for different Odoo versions */
+.o_mail_chatter .o_chatter_topbar button[title*="Log"] {
+  order: 1 !important;
+}
+
+.o_mail_chatter .o_chatter_topbar button[title*="Activity"] {
+  order: 2 !important;
+}
+
+.o_mail_chatter .o_chatter_topbar button[title*="Send"] {
+  order: 3 !important;
+}
+/* Enhanced chatter toggle button styling */
+.maeknit-chatter-side-toggle {
+  order: 0 !important;
+  border: 1px solid #dee2e6 !important;
+  background: white !important;
+  cursor: pointer !important;
+  margin-right: 0.5rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.maeknit-chatter-side-toggle:hover {
+  background: #f8f9fa !important;
+  border-color: #adb5bd !important;
+}
+
+.maeknit-chatter-side-toggle i {
+  font-size: 14px;
+  color: #495057;
+  transition: color 0.2s ease;
+}
+
+.maeknit-chatter-side-toggle:hover i {
+  color: #212529;
+}
+
+/* Floating toggle button that appears when chatter is hidden */
+.maeknit-floating-chatter-toggle {
+  position: fixed !important;
+  right: 20px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 1050 !important;
+  padding: 0.75rem 0.5rem !important;
+  border-radius: 0.5rem 0 0 0.5rem !important;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.15) !important;
+  background: #0d6efd !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  opacity: 0.9 !important;
+}
+
+.maeknit-floating-chatter-toggle:hover {
+  opacity: 1 !important;
+  padding-left: 0.75rem !important;
+  box-shadow: -4px 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.maeknit-floating-chatter-toggle i {
+  font-size: 18px;
+  color: white !important;
+}
+
+/* Enhanced styles to properly expand main content when chatter is hidden */
+
+/* Smooth transition for all containers */
+.o_content,
+.o_action_manager,
+.o_form_view,
+.o_Content,
+.o_form_sheet_bg,
+.o_form_renderer,
+.o_form_sheet {
+  transition: all 0.3s ease !important;
+}
+
+/* More aggressive full-width expansion rules */
+
+/* When chatter is hidden, force ALL main containers to use full width */
+body.maeknit-no-chatter .o_content,
+body.maeknit-no-chatter .o_action_manager,
+body.maeknit-no-chatter .o_Content {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin-right: 0 !important;
+  padding-right: 15px !important;
+}
+
+/* Force form views to expand - target all variants */
+body.maeknit-no-chatter .o_form_view,
+body.maeknit-no-chatter .o_FormRenderer,
+.maeknit-content-expanded,
+.maeknit-form-expanded {
+  max-width: 100% !important;
+  width: 100% !important;
+  flex: 1 1 100% !important;
+  flex-basis: 100% !important;
+  flex-grow: 1 !important;
+}
+
+/* Target the main form background and sheet containers */
+body.maeknit-no-chatter .o_form_sheet_bg,
+body.maeknit-no-chatter .o_form_sheet,
+body.maeknit-no-chatter .o_form_renderer {
+  max-width: 100% !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  margin-right: 0 !important;
+  padding-right: 15px !important;
+  flex: 1 1 100% !important;
+}
+
+/* Force notebook and tabs to expand fully */
+body.maeknit-no-chatter .o_notebook,
+body.maeknit-no-chatter .nav-tabs,
+body.maeknit-no-chatter .tab-content,
+body.maeknit-no-chatter .tab-pane {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Expand the xxl form view wrapper - THIS IS KEY FOR ODOO 18 */
+body.maeknit-no-chatter .o_xxl_form_view,
+body.maeknit-no-chatter .o_xxl_form_view > .o_form_sheet_bg {
+  max-width: 100% !important;
+  width: 100% !important;
+  flex: 1 1 100% !important;
+}
+
+/* Make sure action containers fill width */
+body.maeknit-no-chatter .o_action_manager > .o_action,
+body.maeknit-no-chatter .o_content > *:not(.o-mail-Chatter):not(.maeknit-chatter-hidden) {
+  flex: 1 1 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Remove any fixed widths from form groups and fields */
+body.maeknit-no-chatter .o_form_sheet .o_group,
+body.maeknit-no-chatter .o_form_sheet .o_inner_group,
+body.maeknit-no-chatter .o_form_sheet table {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Override any inline max-width styles on main containers */
+body.maeknit-no-chatter .o_action_manager[style*="max-width"],
+body.maeknit-no-chatter .o_form_view[style*="max-width"],
+body.maeknit-no-chatter .o_form_sheet_bg[style*="max-width"] {
+  max-width: 100% !important;
+}
+
+/* Ensure parent flex containers adjust properly */
+body.maeknit-no-chatter .o_action_manager,
+body.maeknit-no-chatter .o_content {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+body.maeknit-no-chatter .o_xxl_form_view {
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Hidden chatter should not take any space */
+.maeknit-chatter-hidden {
+  display: none !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  flex: 0 0 0 !important;
+}
+
+/* Ensure parent containers adjust properly */
+.maeknit-no-chatter .o_xxl_form_view,
+.maeknit-no-chatter .o_xxl_form_view > *:not(.o-mail-Chatter):not(.maeknit-chatter-hidden) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Only disable caret on non-editable elements */
+body *:not(input):not(textarea):not([contenteditable="true"]):not([role="textbox"]) {
+  caret-color: transparent !important;
+  user-select: none !important;
+  cursor: pointer !important;
+}
+
+/* Restore normal typing behavior in actual editable areas */
+input,
+textarea,
+[contenteditable="true"],
+[role="textbox"] {
+  caret-color: auto !important;
+  user-select: text !important;
+  cursor: text !important;
+}

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="maeknit_fitting_notes_form_view" model="ir.ui.view">
+        <field name="name">maeknit.fitting.notes.form</field>
+        <field name="model">maeknit.fitting.notes</field>
+        <field name="arch" type="xml">
+            <form string="Fitting">
+                <header>
+                    <button name="action_confirm"
+                            type="object"
+                            string="Confirm"
+                            class="btn-success"
+                            invisible="state != 'draft'"/>
+                    <button name="action_manufacture"
+                            type="object"
+                            string="Manufacture"
+                            class="btn-primary"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_set_draft"
+                            type="object"
+                            string="Set to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,sent_to_shop_floor"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_production"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-industry">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">MFG Order</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="product_id" readonly="1" options="{'no_open': False}"/>
+                        </h1>
+                        <div>
+                            <span class="badge rounded-pill text-bg-success fs-6">
+                                <field name="sample_number" readonly="1"/>
+                            </span>
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" readonly="1"/>
+                            <field name="production_id" readonly="1" options="{'no_open': False}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page name="fitting_visuals" string="Fitting Visuals">
+                            <group col="1">
+                                <field name="sketch_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                            </group>
+                        </page>
+                        <page name="notes" string="Notes">
+                            <group col="1">
+                                <field name="notes" nolabel="1" class="o_fullwidth_widget" placeholder="Add fitting notes here…"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="maeknit_fitting_notes_list_view" model="ir.ui.view">
+        <field name="name">maeknit.fitting.notes.list</field>
+        <field name="model">maeknit.fitting.notes</field>
+        <field name="arch" type="xml">
+            <list string="Fittings">
+                <field name="sample_number"/>
+                <field name="product_id"/>
+                <field name="production_id"/>
+                <field name="company_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'confirmed'"
+                       decoration-info="state == 'sent_to_shop_floor'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="maeknit_fitting_notes_kanban_view" model="ir.ui.view">
+        <field name="name">maeknit.fitting.notes.kanban</field>
+        <field name="model">maeknit.fitting.notes</field>
+        <field name="arch" type="xml">
+            <kanban string="Fittings" default_group_by="state">
+                <field name="sample_number"/>
+                <field name="product_id"/>
+                <field name="production_id"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <strong><field name="product_id"/></strong>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <span class="badge rounded-pill text-bg-success">
+                                    <field name="sample_number"/>
+                                </span>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <span class="text-muted"><field name="production_id"/></span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_maeknit_fitting_notes" model="ir.actions.act_window">
+        <field name="name">Fittings</field>
+        <field name="res_model">maeknit.fitting.notes</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="path">fittings</field>
+    </record>
+
+    <menuitem id="menu_maeknit_fittings"
+              name="Fittings"
+              parent="mrp.menu_mrp_manufacturing"
+              action="action_maeknit_fitting_notes"
+              sequence="25"/>
+
+</odoo>

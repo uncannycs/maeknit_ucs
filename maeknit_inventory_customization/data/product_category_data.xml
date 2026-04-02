@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Create standard product categories that match our custom selection values -->
+        <record id="product_category_yarn" model="product.category" forcecreate="false">
+            <field name="name">Yarn</field>
+            <field name="complete_name">Yarn</field>
+        </record>
+        
+        <record id="product_category_garment" model="product.category" forcecreate="false">
+            <field name="name">Garment</field>
+            <field name="complete_name">Garment</field>
+        </record>
+        
+        <record id="product_category_swatch" model="product.category" forcecreate="false">
+            <field name="name">Swatch</field>
+            <field name="complete_name">Swatch</field>
+        </record>
+        
+        <record id="product_category_services" model="product.category" forcecreate="false">
+            <field name="name">Services</field>
+            <field name="complete_name">Services</field>
+        </record>
+        
+        <record id="product_category_misc" model="product.category" forcecreate="false">
+            <field name="name">Misc</field>
+            <field name="complete_name">Misc</field>
+        </record>
+    </data>
+</odoo>

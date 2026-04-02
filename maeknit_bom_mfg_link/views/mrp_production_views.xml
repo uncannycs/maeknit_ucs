@@ -1,0 +1,437 @@
+<odoo>
+    <!-- Hide Structure/Left Carrier/Right Carrier column headers for UK companies.
+         Placed here (not in maeknit_inventory_customization or maeknit_sales_customization)
+         because is_uk_company on mrp.production is defined in this module. -->
+    <record id="mrp_production_form_view_uk_col_invisible" model="ir.ui.view">
+        <field name="name">mrp.production.form.uk.col.invisible</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='left_carrier']" position="attributes">
+                <attribute name="column_invisible">parent.is_uk_company</attribute>
+            </xpath>
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='right_carrier']" position="attributes">
+                <attribute name="column_invisible">parent.is_uk_company</attribute>
+            </xpath>
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='structure_id']" position="attributes">
+                <attribute name="column_invisible">parent.is_uk_company</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mrp_production_form_view_inherit" model="ir.ui.view">
+        <field name="name">mrp.production.form.inherit</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id'][@default_focus='1']" position="after">
+                <field name="rel_service" options="{'no_create': true}" required="1"/>
+                <field name="partner_id" invisible="0" required="1"/>
+                <!-- Swatch picker — Toile MO only, shown immediately after service/partner -->
+                <label for="toile_swatch_mo_id" string="Swatch" invisible="not is_toile_mo"/>
+                <div invisible="not is_toile_mo" class="d-flex align-items-center gap-2">
+                    <field name="toile_swatch_mo_id" nolabel="1" class="flex-grow-1"
+                           options="{'no_create': True, 'no_open': True}"
+                           context="{'show_product_name': True}"
+                           domain="[('rel_service.name', '=', 'Swatch Service'), ('partner_id', '=', partner_id)]"
+                           placeholder="Pick a swatch..."/>
+                    <button name="action_open_toile_swatch_mo" type="object"
+                            class="btn btn-sm btn-link p-0"
+                            icon="fa-external-link"
+                            invisible="not toile_swatch_mo_id"
+                            title="Open Swatch MO"
+                            string=""/>
+                </div>
+                <!-- Product — Toile MO only, rendered here (below swatch picker); top product_id stays hidden -->
+                <field name="product_id" string="Select a Product"
+                       invisible="not is_toile_mo"
+                       options="{'no_create': true}"
+                       required="is_toile_mo"/>
+                <!-- Add invisible fields for filtering and update domain on colorway/size/yarn -->
+                <field name="style_colorway_ids" invisible="1"/>
+                <field name="style_size_ids" invisible="1"/>
+                <field name="style_yarn_variant_ids" invisible="1"/>
+                <field name="size_id"
+                       required="not is_swatch_mo and not is_toile_mo"
+                       invisible="is_swatch_mo"
+                       options="{'no_create': False, 'no_create_edit': False}"
+                       domain="[('id', 'in', style_size_ids)]"
+                       context="{'default_attribute_id': %(maeknit_inventory_customization.attr_size)d}"/>
+                <field name="colorway_id" required="1" invisible="0" domain="[('id', 'in', style_colorway_ids)]" context="{'default_attribute_id': %(maeknit_inventory_customization.attr_colorway)d}" options="{'no_create': False, 'no_create_edit': True}"/>
+                <field name="yarn_variant"
+                       invisible="not is_swatch_mo"
+                       domain="[('id', 'in', style_yarn_variant_ids)]"
+                       context="{'default_attribute_id': %(maeknit_inventory_customization.attr_yarn_variant)d}"
+                       options="{'no_create': False, 'no_create_edit': False}"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="machine_id_selection" widget="radio"/>
+                <field name="type" required="1" string="BOM Type"/>
+                <field name="subcontractor_ids" widget="many2many_tags" options="{'no_create': False}" domain="[('supplier_rank','>',0)]" placeholder="Select subcontractors..." string="Subcontractors" invisible="type != 'subcontract'" required="type == 'subcontract'"></field>
+                <field name="order_date" string="Order Date" invisible="1"/>
+                <field name="gauge_id" string="Gauge" required="1"/>
+                <!-- Calibration Swatch link — Dev MO 
+                <label for="dev_swatch_product_name" string="s" invisible="not is_dev_mo"/>
+                <div invisible="not is_dev_mo" class="d-flex align-items-center gap-2">
+                    <div class="d-flex flex-column flex-grow-1">
+                        <field name="dev_swatch_product_name" nolabel="1" readonly="1" placeholder="None selected"/>
+                        <field name="dev_swatch_mo_name" nolabel="1" readonly="1" class="text-muted small" invisible="not dev_swatch_mo_id"/>
+                    </div>
+                    <button name="action_open_dev_swatch_mo" type="object"
+                            class="btn btn-sm btn-link p-0"
+                            icon="fa-external-link"
+                            invisible="not dev_swatch_mo_id"
+                            title="Open Swatch MO"
+                            string=""/>
+                </div>
+                -->
+                <!-- Toile link — Dev MO only, if a toile is linked 
+                <label for="first_toile_product_name" string="Toile" invisible="not is_dev_mo or not first_toile_mo_id"/>
+                <div invisible="not is_dev_mo or not first_toile_mo_id" class="d-flex align-items-center gap-2">
+                    <field name="first_toile_product_name" nolabel="1" readonly="1" class="flex-grow-1"/>
+                    <button name="action_open_first_toile_mo" type="object"
+                            class="btn btn-sm btn-link p-0"
+                            icon="fa-external-link"
+                            title="Open Toile MO"
+                            string=""/>
+                </div>
+                -->
+                <!-- Generate Toile — Dev MO only, when a swatch is linked -->
+                <div invisible="not is_dev_mo or not dev_swatch_mo_id" style="margin-top: 4px;">
+                    <button name="action_generate_toile" type="object"
+                            string="Generate Toile"
+                            class="btn btn-sm btn-outline-primary"/>
+                </div>
+                <field name="latest_program_workorder_id" invisible="1"/>
+                <div class="o_field_widget" style="margin-top: 2px;">
+                    <button name="action_view_latest_program_files"
+                            type="object"
+                            string="Program"
+                            class="btn btn-sm btn-outline-success"
+                            invisible="not latest_program_workorder_id"/>
+                </div>
+            </xpath>
+            <xpath expr="//button[@name='action_generate_bom']" position="replace">
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <field name="is_uk_company" invisible="1" column_invisible="1"/>
+                <field name="is_toile_mo" invisible="1"/>
+                <field name="is_dev_mo" invisible="1"/>
+                <field name="toile_mo_ids" invisible="1"/>
+                <field name="first_toile_mo_id" invisible="1"/>
+                <field name="toile_swatch_product_name" invisible="1"/>
+                <field name="dev_swatch_mo_id" invisible="1"/>
+                <field name="dev_mo_id" invisible="1"/>
+                <field name="toile_swatch_mo_name" invisible="1"/>
+                <field name="dev_swatch_mo_name" invisible="1"/>
+                <field name="linked_dev_mo_id" invisible="1"/>
+                <field name="dev_swatch_mo_ids" invisible="1"/>
+                <field name="swatch_service_id" invisible="1"/>
+                <field name="toile_service_id" invisible="1"/>
+            </xpath>
+            <!-- Smart buttons -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <!-- Swatch MO → parent Dev MO -->
+                <button name="action_open_linked_dev_mo" type="object"
+                        class="oe_stat_button"
+                        icon="fa-flask"
+                        invisible="not is_swatch_mo or not linked_dev_mo_id"
+                        string="Dev MO"/>
+                <!-- Toile MO → its Dev MO -->
+                <button name="action_open_dev_mo_from_toile" type="object"
+                        class="oe_stat_button"
+                        icon="fa-code-fork"
+                        invisible="not is_toile_mo or not dev_mo_id"
+                        string="Dev MO"/>
+                <!-- Sync button — Dev MO only -->
+                <button name="action_open_sync_wizard" type="object"
+                        class="oe_stat_button"
+                        icon="fa-refresh"
+                        invisible="not is_dev_mo"
+                        string="Sync"/>
+            </xpath>
+            <xpath expr="//page[@name='miscellaneous']" position="before">
+                <page string="Sketch" name="sketch" invisible="is_uk_company">
+                    <group col="1">
+                        <field name="excalidraw_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                    </group>
+                </page>
+                <page string="Stitch Construction" name="stitch_construction" invisible="not is_uk_company">
+                    <group col="1">
+                        <field name="excalidraw_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                    </group>
+                </page>
+                <page string="Garment Construction" name="garment_construction" invisible="not is_uk_company">
+                    <group col="1">
+                        <field name="garment_construction_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                    </group>
+                </page>
+            </xpath>
+
+            <xpath expr="//page[@name='operations']" position="replace"/>
+
+            <xpath expr="//page[@name='components']" position="before">
+
+                <page string="Work Orders" name="operations" groups="mrp.group_mrp_routings">
+                    <field name="workorder_ids"
+                        widget="mrp_workorder_one2many"
+                        readonly="state == 'cancel' or (state == 'done' and is_locked)"
+                        context="{'list_view_ref': 'mrp.mrp_production_workorder_tree_editable_view_mo_form', 'default_product_uom_id': product_uom_id, 'from_manufacturing_order': True}"/>
+                </page>
+
+            </xpath>
+
+            <xpath expr="//page[@name='operations']" position="after">
+                <page string="Structure" name="structure" invisible="is_uk_company">
+                    <field name="structure_ids" readonly="state in ('done', 'cancel')">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                        </list>
+                    </field>
+                </page>
+                <page string="Structure CAD" name="structure_cad" invisible="is_uk_company">
+                    <group col="1">
+                        <field name="structure_cad_data" widget="excalidraw" nolabel="1" class="o_fullwidth_widget"/>
+                    </group>
+                </page>
+                <page string="Artwork" name="artwork" invisible="is_uk_company">
+                    <group col="1">
+                        <field name="artwork_data" widget="artwork_widget" nolabel="1" class="o_fullwidth_widget"/>
+                    </group>
+                </page>
+
+                <!-- Dev MO: list of linked Swatch MOs -->
+                <page string="Swatch" name="dev_swatch_tab" invisible="not is_dev_mo">
+                    <field name="dev_swatch_mo_ids" readonly="state in ('done', 'cancel')"
+                           context="{'default_rel_service': swatch_service_id, 'default_parent_garment_mo_id': id, 'default_partner_id': partner_id}">
+                        <list>
+                            <field name="name" string="MO Reference"/>
+                            <field name="product_id" string="Product" readonly="1"/>
+                            <field name="yarn_variant" string="Yarn" readonly="1"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state in ('done', 'to_close')"
+                                   decoration-warning="state == 'progress'"
+                                   decoration-info="state == 'confirmed'"
+                                   decoration-muted="state == 'draft'"
+                                   readonly="1"/>
+                        </list>
+                    </field>
+                </page>
+
+                <!-- Dev MO: list of linked Toile MOs -->
+                <page string="Toile" name="dev_toile_tab" invisible="not is_dev_mo">
+                    <field name="toile_mo_ids" readonly="state in ('done', 'cancel')"
+                           context="{'default_rel_service': toile_service_id, 'default_parent_garment_mo_id': id, 'default_dev_mo_id': id, 'default_partner_id': partner_id}">
+                        <list>
+                            <field name="product_id" string="Toile" readonly="1"/>
+                            <field name="toile_swatch_mo_id" string="Swatch Used" readonly="1"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state in ('done', 'to_close')"
+                                   decoration-warning="state == 'progress'"
+                                   decoration-info="state == 'confirmed'"
+                                   decoration-muted="state == 'draft'"
+                                   readonly="1"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    
+    </record>
+
+    <!-- Rename Whole CAD to Documentation for UK companies -->
+    <record id="mrp_production_form_view_whole_cad_uk_rename" model="ir.ui.view">
+        <field name="name">mrp.production.form.whole.cad.uk.rename</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="maeknit_mfg_customization.mrp_production_form_view_inherit_cad"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='whole_cad']" position="replace">
+                <page string="Whole CAD" name="whole_cad" invisible="product_category == 'swatch' or is_uk_company or is_toile_mo">
+                    <group col="1">
+                        <field name="whole_cad_data_with_images" widget="whole_cad_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="whole_cad_data" invisible="1"/>
+                    </group>
+                </page>
+                <page string="Documentation" name="whole_cad_uk" invisible="product_category == 'swatch' or not is_uk_company or is_toile_mo">
+                    <group col="1">
+                        <field name="whole_cad_data_with_images" widget="whole_cad_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="whole_cad_data" invisible="1"/>
+                    </group>
+                </page>
+                <page string="CAD &amp; POM" name="cad_pom" invisible="not is_uk_company">
+                    <group col="1">
+                        <field name="cad_pom_data_with_images" widget="whole_cad_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="cad_pom_data" invisible="1"/>
+                    </group>
+                </page>
+            </xpath>
+            <!-- Hide Panel CAD for UK companies -->
+            <xpath expr="//page[@name='panel_cad']" position="attributes">
+                <attribute name="invisible">product_category == 'swatch' or is_uk_company</attribute>
+            </xpath>
+            <!-- Hide Miscellaneous for UK companies -->
+            <xpath expr="//page[@name='miscellaneous']" position="attributes">
+                <attribute name="invisible">is_uk_company</attribute>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="mrp_production_form_view_sample_badge" model="ir.ui.view">
+        <field name="name">mrp.production.form.sample.badge</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="maeknit_mfg_customization.mrp_production_form_view_inherit_cad"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]//field[@name='product_tmpl_name']" position="after">
+                <span class="o_tag" style="color:black; padding:2px; margin-left:8px;">
+                    <field name="sample"
+                        readonly="1"
+                        widget="badge"
+                        decoration-info="1"
+                        invisible="product_category == 'swatch'"/>
+                </span>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Hide oe_title product fields for Toile MOs — must inherit from maeknit_mfg_customization
+         because that view adds product_id / product_tmpl_name into the oe_title h1. -->
+    <record id="mrp_production_form_view_toile_title_hide" model="ir.ui.view">
+        <field name="name">mrp.production.form.toile.title.hide</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="maeknit_mfg_customization.mrp_production_form_view_inherit_cad"/>
+        <field name="arch" type="xml">
+            <!-- New record: product_id picker in oe_title; hide for Toile MOs -->
+            <xpath expr="//div[hasclass('oe_title')]//field[@name='product_id']" position="attributes">
+                <attribute name="invisible">id or is_toile_mo</attribute>
+            </xpath>
+            <!-- Saved record: product name in oe_title; for Toile also show on new records (product picker is in body) -->
+            <xpath expr="//div[hasclass('oe_title')]//field[@name='product_tmpl_name']" position="attributes">
+                <attribute name="invisible">not id and not is_toile_mo</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Filter structure_id on MO components to only lines belonging to this MO -->
+    <!-- Dev MO: Stitch Density tab showing Swatch and Toile densities side by side.
+         Placed in this module because dev_swatch_mo_id / swatch_sd_data / toile_sd_data
+         are defined here (maeknit_bom_mfg_link loads after maeknit_mfg_customization). -->
+    <record id="mrp_production_form_view_dev_stitch_density" model="ir.ui.view">
+        <field name="name">mrp.production.form.dev.stitch.density</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='miscellaneous']" position="before">
+                <!-- Dev MO Stitch Density tab — Swatches sub-tab + Toile sub-tab -->
+                <page string="Stitch Density" name="dev_stitch_density" invisible="not is_dev_mo">
+                    <notebook>
+                        <page string="Swatches" name="sd_swatches_page">
+                            <field name="dev_swatch_mo_ids"
+                                   widget="stitch_density_panel"
+                                   mode="swatch"
+                                   nolabel="1"/>
+                        </page>
+                        <page string="Toile" name="sd_toile_page">
+                            <field name="toile_mo_ids"
+                                   widget="stitch_density_panel"
+                                   mode="toile"
+                                   nolabel="1"/>
+                        </page>
+                    </notebook>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mrp_production_form_view_structure_domain" model="ir.ui.view">
+        <field name="name">mrp.production.form.structure.domain</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="maeknit_sales_customization.mrp_production_form_view_inherit_cad"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='structure_id']" position="attributes">
+                <attribute name="domain">[('production_id', '=', parent.id)]</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mrp_production_tree_inherit_partner" model="ir.ui.view">
+        <field name="name">mrp.production.tree.inherit.partner</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="replace">
+                <list string="Manufacturing Orders" multi_edit="1" sample="1" decoration-info="state == 'draft'">
+                    <header>
+                        <button name="button_plan" type="object" string="Plan"/>
+                        <button name="action_assign"  type="object" string="Check availability"/>
+                        <button name="action_cancel" type="object" string="Cancel"/>
+                    </header>
+
+                    <field name="company_id" column_invisible="True"/>
+                    <field name="product_uom_category_id" column_invisible="True"/>
+                    <field name="priority" optional="show" widget="priority" nolabel="1"/>
+                    <field name="message_needaction" column_invisible="True"/>
+                    <field name="service_badge" column_invisible="1"/>
+                    <field name="rel_service"
+                           widget="badge"
+                           decoration-success="service_badge == 'success'"
+                           decoration-info="service_badge == 'info'"
+                           decoration-primary="service_badge == 'primary'"
+                           decoration-warning="service_badge == 'warning'"
+                           width="110"
+                           optional="show"
+                           string="Service"/>
+                    <field name="partner_id" width="140" optional="show"/>
+                    <field name="product_id" width="560" readonly="1" optional="show"/>
+                    <field name="sample" decoration-info="1" optional="show" readonly="1" widget="badge" invisible="product_category == 'swatch'"
+                           string="" options="{'no_label': True}"/>
+                    <field name="colorway_id" invisible="1" column_invisible="1" optional="hide"/>
+                    <field name="product_qty" sum="Total Qty" string="Quantity" readonly="1" optional="show"/>
+                    <field name="name" decoration-bf="1" optional="hide"/>
+                    <field name="date_start" optional="show" widget="remaining_days"/>
+                    <field name="date_finished" optional="hide" widget="remaining_days"/>
+                    <field name="date_deadline" widget="mrp_remaining_days_unformatted" invisible="state in ['done', 'cancel']" optional="hide"
+                        decoration-danger="is_delayed"
+                        decoration-bf="is_delayed"/>
+                    <field name="lot_producing_id" invisible="1" column_invisible="1"/>
+                    <field name="bom_id" invisible="1" column_invisible="1"/>
+                    <field name="origin" width="120" optional="show" readonly="state in ['cancel', 'done']"/>
+                    <field name="user_id" optional="hide" widget="many2one_avatar_user" readonly="state in ['cancel', 'done']"/>
+                    <field name="components_availability_state" column_invisible="True" options='{"lazy": true}'/>
+                    <field name="components_availability" options='{"lazy": true}'
+                        invisible="state not in ['confirmed', 'progress']"
+                        optional="show"
+                        decoration-success="reservation_state == 'assigned' or components_availability_state == 'available'"
+                        decoration-warning="reservation_state != 'assigned' and components_availability_state in ('expected', 'available')"
+                        decoration-danger="reservation_state != 'assigned' and components_availability_state in ('late', 'unavailable')"/>
+                    <field name="reservation_state" optional="hide" decoration-danger="reservation_state == 'confirmed'" decoration-success="reservation_state == 'assigned'"/>
+                    <field name="duration_expected" invisible="duration_expected == 0" groups="mrp.group_mrp_routings" widget="float_time" sum="Total expected duration" optional="hide"/>
+                    <field name="duration" invisible="duration == 0" groups="mrp.group_mrp_routings" widget="float_time" sum="Total real duration" optional="hide"/>
+                    <field name="company_id" readonly="1" groups="base.group_multi_company" optional="show"/>
+                    <field name="state"
+                           decoration-success="state in ('done', 'to_close')"
+                           decoration-warning="state == 'progress'"
+                           decoration-info="state == 'confirmed'"
+                           decoration-danger="state == 'cancel'"
+                           decoration-muted="state == 'draft'"
+                           optional="show" widget="badge" class="text-dark"/>
+                    <field name="activity_exception_decoration" widget="activity_exception"/>
+                    <field name="delay_alert_date" column_invisible="True"/>
+                    <field name="is_delayed" column_invisible="True"/>
+                    <field nolabel="1" name="json_popover" widget="stock_rescheduling_popover" invisible="not json_popover"/>
+                </list>
+            </xpath>
+        </field>
+    </record>
+    <record id="mrp_production_search_inherit_partner" model="ir.ui.view">
+        <field name="name">mrp.production.search.inherit.partner</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.view_mrp_production_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="partner_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

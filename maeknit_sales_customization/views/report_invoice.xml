@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Override for REAL invoice PDF subtotals -->
+    <template id="fix_invoice_subtotal" inherit_id="account.document_tax_totals_template">
+        <xpath expr="//tr[@class='o_subtotal']/td/span" position="replace">
+            <span>Subtotal</span>
+        </xpath>
+    </template>
+
+    <!-- Override for company-currency summary -->
+    <template id="fix_invoice_subtotal_company" inherit_id="account.document_tax_totals_company_currency_template">
+        <xpath expr="//tr[@class='o_subtotal']/td/span" position="replace">
+            <span>Subtotal</span>
+        </xpath>
+    </template>
+
+    <!-- Add Region field to PDF report -->
+    <template id="sale_order_report_region" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@name='expiration_date']" position="after">
+            <div t-if="doc.region" class="col" name="region">
+                <strong>Region</strong>
+                <div t-field="doc.region"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Add Region field to customer portal quotation view -->
+    <template id="sale_order_portal_region" inherit_id="sale.sale_order_portal_content">
+        <xpath expr="//tr[.//span[@t-field='sale_order.validity_date']]" position="after">
+            <tr t-if="sale_order.region">
+                <th class="ps-0 pb-0">Region:</th>
+                <td class="w-100 pb-0 text-wrap"><span t-field="sale_order.region"/></td>
+            </tr>
+        </xpath>
+    </template>
+
+</odoo>

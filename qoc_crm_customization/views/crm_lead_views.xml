@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_lead_view_form_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.view.form.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='expected_revenue']" position="attributes">
+                <attribute name="readonly">child_ids</attribute>
+            </xpath>
+            <xpath expr="//group[@name='opportunity_partner']/field[@name='partner_id']"
+                position="before">
+                <field name="parent_id" />
+            </xpath>
+            <xpath expr="//group[@name='lead_partner']/field[@name='partner_id']" position="before">
+                <field name="parent_id" />
+            </xpath>
+            <xpath expr="//group[@name='opportunity_partner']" position="inside">
+                <field name="season_drop_date" />
+            </xpath>
+            <xpath expr="//group[@name='lead_partner']" position="inside">
+                <field name="season_drop_date" />
+            </xpath>
+            <xpath expr="//page[@name='extra']" position="after">
+                <page name="child_opportunities" string="Child Opportunities">
+                    <field name="child_ids"
+                        readonly="1" />
+                </page>
+                <page name="products" string="Products">
+                    <field name="product_ids" />
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="attributes">
+                <attribute name="widget">many2many_checkboxes</attribute>
+            </xpath>
+            <xpath expr="//group[@name='lead_priority']/field[@name='tag_ids']"
+                position="attributes">
+                <attribute name="widget">many2many_checkboxes</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_lead_product_view_list" model="ir.ui.view">
+        <field name="name">crm.lead.product.view.list</field>
+        <field name="model">crm.lead.product</field>
+        <field name="arch" type="xml">
+            <list string="Products">
+                <field name="product_id" />
+                <field name="quantity" />
+                <field name="price" />
+                <field name="cost" />
+            </list>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_shipping_duty_wizard_form" model="ir.ui.view">
+        <field name="name">purchase.shipping.duty.wizard.form</field>
+        <field name="model">purchase.shipping.duty.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Shipping and Duty Breakdown">
+                <group>
+                    <field name="purchase_id"/>
+                </group>
+                <div class="alert alert-info" role="alert">
+                    This breakdown shows the estimated shipping and duty costs for each material component needed for this Garment RFQ.
+                </div>
+                <field name="line_ids" readonly="1">
+                    <list string="Component Breakdown">
+                        <field name="component_po_id"/>
+                        <field name="product_id"/>
+                        <field name="product_qty"/>
+                        <field name="price_unit"/>
+                        <field name="price_subtotal"/>
+                        <field name="shipping_cost" sum="Total Shipping"/>
+                        <field name="duty_cost" sum="Total Duty"/>
+                        <field name="total_cost" sum="Total Cost"/>
+                        <field name="currency_id" column_invisible="True"/>
+                    </list>
+                </field>
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

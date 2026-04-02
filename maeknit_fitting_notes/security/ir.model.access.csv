@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_maeknit_fitting_notes_user,maeknit.fitting.notes.user,model_maeknit_fitting_notes,base.group_user,1,1,1,1
+access_maeknit_fitting_notes_mrp_user,maeknit.fitting.notes.mrp.user,model_maeknit_fitting_notes,mrp.group_mrp_user,1,1,1,1
+access_maeknit_fitting_notes_mrp_manager,maeknit.fitting.notes.mrp.manager,model_maeknit_fitting_notes,mrp.group_mrp_manager,1,1,1,1

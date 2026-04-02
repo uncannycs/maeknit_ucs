@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_shipping_root" 
+              name="Shipping" 
+              sequence="10"
+              web_icon="maeknit_shipping,static/description/icon.png"/>
+
+    <!-- Configuration Menu -->
+    <menuitem id="menu_shipping_config" 
+              name="Configuration" 
+              parent="menu_shipping_root" 
+              sequence="100"/>
+
+    <!-- Sub Menus under Technical -->
+    <menuitem id="menu_shipping_emails" 
+              name="Shipping Emails" 
+              parent="base.menu_custom" 
+              action="action_shipping_mail" 
+              sequence="10"/>
+
+    <menuitem id="menu_shipping_tracking" 
+              name="Shipping Tracking Numbers" 
+              parent="base.menu_custom" 
+              action="action_shipping_tracking" 
+              sequence="11"/>
+</odoo>

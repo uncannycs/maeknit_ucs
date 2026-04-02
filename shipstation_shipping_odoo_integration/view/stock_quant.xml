@@ -1,0 +1,43 @@
+<odoo>
+    <data>
+        <record id="Shipstation_view_stock_quant_package_details" model="ir.ui.view">
+            <field name="name">Shipstation Package Configuration</field>
+            <field name="model">stock.quant.package</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="stock.view_quant_package_form"/>
+            <field name="arch" type="xml">
+                <!-- Generate Label / Download Label buttons in header -->
+                <xpath expr="//button[@name='unpack']" position="after">
+                    <field name="shipstation_shipment_id" invisible="1"/>
+                    <button name="action_generate_single_label"
+                            string="Generate Label"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not is_generate_label_in_shipstation or shipstation_shipment_id"/>
+                    <button name="action_download_latest_label"
+                            string="Download Label"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="not shipstation_shipment_id"/>
+                </xpath>
+
+                <xpath expr="//field[@name='location_id']" position="after">
+                    <field name="custom_tracking_number" readonly="1"/>
+                    <field name="is_generate_label_in_shipstation"/>
+                    <field name="carrier_id"/>
+                    <field name="shipstation_delivery_package_id"/>
+                    <field name="response_message" readonly="1"/>
+                </xpath>
+
+                <!-- Add dimensions/weight group -->
+                <xpath expr="//field[@name='pack_date']" position="after">
+                    <field name="length" string="Length (in)"/>
+                    <field name="width" string="Width (in)"/>
+                    <field name="height" string="Height (in)"/>
+                    <field name="minimum_weight" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

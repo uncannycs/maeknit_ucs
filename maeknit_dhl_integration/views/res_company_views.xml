@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form_inherit_landed_cost" model="ir.ui.view">
+        <field name="name">res.company.form.inherit.landed.cost</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="DHL Credentials" name="dhl_credentials">
+                    <group>
+                        <group name="DHL Credentials">
+                            <field name="dhl_account_number"/>
+                            <field name="dhl_site_id"/>
+                            <field name="dhl_password" password="True"/>
+                            <field name="dhl_use_production"/>
+                        </group>
+                        <group name="Dutify Credentials">
+                            <field name="dutify_api_key"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

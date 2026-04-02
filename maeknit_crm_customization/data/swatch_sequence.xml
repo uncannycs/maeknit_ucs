@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sequence for Child Opportunity Style Names -->
+        <record id="seq_crm_lead_swatch" model="ir.sequence">
+            <field name="name">CRM Lead Swatch Style Sequence</field>
+            <field name="code">crm.lead.swatch.style</field>
+            <field name="prefix"></field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

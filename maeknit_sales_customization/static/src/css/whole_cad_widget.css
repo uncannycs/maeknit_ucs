@@ -1,0 +1,243 @@
+.whole-cad-widget {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* Drag handle column */
+.whole-cad-table .drag-handle {
+  cursor: grab;
+  color: #bbb;
+  width: 20px;
+  padding: 0 4px !important;
+}
+
+.whole-cad-table .drag-handle:hover {
+  color: #666;
+}
+
+/* Removed all borders from table to match Panel POM's minimal appearance */
+.whole-cad-table {
+  background: white;
+  width: 100%;
+  table-layout: fixed;
+  margin-bottom: 10px;
+  border-collapse: collapse;
+}
+
+.whole-cad-table thead th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  text-align: left;
+  vertical-align: middle;
+  padding: 4px 4px; /* Reduced header padding to minimal levels */
+  font-size: 12px;
+  color: #495057;
+  line-height: 1.2; /* Added line-height */
+}
+
+.whole-cad-table tbody tr:nth-child(odd) {
+  background-color: #e1e5e9fb;
+}
+
+.whole-cad-table tbody tr:nth-child(even) {
+  background-color: #f0f6ff;
+}
+
+.whole-cad-table tbody td {
+  vertical-align: middle;
+  padding: 2px 4px !important; /* Dramatically reduced cell padding */
+  background-color: inherit;
+  line-height: 1; /* Added line-height */
+  max-height: 28px; /* Added max-height */
+}
+
+.whole-cad-table tbody td input {
+  font-size: 12px; /* Reduced input padding and font size */
+  padding: 2px 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  width: 100%;
+  transition: border-color 0.15s ease-in-out;
+  line-height: 1.2; /* Added line-height */
+  height: 24px; /* Added height */
+}
+
+/* Hide number input spinners to save space and match Panel POM */
+.whole-cad-table tbody td input[type="number"]::-webkit-inner-spin-button,
+.whole-cad-table tbody td input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.whole-cad-table tbody td input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Point badge styling to match Panel POM */
+.whole-cad-table .point-letter {
+  font-weight: bold;
+  color: #495057;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px; /* Made point badge smaller */
+  height: 20px; /* Made point badge smaller */
+  background: #e9ecef;
+  border-radius: 50%;
+  font-size: 11px; /* Reduced font size */
+}
+
+.whole-cad-image-section-top {
+  background: white;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.whole-cad-image-container {
+  min-height: 250px;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.whole-cad-zoom-container {
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background-color: white;
+  height: 500px;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.whole-cad-image-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+}
+
+.whole-cad-zoomable-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  cursor: grab;
+}
+
+.whole-cad-zoomable-image:active {
+  cursor: grabbing;
+}
+
+.whole-cad-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.whole-cad-measurements-section {
+  background: white;
+  border-radius: 6px;
+  padding: 10px;
+  width: 100%;
+  min-width: 100%;
+}
+
+.whole-cad-bottom-section {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Red background for out-of-tolerance cells */
+.bg-danger.bg-opacity-25 {
+  background-color: rgba(220, 53, 69, 0.25) !important;
+}
+
+.form-control-plaintext {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+/* Updated tab styling to be more minimal and match Panel POM aesthetic */
+.whole-cad-widget .nav-tabs {
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 10px;
+}
+
+.whole-cad-widget .nav-tabs .nav-link {
+  color: #495057;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 6px 12px;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.whole-cad-widget .nav-tabs .nav-link:hover {
+  border-bottom-color: #dee2e6;
+  color: #0d6efd;
+}
+
+.whole-cad-widget .nav-tabs .nav-link.active {
+  color: #0d6efd;
+  border-bottom-color: #0d6efd;
+  background-color: transparent;
+}
+
+.whole-cad-widget .tab-content {
+  padding-top: 10px;
+}
+
+.whole-cad-widget .btn-sm {
+  padding: 2px 6px; /* Reduced button padding */
+  font-size: 11px; /* Reduced font size */
+}
+
+.whole-cad-widget .form-select-sm {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.whole-cad-widget .form-control-sm {
+  font-size: 12px;
+  padding: 4px 6px;
+}
+
+.whole-cad-widget .badge {
+  font-size: 11px;
+  padding: 3px 6px;
+}
+
+/* Added delete button styling to match Panel POM */
+.whole-cad-widget .btn-danger {
+  padding: 2px 6px; /* Reduced button padding */
+  font-size: 11px; /* Reduced font size */
+}
+
+/* Row highlighting when focused/editing */
+.whole-cad-table tbody tr.row-focused {
+  background-color: #fff3cd !important;
+  box-shadow: 0 0 0 2px #c4e8e466;
+}
+
+.whole-cad-table tbody tr.row-focused td {
+  background-color: #fff3cd !important;
+}

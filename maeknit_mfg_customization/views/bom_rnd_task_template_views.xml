@@ -1,0 +1,68 @@
+<odoo>
+    <!-- Action to open the R&D Task Template list -->
+    <record id="action_rnd_task_template" model="ir.actions.act_window">
+        <field name="name">R&amp;D Task Templates</field>
+        <field name="res_model">maeknit.rnd.task.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>
+                Create reusable templates of R&amp;D sub-tasks to quickly populate BOM Requests.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu under Manufacturing Configuration -->
+    <menuitem id="menu_rnd_task_template_root"
+              name="R&amp;D Task Templates"
+              parent="mrp.menu_mrp_configuration"
+              sequence="51"
+              action="action_rnd_task_template"/>
+
+    <!-- List View -->
+    <record id="view_rnd_task_template_list" model="ir.ui.view">
+        <field name="name">maeknit.rnd.task.template.list</field>
+        <field name="model">maeknit.rnd.task.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="related_service"/>
+                <field name="company_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_rnd_task_template_form" model="ir.ui.view">
+        <field name="name">maeknit.rnd.task.template.form</field>
+        <field name="model">maeknit.rnd.task.template</field>
+        <field name="arch" type="xml">
+            <form string="R&amp;D Task Template">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="related_service" widget="radio" options="{'horizontal': true}"/>
+                        <field name="company_id" widget="radio" options="{'horizontal': true}"/>
+                    </group>
+                    <notebook>
+                        <page string="Task Lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="user_ids" widget="many2many_tags" options="{'no_create': True, 'no_create_edit': True}"/>
+                                </list>
+                                <form>
+                                    <group>
+                                        <field name="sequence"/>
+                                        <field name="name"/>
+                                        <field name="user_ids" widget="many2many_tags" options="{'no_create': True, 'no_create_edit': True}"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

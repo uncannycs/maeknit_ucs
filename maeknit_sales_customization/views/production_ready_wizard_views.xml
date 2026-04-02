@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Updated Production Ready Wizard with colorway selection -->
+        <record id="view_prroduction_ready_wizard" model="ir.ui.view">
+            <field name="name">production.ready.wizard.form</field>
+            <field name="model">production.ready.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Production Ready - Colorway Selection">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="source_bom_request_id" invisible="1"/>
+                                <field name="product_tmpl_id" readonly="1"/>
+                                <field name="partner_id" readonly="1"/>
+                                <field name="rel_service" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="size_id" readonly="1"/>
+                                <field name="colorway_id" readonly="1" string="Original Colorway (Development)"/>
+                            </group>
+                        </group>
+                        
+                        <group string="Available Colorways">
+                            <field name="available_colorway_ids" 
+                                   widget="many2many_tags"
+                                   options="{'color_field': 'color', 'no_create_edit': True, 'no_quick_create': True}"/>
+                        </group>
+                        
+                        <!-- Added context with default_attribute_id and proper no_create_edit option for quick creation -->
+                        <group string="Select Colorways for Production">
+                            <field name="selected_colorway_ids" 
+                                   widget="many2many_tags" 
+                                   context="{'default_attribute_id': %(maeknit_inventory_customization.attr_colorway)d}"
+                                   options="{'color_field': 'color', 'no_create': False, 'no_create_edit': True}"
+                                   placeholder="Select or create colorways to create production BOMs..."
+                                   required="1"/>
+                        </group>
+                        
+                    </sheet>
+                    <footer>
+                        <button name="action_submit_request" string="Create Production BOMs" type="object" class="btn-primary"/>
+                        <button name="action_cancel" string="Cancel" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

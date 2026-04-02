@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Override the stock.menu_stock_root menu to use our custom action -->
+    <record id="stock.menu_stock_root" model="ir.ui.menu">
+        <field name="action" ref="action_product_template_all"/>
+    </record>
+</odoo>

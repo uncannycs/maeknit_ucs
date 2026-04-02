@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ======================================================
+         Report action (registered in Odoo's report engine)
+    ====================================================== -->
+    <record id="action_report_mfg_sheet" model="ir.actions.report">
+        <field name="name">MFG Sheet</field>
+        <field name="model">mrp.production</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">maeknit_mfg_customization.report_mfg_sheet</field>
+        <field name="report_file">maeknit_mfg_customization.report_mfg_sheet</field>
+        <field name="print_report_name">'MFG Sheet - %s' % object.name</field>
+        <field name="paperformat_id" ref="base.paperformat_us"/>
+    </record>
+
+    <!-- ======================================================
+         QWeb template
+    ====================================================== -->
+    <template id="report_mfg_sheet">
+        <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="doc">
+            <t t-set="o" t-value="doc['o']"/>
+            <t t-set="panels" t-value="doc['panels']"/>
+            <t t-set="whole_cad" t-value="doc['whole_cad']"/>
+            <t t-set="cal" t-value="doc['cal']"/>
+
+            <t t-call="web.external_layout">
+                <div class="page">
+
+                    <!-- ── HEADER ── -->
+                    <div class="row mb-3" style="border-bottom:2px solid #333; padding-bottom:8px;">
+                        <div class="col-8">
+                            <h2 style="margin:0; font-size:20px;" t-esc="o.product_id.display_name"/>
+                            <div style="font-size:13px; color:#555; margin-top:4px;">
+                                <strong>MO:</strong> <span t-esc="o.name"/>
+                                <t t-if="o.partner_id">
+                                    &#160;|&#160;<strong>Customer:</strong> <span t-esc="o.partner_id.name"/>
+                                </t>
+                                <t t-if="o.colorway_id">
+                                    &#160;|&#160;<strong>Colorway:</strong> <span t-esc="o.colorway_id.name"/>
+                                </t>
+                                <t t-if="o.size_id">
+                                    &#160;|&#160;<strong>Size:</strong> <span t-esc="o.size_id.name"/>
+                                </t>
+                            </div>
+                            <div style="font-size:13px; color:#555; margin-top:2px;">
+                                <t t-if="o.machine_id">
+                                    <strong>Machine:</strong> <span t-esc="o.machine_id.name"/>&#160;
+                                </t>
+                                <t t-if="o.body_stitch_id">
+                                    <strong>Body Stitch:</strong> <span t-esc="o.body_stitch_id.name"/>&#160;
+                                </t>
+                                <t t-if="o.cuff_stitch_id">
+                                    <strong>Cuff Stitch:</strong> <span t-esc="o.cuff_stitch_id.name"/>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="col-4 text-right" style="font-size:12px; color:#555;">
+                            <t t-if="o.date_start">
+                                <strong>Date:</strong> <span t-esc="o.date_start.strftime('%d %b %Y')"/><br/>
+                            </t>
+                            <t t-if="o.rel_service">
+                                <strong>Service:</strong> <span t-esc="o.rel_service.name"/><br/>
+                            </t>
+                            <t t-if="o.run_id">
+                                <strong>Run:</strong> <span t-esc="o.run_id.name"/>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- ══════════════════════════════════════════
+                         SECTION 1 — RENDER IMAGES
+                    ══════════════════════════════════════════ -->
+                    <t t-if="o.render_image_ids">
+                        <h3 style="background:#f0f0f0; padding:4px 8px; margin-bottom:8px; font-size:14px;">
+                            Render Images
+                        </h3>
+                        <t t-foreach="o.render_image_ids" t-as="img">
+                            <t t-if="img.image">
+                                <div style="margin-bottom:16px; text-align:center; page-break-inside:avoid;">
+                                    <img t-attf-src="/web/image/render.image.line/#{img.id}/image"
+                                         style="width:100%; height:auto;"/>
+                                    <div style="font-size:11px; color:#777; margin-top:4px;" t-esc="img.name"/>
+                                </div>
+                            </t>
+                        </t>
+                    </t>
+
+                    <!-- ══════════════════════════════════════════
+                         SECTION 2 — COMPONENTS
+                    ══════════════════════════════════════════ -->
+                    <t t-if="o.move_raw_ids">
+                        <h3 style="background:#f0f0f0; padding:4px 8px; margin-bottom:8px; font-size:14px;">
+                            Components
+                        </h3>
+                        <table class="table table-sm table-bordered" style="font-size:12px; margin-bottom:16px;">
+                            <thead style="background:#e8e8e8;">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-right">Qty</th>
+                                    <th>UoM</th>
+                                    <th class="text-center">Ply</th>
+                                    <th class="text-center">L.Carrier</th>
+                                    <th class="text-center">R.Carrier</th>
+                                    <th>Operation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.move_raw_ids" t-as="move">
+                                    <tr>
+                                        <td t-esc="move.product_id.display_name"/>
+                                        <td class="text-right" t-esc="'%.3f' % move.product_uom_qty"/>
+                                        <td t-esc="move.product_uom.name"/>
+                                        <td class="text-center" t-esc="move.x_ply or ''"/>
+                                        <td class="text-center" t-esc="move.left_carrier or ''"/>
+                                        <td class="text-center" t-esc="move.right_carrier or ''"/>
+                                        <td t-esc="move.consumed_in_operation_id.name if move.consumed_in_operation_id else ''"/>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+
+                    <!-- ══════════════════════════════════════════
+                         SECTION 3 — STRUCTURE + STITCH DENSITY
+                    ══════════════════════════════════════════ -->
+                    <t t-if="o.structure_ids or (cal.get('bodyCalibrationX') or cal.get('bodyCalibrationY') or cal.get('cuffCalibrationX') or cal.get('cuffCalibrationY'))">
+                        <h3 style="background:#f0f0f0; padding:4px 8px; margin-bottom:8px; font-size:14px;">
+                            Structure &amp; Stitch Density
+                        </h3>
+                        <div class="row" style="margin-bottom:16px; font-size:12px;">
+
+                            <!-- Left: Structure Lines -->
+                            <div class="col-6">
+                                <strong style="display:block; margin-bottom:4px;">Structure Panels</strong>
+                                <t t-if="o.structure_ids">
+                                    <table class="table table-sm table-bordered">
+                                        <thead style="background:#e8e8e8;">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Panel Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="o.structure_ids" t-as="sl">
+                                                <tr>
+                                                    <td t-esc="sl_index + 1"/>
+                                                    <td t-esc="sl.name"/>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </t>
+                                <t t-else="">
+                                    <p style="color:#999;">No structure panels defined.</p>
+                                </t>
+                            </div>
+
+                            <!-- Right: Stitch Density (calibration_data) -->
+                            <div class="col-6">
+                                <strong style="display:block; margin-bottom:4px;">Stitch Density</strong>
+                                <table class="table table-sm table-bordered">
+                                    <thead style="background:#e8e8e8;">
+                                        <tr>
+                                            <th></th>
+                                            <th class="text-center">Body</th>
+                                            <th class="text-center">Cuff</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Swatch Specs (W)</strong></td>
+                                            <td class="text-center" t-esc="cal.get('bodySwatchSpecsX') or '—'"/>
+                                            <td class="text-center" t-esc="cal.get('cuffSwatchSpecsX') or '—'"/>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Swatch Specs (H)</strong></td>
+                                            <td class="text-center" t-esc="cal.get('bodySwatchSpecsY') or '—'"/>
+                                            <td class="text-center" t-esc="cal.get('cuffSwatchSpecsY') or '—'"/>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Measurement (W)</strong></td>
+                                            <td class="text-center">
+                                                <span t-esc="cal.get('bodyMeasurementX') or '—'"/>
+                                                <span style="color:#777;"> <t t-esc="cal.get('bodyMeasurementXUnit', 'in')"/></span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span t-esc="cal.get('cuffMeasurementX') or '—'"/>
+                                                <span style="color:#777;"> <t t-esc="cal.get('cuffMeasurementXUnit', 'in')"/></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Measurement (H)</strong></td>
+                                            <td class="text-center">
+                                                <span t-esc="cal.get('bodyMeasurementY') or '—'"/>
+                                                <span style="color:#777;"> <t t-esc="cal.get('bodyMeasurementYUnit', 'in')"/></span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span t-esc="cal.get('cuffMeasurementY') or '—'"/>
+                                                <span style="color:#777;"> <t t-esc="cal.get('cuffMeasurementYUnit', 'in')"/></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Calibration (W)</strong></td>
+                                            <td class="text-center" t-esc="cal.get('bodyCalibrationX') or '—'"/>
+                                            <td class="text-center" t-esc="cal.get('cuffCalibrationX') or '—'"/>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Calibration (H)</strong></td>
+                                            <td class="text-center" t-esc="cal.get('bodyCalibrationY') or '—'"/>
+                                            <td class="text-center" t-esc="cal.get('cuffCalibrationY') or '—'"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </t>
+
+                    <!-- ══════════════════════════════════════════
+                         SECTION 4 — PANEL POM
+                    ══════════════════════════════════════════ -->
+                    <t t-if="panels">
+                        <h3 style="background:#f0f0f0; padding:4px 8px; margin-bottom:8px; font-size:14px;">
+                            Panel POM
+                        </h3>
+
+                        <t t-foreach="panels" t-as="panel">
+                            <!-- Whole panel block stays on one page -->
+                            <div style="page-break-inside:avoid; margin-top:16px;">
+
+                            <!-- Panel heading -->
+                            <div style="margin-bottom:6px;">
+                                <strong style="font-size:13px; border-bottom:1px solid #ccc; display:block; padding-bottom:2px;"
+                                        t-esc="panel['name']"/>
+                            </div>
+
+                            <!-- Two images side by side, capped so they don't push table off-page -->
+                            <div class="row" style="margin-bottom:8px;">
+                                <div class="col-6" style="text-align:center;">
+                                    <t t-if="panel['image']">
+                                        <img t-attf-src="data:image/jpeg;base64,#{panel['image']}"
+                                             style="max-height:260px; width:auto; max-width:100%;"/>
+                                    </t>
+                                </div>
+                                <div class="col-6" style="text-align:center;">
+                                    <t t-if="panel['image2']">
+                                        <img t-attf-src="data:image/jpeg;base64,#{panel['image2']}"
+                                             style="max-height:260px; width:auto; max-width:100%;"/>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <!-- Measurements table for this panel -->
+                            <t t-if="panel['measurements']">
+                                <t t-set="meas_list" t-value="[m for m in panel['measurements'] if isinstance(m, dict) and (m.get('name') or m.get('request'))]"/>
+                                <t t-if="meas_list">
+                                    <table class="table table-sm table-bordered" style="font-size:11px; margin-bottom:12px;">
+                                        <thead style="background:#e8e8e8;">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Measurement</th>
+                                                <th class="text-right">Spec</th>
+                                                <th class="text-right">Tol.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="meas_list" t-as="m">
+                                                <tr>
+                                                    <td t-esc="m.get('point', m_index + 1)"/>
+                                                    <td t-esc="m.get('name', '')"/>
+                                                    <td class="text-right" t-esc="m.get('request', '')"/>
+                                                    <td class="text-right" t-esc="m.get('tolerance', '')"/>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </t>
+                            </t>
+
+                            </div><!-- end page-break-inside:avoid wrapper -->
+                        </t><!-- end t-foreach panels -->
+                    </t>
+
+                    <!-- ══════════════════════════════════════════
+                         SECTION 5 — WHOLE CAD
+                    ══════════════════════════════════════════ -->
+                    <t t-if="whole_cad['image'] or whole_cad['measurements']">
+                        <h3 style="background:#f0f0f0; padding:4px 8px; margin-bottom:8px; font-size:14px; margin-top:16px;">
+                            Whole CAD
+                        </h3>
+
+                        <t t-if="whole_cad['image']">
+                            <div style="text-align:center; margin-bottom:12px;">
+                                <img t-attf-src="data:image/jpeg;base64,#{whole_cad['image']}"
+                                     style="width:100%; height:auto;"/>
+                            </div>
+                        </t>
+
+                        <t t-if="whole_cad['measurements']">
+                            <t t-set="cad_meas" t-value="[m for m in whole_cad['measurements'] if isinstance(m, dict) and (m.get('name') or m.get('request'))]"/>
+                            <t t-if="cad_meas">
+                                <table class="table table-sm table-bordered" style="font-size:11px;">
+                                    <thead style="background:#e8e8e8;">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Measurement</th>
+                                            <th class="text-right">Spec (<t t-esc="whole_cad['unit']"/>)</th>
+                                            <th class="text-right">Tol.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="cad_meas" t-as="m">
+                                            <tr>
+                                                <td t-esc="m.get('point', m_index + 1)"/>
+                                                <td t-esc="m.get('name', '')"/>
+                                                <td class="text-right" t-esc="m.get('request', '')"/>
+                                                <td class="text-right" t-esc="m.get('tolerance', '')"/>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                        </t>
+
+                    </t>
+
+                </div><!-- end .page -->
+            </t><!-- end t-call web.external_layout -->
+        </t><!-- end t-foreach docs -->
+        </t><!-- end t-call web.html_container -->
+    </template>
+
+</odoo>

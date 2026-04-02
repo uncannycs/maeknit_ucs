@@ -1,0 +1,52 @@
+{
+    'name': 'Maeknit Product Customization',
+    'description': 'Customize Product Templates with OWL',
+    'summary': 'Custom Product Templates',
+    'version': '1.0',
+    'depends': ['stock', 'product', 'base', 'web', 'crm', 'mrp', 'sale', 'purchase', 'base_automation'],
+    'author': 'Mahimul Islam (Maeknit)',
+    'category': 'Customization',
+    'data': [
+        'security/ir.model.access.csv',
+        
+        # Load data first
+        'data/product_category_data.xml',
+        'data/fiber_category_data.xml',
+        'data/fiber_type_data.xml',
+        'data/stitch_library_data.xml',
+        'data/attributes.xml',
+
+        # Then load views
+        'views/product_template_views.xml',
+        'views/product_kanban_views.xml',
+        'views/inventory_menu_override.xml',
+        'views/product_fiber_views.xml',
+        'views/product_color_views.xml',
+        'views/machine_library_views.xml',
+        'views/gauge_library_views.xml',
+        'views/stitch_library_views.xml',
+        'views/wash_library_views.xml',
+        'views/dry_library_views.xml',
+        'views/mrp_bom_views.xml',
+        'views/yarn_stock_views.xml',
+        'views/yarn_programming_views.xml',
+        'views/fiber_category_views.xml',
+        'views/fiber_type_views.xml',
+        'views/product_quick_create_views.xml',
+        'views/product_bom_button_override.xml',
+        'views/sync_categories_views.xml',
+        'views/purchase_order_views.xml',
+        # 'report/purchase_quotation_report.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'maeknit_inventory_customization/static/src/css/product_form.css',
+            'maeknit_inventory_customization/static/src/css/product_kanban.css',
+        ],
+    },
+    'installable': True,
+    'application': False,
+    'auto_install': False,
+    'license': 'LGPL-3',
+    'website': 'https://maeknit.com',
+}

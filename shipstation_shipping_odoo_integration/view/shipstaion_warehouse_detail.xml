@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_form_shipstation_warehouse_detail" model="ir.ui.view">
+        <field name="name">Shipstation Warehouse Detail</field>
+        <field name="model">shipstation.warehouse.detail</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Shipstation Warehouse Detail" create='false'>
+                <sheet>
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="warehouse_id" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

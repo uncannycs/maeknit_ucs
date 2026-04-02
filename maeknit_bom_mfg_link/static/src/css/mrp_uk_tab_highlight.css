@@ -1,0 +1,16 @@
+/* Highlight Work Orders and Components tabs for UK companies */
+.o_mrp_uk_company .o_notebook_headers a.nav-link[name="operations"],
+.o_mrp_uk_company .o_notebook_headers a.nav-link[name="components"] {
+    background-color: #ced4da;
+    color: #343a40;
+    border-color: #ced4da;
+}
+
+/* Active state - slightly lighter to show it's selected */
+.o_mrp_uk_company .o_notebook_headers a.nav-link.active[name="operations"],
+.o_mrp_uk_company .o_notebook_headers a.nav-link.active[name="components"] {
+    background-color: #e9ecef;
+    color: #343a40;
+    border-color: #ced4da;
+    border-bottom-color: #fff;
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Render Image Line Form View -->
+    <record id="view_render_image_line_form" model="ir.ui.view">
+        <field name="name">render.image.line.form</field>
+        <field name="model">render.image.line</field>
+        <field name="arch" type="xml">
+            <form string="Render Image">
+                <sheet>
+                    <group>
+                        <field name="name" placeholder="Enter image name..."/>
+                        <field name="image" widget="image" class="oe_avatar" options="{'size': [400, 400]}"/>
+                        <field name="image_filename" invisible="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Save" type="object" class="btn-primary" special="save"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Render Image Line Tree View -->
+    <record id="view_render_image_line_tree" model="ir.ui.view">
+        <field name="name">render.image.line.tree</field>
+        <field name="model">render.image.line</field>
+        <field name="arch" type="xml">
+            <list string="Render Images" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="image" widget="image" options="{'size': [50, 50]}"/>
+            </list>
+        </field>
+    </record>
+</odoo>

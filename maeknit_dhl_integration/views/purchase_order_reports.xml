@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_purchaseorder_document_inherit_dhl" inherit_id="purchase.report_purchaseorder_document">
+        <xpath expr="//div[@id='informations']" position="inside">
+            <div t_if="o.dhl_account_number" class="col-3 bm-2">
+                <strong>DHL Account:</strong>
+                <p t_field="o.dhl_account_number" class="m-0"/>
+            </div>
+        </xpath>
+        <xpath expr="//div[@id='total']" position="after">
+            <div class="row justify-content-end" t_if="o.dhl_shipping_estimate or o.duty_tax_estimate">
+                <div class="col-4">
+                    <table class="table table-sm">
+                        <tr class="border-black" t_if="o.dhl_shipping_estimate">
+                            <td><strong>Shipping (Est.)</strong></td>
+                            <td class="text-end">
+                                <span t_field="o.dhl_shipping_estimate"/>
+                            </td>
+                        </tr>
+                        <tr t_if="o.duty_tax_estimate">
+                            <td><strong>Duties (Est.)</strong></td>
+                            <td class="text-end">
+                                <span t_field="o.duty_tax_estimate"/>
+                            </td>
+                        </tr>
+                        <tr class="border-black o_total">
+                            <td><strong>Total Landed Cost</strong></td>
+                            <td class="text-end">
+                                <span t_field="o.total_landed_cost"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="reknit_wizard_form_view" model="ir.ui.view">
+        <field name="name">reknit.wizard.form</field>
+        <field name="model">reknit.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Re-knit Options">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Re-knit</h1>
+                        <p>Select the reason for re-knitting and configure options</p>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Maintenance Module Section -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Maintenance Module</h5>
+                                </div>
+                                <div class="card-body">
+                                    <h6>Machine</h6>
+                                    <group>
+                                        <field name="machine_issue" widget="radio" nolabel="1"/>
+                                        <field name="machine_other_description" 
+                                                invisible="machine_issue != 'machine_other'"
+                                                required="machine_issue == 'machine_other'"
+                                                placeholder="Describe the machine issue..."/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quality Module Section -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Quality Module</h5>
+                                </div>
+                                <div class="card-body">
+                                    <h6>Program</h6>
+                                    <group>
+                                        <field name="program_issue" widget="radio" nolabel="1"/>
+                                        <field name="program_other_description" 
+                                                invisible="program_issue != 'program_other'"
+                                                required="program_issue == 'program_other'"
+                                                placeholder="Describe the program issue..."/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Scrap Yarn Section -->
+                    <div class="mt-3">
+                        <group>
+                            <field name="scrap_yarn"/>
+                        </group>
+                        <div invisible="not scrap_yarn" class="alert alert-info">
+                            <i class="fa fa-info-circle mr-2"/>
+                            If scrapped, consume all yarn in BOM
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden fields -->
+                    <field name="production_id" invisible="1"/>
+                    <field name="has_issue_selected" invisible="1"/>
+                </sheet>
+                <footer>
+                    <button string="Confirm" type="object" name="action_confirm_reknit" 
+                            class="btn-primary" invisible="not has_issue_selected"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!-- Added proper action definition for the wizard -->
+    <record id="action_reknit_wizard" model="ir.actions.act_window">
+        <field name="name">Re-knit Options</field>
+        <field name="res_model">reknit.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="mrp.model_mrp_production"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

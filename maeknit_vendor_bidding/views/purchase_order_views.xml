@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_order_form_inherit_bidding" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.bidding</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            
+            <xpath expr="//header" position="inside">
+                <button name="action_confirm_winning_factory"
+                        string="Confirm Winning Factory"
+                        type="object"
+                        class="btn-primary"
+                        invisible="bid_rfq_type != 'garment' or state in ['purchase', 'done', 'cancel']"
+                        help="Confirms this factory as the winner, cancels others, and updates component RFQs."/>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_component_rfqs"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-cubes"
+                        invisible="bid_rfq_type != 'garment' or component_rfq_count == 0">
+                    <field name="component_rfq_count" widget="statinfo" string="Components"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="bid_rfq_type" readonly="1" invisible="1"/>
+                <field name="bid_partner_id" invisible="0"/>
+                <field name="linked_so_id" readonly="1" invisible="1"/>
+                <field name="is_winning_bid" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <!-- Add Custom Cost Breakdown Tab for Garment RFQ -->
+<!--                <page string="Factory Bidding Costs" name="page_garment_bid_costs" invisible="bid_rfq_type != 'garment'">-->
+<!--                    <group>-->
+<!--                        <group string="Cost Breakdown">-->
+<!--                            <field name="total_garment_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
+<!--                            <field name="total_material_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
+<!--                            <field name="garment_shipping" widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
+<!--                            <field name="garment_customs_duties" widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
+<!--                            <field name="component_shipping" widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
+<!--                            <field name="component_customs_duties" widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
+<!--                            <field name="landed_cost" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/></group>-->
+<!--                    </group>-->
+<!--                </page>-->
+
+                <!-- Add Factory Shipping Breakdown Tab for Global Component RFQ -->
+                <page string="Factory Shipping Breakdown" name="page_routing_breakdown" invisible="bid_rfq_type != 'component'">
+                    <field name="factory_breakdown_ids" readonly="1">
+                        <list>
+                            <field name="factory_id"/>
+                            <field name="shipping_cost" sum="Total Shipping"/>
+                            <field name="duty_cost" sum="Total Duty"/>
+                            <field name="total_route_cost" sum="Total Route Cost"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+
+    <record id="purchase_order_form_inherit_total_landed_cost" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.landed.cost</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="maeknit_dhl_integration.purchase_order_form_inherit_landed_cost"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='landed_costs']" position="after">
+                <group name="cost_breakdown" string="Cost Breakdown" invisible="bid_rfq_type != 'garment'">
+                    <button name="action_open_shipping_duty_wizard"
+                            string="View Component Breakdown"
+                            type="object"
+                            class="oe_link"
+                            icon="fa-list"
+                            invisible="bid_rfq_type != 'garment'"/>
+                    <field name="total_garment_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="total_material_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="garment_shipping" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="garment_customs_duties" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="component_shipping" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="component_customs_duties" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="landed_cost" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

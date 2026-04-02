@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_task_form_with_bom_button" model="ir.ui.view">
+        <field name="name">project.task.form.with.bom.button</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_bom_queue"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-cubes">
+                        BOM Request
+                </button>
+            </xpath>
+        </field>
+    </record>
+    
+
+  <!-- Custom Task Form View to ensure state field is properly configured -->
+  <record id="view_task_form_custom" model="ir.ui.view">
+      <field name="name">project.task.form.custom</field>
+      <field name="model">project.task</field>
+      <field name="inherit_id" ref="project.view_task_form2"/>
+      <field name="arch" type="xml">
+          <!-- Add state field after priority field -->
+          <xpath expr="//field[@name='tag_ids']" position="after">
+              <field name="state"/>
+          </xpath>
+        
+          <!-- Hide stage_id field in form view if it exists -->
+          <xpath expr="//field[@name='stage_id']" position="attributes">
+              <attribute name="invisible">1</attribute>
+          </xpath>
+
+        <xpath expr="//field[@name='state'][@widget='project_task_state_selection']" position="attributes">
+          <attribute name="invisible">1</attribute>
+      </xpath>
+      </field>
+  </record>
+
+  <record id="action_tasks_grouped_by_state" model="ir.actions.act_window">
+    <field name="name">Tasks by State</field>
+    <field name="res_model">project.task</field>
+    <field name="view_mode">tree,form</field>
+    <field name="context">{'group_by': 'state', 'group_expand': True}</field>
+  </record>
+
+  <record id="project.open_view_my_task_list_tree" model="ir.actions.act_window.view">
+      <field name="sequence" eval="1"/> 
+  </record>
+
+  <record id="project.open_view_my_task_list_kanban" model="ir.actions.act_window.view">
+      <field name="sequence" eval="2"/> 
+  </record>
+
+  <record id="project.open_view_all_task_list_tree" model="ir.actions.act_window.view">
+      <field name="sequence" eval="1"/>
+  </record>
+
+  <record id="project.open_view_all_task_list_kanban" model="ir.actions.act_window.view">
+      <field name="sequence" eval="2"/>
+  </record>
+
+</odoo>

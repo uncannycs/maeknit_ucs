@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="maeknit_sales_customization.VariantPickerDialog">
+        <Dialog title="'Select Product Variant'" size="'md'">
+            <t t-set-slot="default">
+                <div class="o_variant_picker">
+                    <t t-foreach="props.variants" t-as="variant" t-key="variant.id">
+                        <div class="form-check mb-2">
+                            <input
+                                type="radio"
+                                class="form-check-input"
+                                name="maeknit_variant_picker"
+                                t-att-id="'variant_' + variant.id"
+                                t-att-value="variant.id"
+                                t-att-checked="state.selectedId === variant.id"
+                                t-on-change="() => this.onSelect(variant.id)"
+                            />
+                            <label class="form-check-label ms-1" t-att-for="'variant_' + variant.id">
+                                <t t-esc="variant.display_name"/>
+                                <t t-if="variant.product_template_attribute_value_ids.length === 0">
+                                    <span class="badge bg-secondary ms-2">No variant</span>
+                                </t>
+                            </label>
+                        </div>
+                    </t>
+                </div>
+            </t>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="onConfirm">Confirm</button>
+                <button class="btn btn-secondary" t-on-click="onDiscard">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

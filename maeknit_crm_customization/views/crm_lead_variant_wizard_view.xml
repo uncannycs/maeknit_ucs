@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view for wizard -->
+    <record id="view_crm_lead_variant_wizard_form" model="ir.ui.view">
+        <field name="name">crm.lead.variant.wizard.form</field>
+        <field name="model">crm.lead.variant.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add Product Variants" class="o_form_view">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="product_id"
+                                   readonly="not sale_order_id"
+                                   class="oe_inline"
+                                   options="{'no_open': True}"
+                                   domain="[('product_category', '=', 'garment')]"/>
+                        </h1>
+                        <field name="lead_id" invisible="1"/>
+                        <field name="sale_order_id" invisible="1"/>
+                    </div>
+
+                    <group>
+                        <group>
+                            <separator string="Size and Colorway Combinations" colspan="2"/>
+                            <p class="text-muted" colspan="2">
+                                Add size and colorway combinations below. Each unique size and colorway will be created as product variants.
+                                <br/>
+                                <strong>Example:</strong> Enter sizes like S, M, L, XL and colors like Red, Blue, Black.
+                            </p>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Variant Combinations">
+                            <field name="variant_line_ids" widget="one2many">
+                                <list string="Variant Combinations" editable="bottom">
+                                    <field name="size_name" string="Size" placeholder="e.g., S, M, L, XL" required="1"/>
+                                    <field name="colorway_name" string="Colorway" placeholder="e.g., Red, Blue, Black" required="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <footer>
+                    <button string="Create Variants" type="object" name="action_create_variants" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_crm_lead_variant_wizard" model="ir.actions.act_window">
+        <field name="name">Add Product Variants</field>
+        <field name="res_model">crm.lead.variant.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

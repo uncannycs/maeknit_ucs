@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     Add the new fields to the sale order form view 
+    <record id="view_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="domain">[('hidden','=',False)]</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="readonly">not lead_id or not x_rel_service_id</attribute>
+            </xpath>
+
+            <!-- Add edit product button -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_id']" position="after">
+                <button name="action_edit_product_name"
+                        type="object"
+                        icon="fa-pencil-square-o"
+                        title="Edit Product Name"
+                        class="btn-sm py-0 px-1"
+                        style="min-width: 24px; padding: 0 4px !important;"
+                        invisible="not product_id"/>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']/list/field[@name='name']" position="after">
+                <field name="sample" string="Sample" invisible="not is_development_reverse_service"/>
+                <field name="revision" string="Revision" invisible="is_development_reverse_service" column_invisible="1"/>
+                <field name="is_grading_service" column_invisible="1"/>
+                <field name="is_swatch_service" column_invisible="1"/>
+                <field name="size" string="Size" optional="show" invisible="not is_grading_service or is_swatch_service"/>
+                <field name="colorway" string="Colorway" optional="show" invisible="not is_swatch_service"/>
+
+                <field name="is_development_reverse_service" column_invisible="1"/>
+                <field name="is_production_service" column_invisible="1"/>
+                <field name="related_service" invisible="1" column_invisible="1"/>
+                <field name="rel_service"/>
+                
+                <!-- Price Calculator Icon -->
+                <field name="has_pricing_data" column_invisible="1"/>
+                <button 
+                    name="action_open_price_calculator" 
+                    type="object" 
+                    icon="fa-calculator" 
+                    class="btn-link price-calculator-icon"
+                    invisible="not (product_type == 'consu' and (is_development_reverse_service or is_grading_service or is_production_service))"
+                    title="Price Calculator"/>
+                
+                <button name="action_add_grading_sizes" type="object" string="Add Sizes" class="btn-secondary" invisible="not (is_grading_service and product_type == 'consu')" help="Add grading sizes for this product"/>
+                <field name="style_family"/>
+                <field name="revision_status" string="Revision" invisible="1" column_invisible="1"/>
+                <button name="action_request_revision" type="object" string="Revision" class="btn-primary" invisible="not (product_type == 'consu' and revision_status != 'requested' and is_development_reverse_service)"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_form_line_product_domain" model="ir.ui.view">
+        <field name="name">sale.order.form.line.product.domain</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+    
+            <xpath expr="//field[@name='order_line']//list//field[@name='product_id']"
+                position="attributes">
+            <attribute name="domain">
+                [
+                    ('sale_ok', '=', True),
+                    ('product_tmpl_id.brand_id', '=', parent.partner_id)
+                ]
+            </attribute>
+        </xpath>
+     
+    
+            <xpath expr="//field[@name='order_line']//list//field[@name='product_template_id']" position="attributes">
+                <attribute name="domain">
+                    [
+                        '|',
+                            ('type', '=', 'service'),
+                            '&amp;',
+                                ('sale_ok', '=', True),
+                                ('brand_id', '=', parent.partner_id)
+                    ]
+                </attribute>
+            </xpath>
+            
+    
+        </field>
+    </record>
+    
+</odoo>

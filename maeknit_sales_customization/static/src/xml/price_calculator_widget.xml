@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="price_calculator_widget.PriceCalculatorWidget">
+        <Dialog
+        size="'xl'"
+        title="'Price Calculator'"
+        contentClass="'price-calculator-dialog'"
+        footer="false"
+    >            <div class="price-calculator-container">
+                <t t-if="state.isLoading">
+                    <div class="text-center p-5">
+                        <i class="fa fa-spinner fa-spin fa-3x text-primary"/>
+                        <p class="mt-3 text-muted">Loading pricing data...</p>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="calculator-content">
+                        <!-- Service Info Banner -->
+                        <div class="alert alert-info mb-4 d-flex align-items-center">
+                            <i class="fa fa-info-circle fa-lg me-3"/>
+                            <div>
+                                <strong>Service:</strong> <t t-esc="state.relatedService ? state.relatedService[1] : 'N/A'"/> 
+                                <span class="mx-2">|</span>
+                                <strong>Company:</strong> <t t-esc="state.company ? state.company[1] : 'N/A'"/>
+                            </div>
+                        </div>
+
+                        <!-- Operations Section -->
+                        <div class="operations-section mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0"><i class="fa fa-tasks me-2"/>Operations</h5>
+                                <button class="btn btn-sm btn-success" t-on-click="() => this.addOperation()">
+                                    <i class="fa fa-plus me-1"/> Add Operation
+                                </button>
+                            </div>
+
+                            <div class="table-responsive shadow-sm">
+                                <table class="table table-sm table-hover operations-table mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th style="width: 20%"><i class="fa fa-cog me-1"/>Operation</th>
+                                            <th style="width: 18%"><i class="fa fa-user me-1"/>Assigned Person</th>
+                                            <th style="width: 18%"><i class="fa fa-industry me-1"/>Work Center</th>
+                                            <th style="width: 14%"><i class="fa fa-clock me-1"/>Time (min) / £ Amount</th>
+                                            <th style="width: 12%" class="text-end"><i class="fa fa-calculator me-1"/>Total</th>
+                                            <th style="width: 6%" class="text-center"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="state.operations.length === 0">
+                                            <tr>
+                                                <td colspan="7" class="text-center text-muted py-4">
+                                                    <i class="fa fa-inbox fa-2x mb-2 d-block"/>
+                                                    <span>No operations added. Click "Add Operation" to start.</span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-foreach="state.operations" t-as="op" t-key="op.id">
+                                            <tr class="align-middle">
+                                                <td>
+                                                    <select 
+                                                        class="form-select form-select-sm" 
+                                                        t-on-change="(ev) => this.updateOperation(op_index, 'operation_id', ev.target.value)"
+                                                        t-on-keydown="(ev) => this.handleKeyDown(ev, op_index, 'operation')"
+                                                        t-att-value="op.operation_id ? op.operation_id[0] : ''"
+                                                        t-att-data-row="op_index"
+                                                        data-column="operation">
+                                                        <option value="">Select Operation</option>
+                                                        <t t-foreach="state.availableOperations" t-as="operation" t-key="operation.id">
+                                                            <option t-att-value="operation.id" 
+                                                                    t-att-selected="op.operation_id and op.operation_id[0] === operation.id">
+                                                                <t t-esc="operation.displayName"/>
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select 
+                                                        class="form-select form-select-sm" 
+                                                        t-on-change="(ev) => this.updateOperation(op_index, 'employee_id', ev.target.value)"
+                                                        t-on-keydown="(ev) => this.handleKeyDown(ev, op_index, 'employee')"
+                                                        t-att-value="op.employee_id ? op.employee_id[0] : ''"
+                                                        t-att-data-row="op_index"
+                                                        data-column="employee">
+                                                        <option value="">Select Person</option>
+                                                        <t t-foreach="state.availableEmployees" t-as="emp" t-key="emp.id">
+                                                            <option t-att-value="emp.id" 
+                                                                    t-att-selected="op.employee_id and op.employee_id[0] === emp.id">
+                                                                <t t-esc="emp.name"/>
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <!-- Use filtered workcenters based on operation tags -->
+                                                    <select
+                                                        class="form-select form-select-sm"
+                                                        t-on-change="(ev) => this.updateOperation(op_index, 'workcenter_id', ev.target.value)"
+                                                        t-on-keydown="(ev) => this.handleKeyDown(ev, op_index, 'workcenter')"
+                                                        t-att-value="op.workcenter_id ? op.workcenter_id[0] : ''"
+                                                        t-att-data-row="op_index"
+                                                        data-column="workcenter">
+                                                        <option value="">Select Work Center</option>
+                                                        <t t-set="filteredWCs" t-value="this.getFilteredWorkcentersForOperation(op_index)"/>
+                                                        <t t-foreach="filteredWCs" t-as="wc" t-key="wc.id">
+                                                            <option t-att-value="wc.id"
+                                                                    t-att-selected="op.workcenter_id and op.workcenter_id[0] === wc.id">
+                                                                <t t-esc="wc.name"/>
+                                                            </option>
+                                                        </t>
+                                                        <t t-if="filteredWCs.length === 0">
+                                                            <option value="" disabled="">No matching workcenters found</option>
+                                                        </t>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <!-- Outsource: show £ amount input -->
+                                                    <t t-if="op.is_outsourced">
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text bg-warning text-dark fw-bold">£</span>
+                                                            <input
+                                                                type="number"
+                                                                class="form-control form-control-sm"
+                                                                t-att-value="op.outsource_amount"
+                                                                t-on-input="(ev) => this.updateOutsourceAmount(op_index, ev.target.value)"
+                                                                t-on-keydown="(ev) => this.handleKeyDown(ev, op_index, 'time')"
+                                                                step="0.01"
+                                                                min="0"
+                                                                placeholder="0.00"
+                                                                t-att-data-row="op_index"
+                                                                data-column="time"/>
+                                                        </div>
+                                                    </t>
+                                                    <!-- Normal: show minutes input -->
+                                                    <t t-else="">
+                                                        <input
+                                                            type="number"
+                                                            class="form-control form-control-sm"
+                                                            t-att-value="op.expected_minutes"
+                                                            t-on-input="(ev) => this.updateOperation(op_index, 'expected_minutes', ev.target.value)"
+                                                            t-on-keydown="(ev) => this.handleKeyDown(ev, op_index, 'time')"
+                                                            step="0.01"
+                                                            min="0"
+                                                            placeholder="0.00"
+                                                            t-att-data-row="op_index"
+                                                            data-column="time"/>
+                                                    </t>
+                                                </td>
+                                                <td class="text-end">
+                                                    <span class="badge bg-success fs-6">
+                                                        <t t-esc="formatCurrency(op.total_cost)"/>
+                                                    </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button 
+                                                        class="btn btn-sm btn-outline-danger" 
+                                                        t-on-click="() => this.removeOperation(op_index)"
+                                                        title="Remove operation">
+                                                        <i class="fa fa-trash"/>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Additional Costs Section -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="card h-100 border-primary">
+                                    <div class="card-body">
+                                        <label class="form-label fw-bold mb-2">
+                                            <i class="fa fa-box me-2 text-primary"/>Material Cost
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-primary text-white">
+                                                <t t-esc="state.isUkCompany ? '£' : '$'"/>
+                                            </span>
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                t-att-value="state.materialCost"
+                                                t-on-input="(ev) => this.updateMaterialCost(ev.target.value)"
+                                                step="0.01"
+                                                min="0"
+                                                placeholder="0.00"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-success">
+                                    <div class="card-body">
+                                        <label class="form-label fw-bold mb-2">
+                                            <i class="fa fa-percent me-2 text-success"/>Margin
+                                        </label>
+                                        <div class="input-group">
+                                            <input 
+                                                type="number" 
+                                                class="form-control" 
+                                                t-att-value="state.marginPercent"
+                                                t-on-input="(ev) => this.updateMarginPercent(ev.target.value)"
+                                                step="1"
+                                                min="0"
+                                                placeholder="60"/>
+                                            <span class="input-group-text bg-success text-white">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-info">
+                                    <div class="card-body">
+                                        <label class="form-label fw-bold mb-2">
+                                            <i class="fa fa-truck me-2 text-info"/>Shipping Cost
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-info text-white">
+                                                <t t-esc="state.isUkCompany ? '£' : '$'"/>
+                                            </span>
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                t-att-value="state.shippingCost"
+                                                t-on-input="(ev) => this.updateShippingCost(ev.target.value)"
+                                                step="0.01"
+                                                min="0"
+                                                placeholder="0.00"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-end mb-2">
+                            <span class="px-3 py-1 rounded border bg-white text-dark fw-bold"
+                                  style="font-size:0.95rem;">
+                                Total: <t t-esc="this.formatCurrency(this.state.totalCost)"/>
+                            </span>
+                        </div>
+                        
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-outline-secondary" t-on-click="() => this.closeDialog()">
+                                <i class="fa fa-times me-1"/> Cancel
+                            </button>
+                            <button class="btn btn-warning" t-on-click="() => this.applyToAll()">
+                                <i class="fa fa-copy me-1"/> Apply to All
+                            </button>
+                            <button class="btn btn-success btn-lg" t-on-click="() => this.saveAndConfirm()">
+                                <i class="fa fa-check me-1"/> Confirm &amp; Save
+                            </button>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </Dialog>
+    </t>
+</templates>

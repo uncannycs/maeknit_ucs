@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stitch_density_wizard_form" model="ir.ui.view">
+        <field name="name">stitch.density.wizard.form</field>
+        <field name="model">stitch.density.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Enter Stitch Density Measurements">
+                <field name="calibration_mo_id" invisible="1"/>
+                <field name="parent_garment_mo_id" invisible="1"/>
+                <field name="mode" invisible="1"/>
+                
+                <group>
+                    <group>
+                        <label for="measurement_unit" string="Measurement Unit:"/>
+                        <field name="measurement_unit" widget="radio" options="{'horizontal': true}" nolabel="1"/>
+                    </group>
+                </group>
+                
+                <group>
+                    <group string="Body">
+                        <label for="body_swatch_specs_x" string="Swatch Specs"/>
+                        <div class="o_row">
+                            <field name="body_swatch_specs_x" placeholder="200"/>
+                            <span>by</span>
+                            <field name="body_swatch_specs_y" placeholder="200"/>
+                        </div>
+                        <div class="text-muted">X (courses)    Y (wales)</div>
+                        
+                        <field name="body_measurement_x" string="Measurement Width (inches)"/>
+                        <field name="body_measurement_y" string="Measurement Height (inches)"/>
+                        
+                        <field name="body_calibration_y" string="Body Calibration value Y =" readonly="1" 
+                               invisible="mode == 'swatch_measurement'" 
+                               class="o_field_highlight"/>
+                        <field name="body_calibration_x" string="Body Calibration value X =" readonly="1" 
+                               invisible="mode == 'swatch_measurement'" 
+                               class="o_field_highlight"/>
+                    </group>
+                    
+                    <group string="Cuff">
+                        <label for="cuff_swatch_specs_x" string="Swatch Specs"/>
+                        <div class="o_row">
+                            <field name="cuff_swatch_specs_x" placeholder="50"/>
+                            <span>by</span>
+                            <field name="cuff_swatch_specs_y" placeholder="200"/>
+                        </div>
+                        <div class="text-muted">X (course)    Y (wales)</div>
+                        
+                        <field name="cuff_measurement_x" string="Measurement Width (inches)"/>
+                        <field name="cuff_measurement_y" string="Measurement Height (inches)"/>
+                        
+                        <field name="cuff_calibration_y" string="Cuff Calibration value Y =" readonly="1" 
+                               invisible="mode == 'swatch_measurement'" 
+                               class="o_field_highlight"/>
+                        <field name="cuff_calibration_x" string="Cuff Calibration value X =" readonly="1" 
+                               invisible="mode == 'swatch_measurement'" 
+                               class="o_field_highlight"/>
+                    </group>
+                </group>
+                
+                <group invisible="mode != 'swatch_measurement'">
+                    <group string="Width">
+                        <field name="width_image" widget="image" options="{'size': [400, 300]}"/>
+                    </group>.
+                    <group string="Width 2">
+                        <field name="width_image_2" widget="image" options="{'size': [400, 300]}"/>
+                    </group>
+                    <group string="Height">
+                        <field name="height_image" widget="image" options="{'size': [400, 300]}"/>
+                    </group>
+                    <group string="Height 2">
+                        <field name="height_image_2" widget="image" options="{'size': [400, 300]}"/>
+                    </group>
+                </group>
+                
+                <footer>
+                    <button string="Submit and Continue" type="object" name="action_submit_measurements" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

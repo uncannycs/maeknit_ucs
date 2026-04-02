@@ -1,0 +1,262 @@
+.measurement-sheet-widget {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.panel-section {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 15px;
+  height: 100%;
+}
+
+.panel-title {
+  background: #e9ecef;
+  margin: -15px -15px 15px -15px;
+  padding: 10px 15px;
+  border-radius: 6px 6px 0 0;
+  font-weight: 600;
+  text-align: center;
+}
+/* Fix row rule */
+.measurements-table tbody tr {
+  padding: 0;
+}
+.measurements-table tbody tr {
+  height: 4px; /* enforce row height */
+}
+
+.measurements-table tbody td,
+.measurements-table tbody th {
+  padding: 0 !important; /* kill default Bootstrap padding */
+  line-height: 1; /* minimal text height */
+  max-height: 4px; /* enforce inside cells too */
+}
+
+/* Make all cell text red */
+.measurement-sheet-widget .measurement-row > td {
+  max-height: 4px !important;
+}
+
+.panel-content {
+  gap: 15px;
+}
+.rowbtn {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.measurements-table-wrapper {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.measurements-table {
+  min-width: 100%;
+}
+.point-letter {
+  font-weight: bold;
+  color: #495057;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #e9ecef;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.garment-diagram {
+  min-width: 150px;
+}
+
+.diagram-container {
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  padding: 10px;
+  background: white;
+  text-align: center;
+}
+
+.diagram-container img {
+  max-width: 100%;
+  height: auto;
+}
+
+.nav-tabs .nav-link {
+  border: 1px solid #dee2e6;
+  border-bottom: none;
+  background: #f8f9fa;
+  color: #495057;
+}
+
+/* Measurements section grows to fit extra columns when pending request is active */
+.measurements-section {
+  min-width: 300px;
+  flex-shrink: 0;
+}
+
+/* Hide number input spin buttons */
+.measurements-table input[type="number"]::-webkit-inner-spin-button,
+.measurements-table input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.measurements-table input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Image section takes all remaining width */
+.image-section {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Two images side by side inside image-section */
+.image-section-inner {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.image-panel-points,
+.image-panel-structure {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Label above each image panel */
+.image-panel-label {
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+  color: #495057;
+  background: #e9ecef;
+  border-radius: 4px 4px 0 0;
+  padding: 3px 8px;
+  margin-bottom: 2px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.image-display .replace-button-area {
+  display: flex;
+  justify-content: center;
+}
+
+.image-container {
+  min-height: 340px;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+/* Updated zoom container to use overflow hidden and fixed height for proper panning */
+.zoom-container,
+.zoom-container-2 {
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background-color: white;
+  height: 300px;
+  width: 100%;
+  position: relative;
+  cursor: grab;
+}
+
+.zoom-container:active,
+.zoom-container-2:active {
+  cursor: grabbing;
+}
+
+/* Added image wrapper for zoom/pan transform */
+.image-wrapper,
+.image-wrapper-2 {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: top left;
+  transition: transform 0.2s ease;
+}
+
+/* Updated zoomable image to fill wrapper */
+.zoomable-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-tabs .nav-link.active {
+  background: white;
+  color: #495057;
+  border-color: #dee2e6 #dee2e6 white;
+}
+
+.form-control-sm {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+/* Drag handle column */
+.drag-handle {
+  cursor: grab;
+  color: #bbb;
+  width: 20px;
+  padding: 0 4px !important;
+}
+
+.drag-handle:hover {
+  color: #666;
+}
+
+.measurement-row[draggable="true"]:active .drag-handle {
+  cursor: grabbing;
+}
+
+/* Row highlighting when focused/editing */
+.measurements-table tbody tr.row-focused {
+  background-color: #fff3cd !important;
+  box-shadow: 0 0 0 2px #c4e8e466;
+}
+
+.measurements-table tbody tr.row-focused td {
+  background-color: #fff3cd !important;
+}
+
+/* Mega download button */
+.mega-download-area {
+  margin-top: 12px;
+}
+
+.mega-download-btn {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 6px;
+}

@@ -1,0 +1,37 @@
+/* Added zoom and pan styles copied from Panel CAD */
+
+.calibration-zoom-container {
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: white;
+    height: 300px;
+    width: 100%;
+    position: relative;
+    cursor: grab;
+  }
+  
+  .calibration-zoom-container:active {
+    cursor: grabbing;
+  }
+  
+  .calibration-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-origin: top left;
+    transition: transform 0.2s ease;
+  }
+  
+  .calibration-zoomable-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+  }
+  
+  .zoom-controls {
+    margin-top: 8px;
+  }
+  

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action to run the sync -->
+    <record id="action_sync_categories" model="ir.actions.server">
+        <field name="name">Sync Product Categories</field>
+        <field name="model_id" ref="model_maeknit_sync_categories"/>
+        <field name="state">code</field>
+        <field name="code">action = model.sync_all_products()</field>
+    </record>
+
+    <!-- Action to view product categories -->
+    <record id="action_view_product_categories" model="ir.actions.server">
+        <field name="name">View Product Categories</field>
+        <field name="model_id" ref="model_maeknit_sync_categories"/>
+        <field name="state">code</field>
+        <field name="code">action = model.view_product_categories()</field>
+    </record>
+
+    <!-- Menu item for the sync action -->
+    <menuitem id="menu_sync_categories"
+              name="Sync Product Categories"
+              parent="stock.menu_product_in_config_stock"
+              action="action_sync_categories"
+              sequence="100"/>
+              
+    <!-- Menu item to view product categories -->
+    <menuitem id="menu_view_product_categories"
+              name="View Product Categories"
+              parent="stock.menu_product_in_config_stock"
+              action="action_view_product_categories"
+              sequence="101"/>
+</odoo>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Fiber Categories -->
+        <record id="fiber_category_natural" model="fiber.category" forcecreate="false">
+            <field name="name">Natural</field>
+            <field name="description">Fibers derived from plants, animals, or mineral sources</field>
+        </record>
+        
+        <record id="fiber_category_synthetic" model="fiber.category" forcecreate="false">
+            <field name="name">Synthetic</field>
+            <field name="description">Man-made fibers created from chemical compounds</field>
+        </record>
+        
+        <record id="fiber_category_semi_synthetic" model="fiber.category" forcecreate="false">
+            <field name="name">Semi-synthetic</field>
+            <field name="description">Fibers made from natural materials that undergo chemical processing</field>
+        </record>
+        
+        <record id="fiber_category_blends" model="fiber.category" forcecreate="false">
+            <field name="name">Blends</field>
+            <field name="description">Common fiber blends and mixtures</field>
+        </record>
+        
+        <record id="fiber_category_animal" model="fiber.category" forcecreate="false">
+            <field name="name">Animal</field>
+            <field name="description">Fibers derived from animal sources</field>
+        </record>
+        
+        <record id="fiber_category_plant" model="fiber.category" forcecreate="false">
+            <field name="name">Plant</field>
+            <field name="description">Fibers derived from plant sources</field>
+        </record>
+        
+        <record id="fiber_category_mineral" model="fiber.category" forcecreate="false">
+            <field name="name">Mineral</field>
+            <field name="description">Fibers derived from mineral sources</field>
+        </record>
+        
+        <record id="fiber_category_specialty" model="fiber.category" forcecreate="false">
+            <field name="name">Specialty</field>
+            <field name="description">Specialty and high-performance fibers</field>
+        </record>
+        
+        <record id="fiber_category_eco_friendly" model="fiber.category" forcecreate="false">
+            <field name="name">Eco-friendly</field>
+            <field name="description">Sustainable and environmentally friendly fibers</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List view for product.fiber -->
+    <record id="view_product_fiber_list" model="ir.ui.view">
+        <field name="name">product.fiber.list</field>
+        <field name="model">product.fiber</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" class="o_list_view_ungrouped">
+                <field name="percentage" sum="Total %" widget="integer"/>
+                <field name="fiber_type_id" options="{'no_create_edit': False, 'no_quick_create': False}"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form view for product.fiber -->
+    <record id="view_product_fiber_form" model="ir.ui.view">
+        <field name="name">product.fiber.form</field>
+        <field name="model">product.fiber</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="maeknit-form">
+                        <div class="form-section">
+                            <group>
+                                <field name="product_tmpl_id" invisible="1"/>
+                                <field name="percentage" class="form-control"/>
+                                <field name="fiber_type_id" class="form-control" options="{'no_create_edit': False, 'no_quick_create': False}"/>
+                            </group>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

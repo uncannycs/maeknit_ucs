@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="maeknit_product_template_form_view" model="ir.ui.view">
+        <field name="name">maeknit.product.template.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="priority" eval="1000"/>
+        <field name="arch" type="xml">
+            <!-- Add product_category field after name -->
+            <xpath expr="//div[@class='oe_title']" position="replace">
+                <div class="oe_title">
+                  <label for="name" class="oe_edit_only"/>
+                  <h1>
+                    <field name="name"
+                           placeholder="Product Name"
+                           readonly="1"/>
+                    <field name="product_category" invisible="1"/>
+                    <field name="sale_ok" invisible="0"/>
+                    <field name="purchase_ok" invisible="0"/>
+                  </h1>
+                </div>
+            </xpath>
+            <!-- Add variants_from_bom field for garment and swatch products -->
+            <xpath expr="//field[@name='product_category']" position="after">
+                <field name="is_storable" invisible="1"/>
+                <field name="is_cost_readonly" invisible="1"/>
+                <field name="variants_from_bom" invisible="1"/>
+            </xpath>
+
+            <!-- Replace the general information tab -->
+            <xpath expr="//notebook/page[@name='general_information']" position="replace">
+                <page string="General" name="general_information">
+                    <div class="oe_title mt-2 mb-3">
+                        <label for="product_category" class="oe_edit_only me-2">Category</label>
+                        <field name="product_category" class="oe_inline" style="border: 1px solid #ccc; border-radius: 4px; padding: 2px 6px;"/>
+                    </div>
+              
+                    <!-- YARN CATEGORY -->
+                    <div class="maeknit-form" invisible="product_category != 'yarn'">
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <div class="section-title">Yarn Information</div>
+                            <div class="two-col-layout">
+                                <div>
+                                    <label for="yarn_name" class="mt-3">Yarn Name</label>
+                                    <field name="yarn_name" placeholder="Enter yarn name" class="form-control"/>
+
+                                    <label for="vendor_id" class="mt-3" >Vendor</label>
+                                    <field name="vendor_id"
+                                        domain="[('contact_type','=','vendor')]"
+                                        options="{'no_create': False, 'no_quick_create': True}"
+                                        context="{
+                                            'default_contact_type': 'vendor',
+                                            'default_is_company': True,
+                                            'form_view_ref': 'maeknit_crm_customization.view_partner_quick_create'
+                                        }"
+                                        placeholder="Select a vendor"
+                                        required="product_category == 'yarn'"
+                                        class="form-control"/>
+                                    <label for="origin_country_id" class="mt-3">Origin</label>
+                                    <field name="origin_country_id" options="{'no_create': True}" placeholder="Select country" class="form-control"/>
+                                    <label for="yarn_card" class="mt-3">Yarn-card Book</label>
+                                    <field name="yarn_card" placeholder="Enter Yarn card Book"  options="{'no_create': True}" domain="[('product_category','=','yarn_book'), ('vendor_id','=',vendor_id)]" class="form-control"/>
+                                    <label for="invoice_policy" class="mt-3" invisible="not sale_ok or type == 'combo'">Invoice Policy</label>
+                                    <field name="invoice_policy" class="form-control" invisible="not sale_ok or type == 'combo'">order</field>
+                                </div>
+                                <div>
+                                    <label for="yarn_count" class="mt-3">Count</label>
+                                    <field name="yarn_count" placeholder="e.g. 2/48" class="form-control"/>
+                                    <label for="pricelist_id" class="mt-3">Pricelist</label>
+                                    <field name="pricelist_id" placeholder="Pricelist" class="form-control"/>
+                                    <label for="cost_price" class="mt-3">Cost</label>
+                                    <field name="cost_price" class="form-control"/>
+                                    <label for="company_id" class="mt-3">Lab</label>
+                                    <field name="company_id" options="{'no_create': True}" placeholder="Lab" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Two-Column Layout -->
+                        <div class="two-col-layout">
+
+                            <!-- Fiber Composition Section -->
+                            <div class="form-section">
+                                <field name="fiber_ids" widget="one2many" mode="list" context="{'list_view_ref': 'maeknit_inventory_customization.view_product_fiber_list'}" class="custom-table"/>
+                            </div>
+
+                            <!-- Color Section -->
+                            <div class="form-section">
+                                <field name="color_ids" widget="one2many" mode="list" context="{'list_view_ref': 'maeknit_inventory_customization.view_product_color_list'}" class="custom-table"/>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="maeknit-form" invisible="product_category != 'yarn_book'">
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <div class="two-col-layout">
+                                <div>
+                                    <label for="book_name" class="mt-3">Book Name</label>
+                                    <field name="book_name" placeholder="Enter book name" class="form-control"/>
+
+                                    <label for="vendor_id" class="mt-3">Vendor</label>
+                                    <field name="vendor_id"
+                                        domain="[('contact_type','=','vendor')]"
+                                        options="{'no_create': False, 'no_quick_create': True}"
+                                        context="{
+                                            'default_contact_type': 'vendor',
+                                            'default_is_company': True,
+                                            'form_view_ref': 'maeknit_crm_customization.view_partner_quick_create'
+                                        }"
+                                        placeholder="Select a vendor"
+                                        class="form-control"/>
+                                        <label for="invoice_policy" class="mt-3" invisible="not sale_ok or type == 'combo'">Invoice Policy</label>
+                                    <field name="invoice_policy" class="form-control" invisible="not sale_ok or type == 'combo'">order</field>
+                                </div>
+                                <div>
+                                    <label for="cost_price" class="mt-3">Cost</label>
+                                    <field name="cost_price" class="form-control"/>
+                                    <label for="company_id" class="mt-3">Lab</label>
+                                    <field name="company_id" options="{'no_create': True}" placeholder="Lab" class="form-control"/>
+                                                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GARMENT CATEGORY -->
+                    <div class="maeknit-form" invisible="product_category != 'garment'">
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <div class="section-title">Garment Information</div>
+                            <div class="two-col-layout">
+                                <div>
+                                    <label for="name">Name</label>
+                                    <field name="name" placeholder="Enter garment name" class="form-control"/>
+
+                                    <label for="brand_id" class="mt-3">Client</label>
+                                    <field name="brand_id" options="{'no_create': True}" placeholder="Select a brand" required="product_category == 'garment'" class="form-control"/>
+
+                                    <label for="parent_project_id" class="mt-3">Lead</label>
+                                    <field name="parent_project_id" options="{'no_create': True}" placeholder="Select a Lead" class="form-control"/>
+
+                                    <label for="style_family">Style Family</label>
+                                    <field name="style_family" class="form-control"/>
+
+                                    <label for="company_id" class="mt-3">Company</label>
+                                    <field name="company_id" options="{'no_create': True}" placeholder="Company" class="form-control"/>
+
+                                </div>
+                                <div>
+                                    <label for="factory_id">Factory</label>
+                                    <field name="factory_id" options="{'no_create': True}" placeholder="Select a factory" class="form-control"/>
+
+                                    <label for="cost_price" class="mt-3">Cost per Garment</label>
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-2">$</span>
+                                        <field name="cost_price" class="form-control" readonly="is_cost_readonly"/>
+                                        
+                                    </div>
+
+                                    <label for="sales_price" class="mt-3">Sales Price</label>
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-2">$</span>
+                                        <field name="sales_price" class="form-control"/>
+                                    </div>
+                                    <label for="hs_code">HS Code</label>
+                                    <field name="hs_code" placeholder="e.g. 206.001.834" class="form-control"/>
+                                    
+                                    <label for="invoice_policy" class="mt-3" invisible="not sale_ok or type == 'combo'">Invoice Policy</label>
+                                    <field name="invoice_policy" class="form-control" invisible="not sale_ok or type == 'combo'">order</field>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- BOM Attributes Section -->
+                        <div class="form-section" invisible="product_category != 'garment'">
+                            <div class="section-title d-flex justify-content-between align-items-center">
+                                <span>BOM Attributes</span>
+                                <div>
+                                    <button name="action_create_bom" type="object" string="Create BOM" class="btn btn-sm btn-success" icon="fa-plus"/>
+                                </div>
+                            </div>
+
+                            <!-- Run Selection -->
+                            <div class="mb-3">
+                                <label for="selected_run_id">Select Run</label>
+                                <field name="selected_run_id" options="{'no_create': False}" class="form-control" can_create="true" can_write="true"/>
+                            </div>
+
+                            <!-- Sizes and Colorways for Run -->
+                            <div class="row" invisible="not selected_run_id">
+                                <div class="col-md-6">
+                                    <label for="run_sizes">Sizes for Run</label>
+                                    <field name="run_sizes" widget="many2many_tags" readonly="1" options="{'color_field': 'color'}" class="form-control"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="run_colorways">Colorways for Run</label>
+                                    <field name="run_colorways" widget="many2many_tags" readonly="1" options="{'color_field': 'color'}" class="form-control"/>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mt-3" invisible="not variants_from_bom">
+                                <i class="fa fa-info-circle me-2"></i>
+                                <strong>Note:</strong> Variants for this garment are created from BOMs. Select a Run above to see available Sizes and Colorways.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SWATCH CATEGORY -->
+                    <div class="maeknit-form" invisible="product_category != 'swatch'">
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <div class="section-title">Swatch Information</div>
+                            <div class="two-col-layout">
+                                <div>
+                                    <label for="name" class="mt-3">Name</label>
+                                    <field name="name" placeholder="Enter swatch name" class="form-control"/>
+
+                                    <label for="brand_id" class="mt-3">Client </label>
+                                    <field name="brand_id" options="{'no_create': True}" placeholder="Select a brand" required="product_category == 'swatch'" class="form-control"/>
+
+                                    <label for="parent_project_id" class="mt-3">Lead</label>
+                                    <field name="parent_project_id" options="{'no_create': True}" placeholder="Select a lead" class="form-control"/>
+                                    
+                                    <label for="style_family" class="mt-3">Style Family</label>
+                                    <field name="style_family" placeholder="AA" class="form-control"/>
+
+                                    <label for="company_id" class="mt-3">Company</label>
+                                    <field name="company_id" options="{'no_create': True}" placeholder="Company" class="form-control"/>
+                                </div>
+                                <div>
+                                    <label for="factory_id" class="mt-3">Factory</label>
+                                    <field name="factory_id" options="{'no_create': True}" placeholder="Select a factory" class="form-control"/>
+
+                                    <label for="cost_price" class="mt-3">Cost per Swatch</label>
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-2">$</span>
+                                        <field name="cost_price" class="form-control" readonly="is_cost_readonly"/>
+                                    </div>
+
+                                    <label for="sales_price" class="mt-3">Sales Price</label>
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-2">$</span>
+                                        <field name="sales_price" class="form-control"/>
+                                    </div>
+                                    <label for="hs_code" class="mt-3">HS Code</label>
+                                    <field name="hs_code" placeholder="e.g. 206.001.834" class="form-control"/>
+
+                                    <label for="invoice_policy" class="mt-3" invisible="not sale_ok or type == 'combo'">Invoice Policy</label>
+                                    <field name="invoice_policy" class="form-control" invisible="not sale_ok or type == 'combo'">order</field>
+                                
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- BOM Attributes Section -->
+                        <div class="form-section" invisible="product_category != 'swatch'">
+                            <div class="section-title d-flex justify-content-between align-items-center">
+                                <span>BOM Attributes</span>
+                                <div>
+                                    <button name="action_create_bom" type="object" string="Create BOM" class="btn btn-sm btn-success" icon="fa-plus"/>
+                                </div>
+                            </div>
+
+                            <!-- Swatch # Selection -->
+                            <div class="mb-3">
+                                <label for="selected_swatch_number_id">Select Swatch #</label>
+                                <field name="selected_swatch_number_id" options="{'no_create': False}" class="form-control" can_create="true" can_write="true"/>
+                            </div>
+
+                            <!-- Colorways for Swatch # -->
+                            <div class="row" invisible="not selected_swatch_number_id">
+                                <div class="col-md-12">
+                                    <label for="swatch_colorways">Colorways for Swatch</label>
+                                    <field name="swatch_colorways" widget="many2many_tags" readonly="1" options="{'color_field': 'color'}" class="form-control"/>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mt-3" invisible="not variants_from_bom">
+                                <i class="fa fa-info-circle me-2"></i>
+                                <strong>Note:</strong> Variants for this swatch are created from BOMs. Select a Swatch # above to see available Colorways.
+                            </div>
+                        </div>
+
+                        <!-- Additional Information Section -->
+                        <div class="form-section">
+                            <div class="section-title">Additional Information</div>
+                            <div class="two-col-layout">
+                                <div>
+                                    <label for="swatch_package">Swatch Package</label>
+                                    <field name="swatch_package" placeholder="Enter swatch package details" class="form-control" style="min-height: 100px;"/>
+                                </div>
+                                <div>
+                                    <label for="stitch_construction">Stitch Construction</label>
+                                    <field name="stitch_construction" placeholder="Enter stitch construction details" class="form-control" style="min-height: 100px;"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MISC CATEGORY -->
+                    <div class="maeknit-form" invisible="product_category != 'misc'">
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <div class="section-title">Miscellaneous Item Information</div>
+                            <div>
+                                <label for="name">Name</label>
+                                <field name="name" placeholder="Enter item name" class="form-control"/>
+
+                                <label for="sales_price" class="mt-3">Price</label>
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2">$</span>
+                                    <field name="sales_price" class="form-control"/>
+                                </div>
+
+                                <label for="company_id" class="mt-3">Company</label>
+                                    <field name="company_id" options="{'no_create': True}" placeholder="Company" class="form-control"/>
+
+                                
+                                <label for="invoice_policy" class="mt-3" invisible="not sale_ok or type == 'combo'">Invoice Policy</label>
+                                <field name="invoice_policy" class="form-control" invisible="not sale_ok or type == 'combo'">order</field>
+                                
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SERVICES CATEGORY - Use default Odoo behavior -->
+                    <div invisible="product_category != 'services'">
+                        <div class="maeknit-form">
+                            <div class="form-section">
+                                <div class="section-title">Service Information</div>
+                                <div class="two-col-layout">
+                                    <div>
+                                        <label for="name">Service Name</label>
+                                        <field name="name" placeholder="Enter service name" class="form-control"/>
+
+                                        <label for="type" class="mt-3">Product Type</label>
+                                        <field name="type" class="form-control" widget="radio" options="{'horizontal': true}"/>
+
+                                        <label for="company_id" class="mt-3">Company</label>
+                                        <field name="company_id" options="{'no_create': True}" placeholder="Company" class="form-control"/>
+                                        
+                                        <label for="project_template_id" class="mt-3">Template</label>
+                                        <field name="project_template_id" class="form-control"/>
+
+                                    </div>
+                                    <div>
+                                        <label for="sales_price">Sales Price</label>
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-2">$</span>
+                                            <field name="sales_price" class="form-control"/>
+                                        </div>
+
+                                        <label for="cost_price" class="mt-3">Cost</label>
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-2">$</span>
+                                            <field name="cost_price" class="form-control"/>
+                                        </div>
+
+                                        <label for="service_tracking" class="mt-3">Create on Order</label>
+                                        <field name="service_tracking" class="form-control"/>
+                                        <label for="invoice_policy" class="mt-3" invisible="not sale_ok or type == 'combo'">Invoice Policy</label>
+                                        <field name="invoice_policy" class="form-control" invisible="not sale_ok or type == 'combo'">order</field>
+                                    
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="section-title">Additional Information</div>
+                                <div>
+                                    <label for="description">Description</label>
+                                    <field name="description" placeholder="Enter service description" class="form-control" style="min-height: 100px;"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </page>
+            </xpath>
+
+            <!-- Add Stock and Programming tabs -->
+            <xpath expr="//notebook/page[@name='general_information']" position="after">
+                <page string="Stock" name="yarn_stock_tab" invisible="product_category != 'yarn'">
+                    <div class="maeknit-form">
+                        <div class="form-section">
+                            <div class="section-title d-flex justify-content-between align-items-center">
+                                <span>Stock Information</span>
+                                <div>
+                                    <button name="sync_yarn_stock" type="object" string="Sync from Colors" class="btn btn-sm btn-primary" icon="fa-refresh"/>
+                                </div>
+                            </div>
+
+                            <!-- Yarn Stock Table -->
+                            <field name="yarn_stock_ids" widget="one2many" mode="list" context="{'list_view_ref': 'maeknit_inventory_customization.view_yarn_stock_list'}" class="custom-table"/>
+
+                        </div>
+                    </div>
+                </page>
+                <page string="Programming" name="yarn_programming_tab" invisible="product_category != 'yarn'">
+                    <div class="maeknit-form">
+                        <div class="form-section">
+                            <div class="section-title">Programming Information</div>
+
+                            <!-- Yarn Programming Table -->
+                            <field name="yarn_programming_ids" widget="one2many" mode="list" context="{'list_view_ref': 'maeknit_inventory_customization.view_yarn_programming_list'}" class="custom-table"/>
+
+                        </div>
+                    </div>
+                </page>
+            </xpath>
+
+            <xpath expr="//notebook/page[@name='variants']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Hide the "Can be Sold" and "Can be Purchased" checkboxes -->
+            <xpath expr="//field[@name='sale_ok']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='purchase_ok']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

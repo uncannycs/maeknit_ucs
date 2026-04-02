@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+  <t t-name="maeknit_mfg_customization.MrpProductionOwlWidget" owl="1">
+      <div class="o_mrp_production_owl_widget">
+      
+          <!-- Run Indicator Section -->
+          <div class="o_indicator_container">
+              <div class="o_indicator_boxes" t-if="state.samples.length">
+                  <t t-foreach="state.samples" t-as="sample" t-key="sample.id">
+                      <div class="o_indicator_box" 
+                           t-att-class="{
+                              'o_indicator_box_active': sample.active
+                           }">
+                          <t t-esc="sample.name"/>
+                      </div>
+                  </t>
+              </div>
+          </div>
+      </div>
+  </t>
+</templates>

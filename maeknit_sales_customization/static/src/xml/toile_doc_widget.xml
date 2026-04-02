@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="maeknit_sales_customization.ToileDocWidget">
+        <div class="toile-doc-widget">
+
+            <!-- No panel configured yet -->
+            <t t-if="!state.panel">
+                <div class="text-muted p-3">
+                    No panel found. Add a panel in the Panel CAD tab first.
+                </div>
+            </t>
+
+            <t t-else="">
+                <t t-set="panel" t-value="state.panel"/>
+
+                <!-- Version history bar (if actuals exist) -->
+                <t t-if="getActualVersions().length > 0">
+                    <div class="d-flex align-items-center gap-2 mb-3 p-2 bg-light rounded">
+                        <span class="fw-bold text-muted small">Actual:</span>
+                        <select class="form-select form-select-sm" style="width:auto;"
+                                t-on-change="(ev) => setSelectedVersion(ev.target.value)">
+                            <t t-foreach="getActualVersions()" t-as="ver" t-key="ver.version">
+                                <option t-att-value="ver.version"
+                                        t-att-selected="getSelectedVersion() == ver.version">
+                                    Actual <t t-esc="ver.version"/> — <t t-esc="ver.submitted_at"/>
+                                </option>
+                            </t>
+                        </select>
+                        <button class="btn btn-outline-danger btn-sm"
+                                t-on-click="() => deleteActualVersion(getSelectedVersion())"
+                                title="Delete this actual version">
+                            <i class="fa fa-trash"/>
+                        </button>
+                    </div>
+                </t>
+
+                <!-- Main content: table + CAD image side by side -->
+                <div class="d-flex gap-4 align-items-start">
+
+                    <!-- Measurements table -->
+                    <div style="flex: 0 0 auto;">
+                        <table class="table table-sm table-bordered mb-0" style="min-width: 520px;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="50" class="text-center">Point</th>
+                                    <th width="110" class="text-center">Request</th>
+                                    <t t-if="getActualVersions().length > 0">
+                                        <th width="110" class="text-center text-success">Actual <t t-esc="getSelectedVersion()"/></th>
+                                    </t>
+                                    <th width="110" class="text-center text-warning">Actual (New)</th>
+                                    <th width="90" class="text-center">Change</th>
+                                    <th width="120" class="text-center">New Request</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="panel.measurements" t-as="m" t-key="m.point">
+                                    <t t-set="change" t-value="getChange(m.point)"/>
+                                    <t t-set="selectedActuals" t-value="getSelectedActualMeasurements()"/>
+                                    <tr>
+                                        <!-- Point -->
+                                        <td class="text-center align-middle">
+                                            <span class="badge bg-secondary"><t t-esc="m.point"/></span>
+                                            <t t-if="m.name">
+                                                <div class="text-muted" style="font-size:0.7rem;"><t t-esc="m.name"/></div>
+                                            </t>
+                                        </td>
+
+                                        <!-- Last Request -->
+                                        <td class="text-center align-middle text-muted fw-semibold">
+                                            <t t-esc="m.requestValue !== '' ? m.requestValue : '—'"/>
+                                        </td>
+
+                                        <!-- Actual (latest selected version, read-only) -->
+                                        <t t-if="getActualVersions().length > 0">
+                                            <td class="text-center align-middle text-success fw-bold">
+                                                <t t-if="selectedActuals[m.point] !== undefined">
+                                                    <t t-esc="selectedActuals[m.point]"/>
+                                                </t>
+                                                <t t-else="">—</t>
+                                            </td>
+                                        </t>
+
+                                        <!-- Actual input (new entry being recorded) -->
+                                        <td class="align-middle" data-col="actual">
+                                            <input type="number"
+                                                   class="form-control form-control-sm text-center"
+                                                   style="min-width:90px;"
+                                                   step="0.001"
+                                                   t-att-value="state.pendingActuals[m.point] !== '' ? state.pendingActuals[m.point] : ''"
+                                                   t-on-input="(ev) => setPendingActual(m.point, ev.target.value)"
+                                                   t-on-keydown="(ev) => onNewReqKeyDown(ev)"/>
+                                        </td>
+
+                                        <!-- Change = New Request − Last Request -->
+                                        <td t-att-class="'text-center align-middle fw-bold ' + (change > 0 ? 'text-danger' : change &lt; 0 ? 'text-primary' : 'text-muted')"
+                                            t-att-style="state.editedNewReq[m.point] ? 'background:#fff3cd;' : ''">
+                                            <t t-if="change !== 0">
+                                                <t t-esc="(change > 0 ? '+' : '') + change"/>
+                                            </t>
+                                            <t t-else="">0</t>
+                                        </td>
+
+                                        <!-- New Request (editable, yellow if user-edited) -->
+                                        <td class="align-middle" data-col="newreq"
+                                            t-att-style="state.editedNewReq[m.point] ? 'background:#fff3cd;' : ''">
+                                            <input type="number"
+                                                   class="form-control form-control-sm text-center"
+                                                   style="min-width:90px;"
+                                                   step="0.001"
+                                                   t-att-value="state.newRequestOverrides[m.point] !== undefined ? state.newRequestOverrides[m.point] : m.requestValue"
+                                                   t-att-style="state.editedNewReq[m.point] ? 'background:#fff3cd; border-color:#ffc107;' : ''"
+                                                   t-on-input="(ev) => setNewRequest(m.point, ev.target.value)"
+                                                   t-on-keydown="(ev) => onNewReqKeyDown(ev)"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- CAD Image -->
+                    <div style="flex: 1 1 auto; min-width: 240px; max-width: 400px;">
+                        <div class="border border-2 border-dashed rounded p-2 text-center"
+                             style="min-height: 280px; display:flex; align-items:center; justify-content:center;">
+                            <t t-if="panel.image">
+                                <div class="image-display d-flex flex-column h-100">
+                                    <div class="o_cad_preview_trigger" style="cursor:zoom-in;" title="Click to preview">
+                                        <img t-att-src="panel.image"
+                                             style="max-width:100%; max-height:360px; object-fit:contain;"
+                                             t-att-alt="panel.name"/>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="text-muted small">
+                                    <i class="fa fa-image fa-3x d-block mb-2"/>
+                                    No CAD image
+                                </div>
+                            </t>
+                        </div>
+                        <div class="text-center text-muted small mt-1 fw-semibold">
+                            <t t-esc="panel.name"/>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </t>
+
+        </div>
+    </t>
+</templates>

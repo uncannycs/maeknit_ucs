@@ -1,0 +1,37 @@
+<!-- custom-addons/maeknit_crm_customization/views/res_partner_quick_create.xml -->
+<odoo>
+    <record id="view_partner_quick_create" model="ir.ui.view">
+      <field name="name">res.partner.form.quick.create</field>
+      <field name="model">res.partner</field>
+      <field name="arch" type="xml">
+        <form string="Create Contact">
+          <sheet>
+              <group>
+
+                <!-- Row 1: main fields (single column) -->
+                <group expand="0" col="1">
+                  <field name="is_company" invisible="1"/>
+                  <field name="contact_type" options="{'no_quick_create': True, 'no_create_edit': True}"/>
+                  <field name="name" required="1"/>
+                  <field name="email"/>
+                </group>
+                <newline/>
+          
+                <!-- Row 2: Address (two columns inside this block) -->
+                <group expand="0" string="Address (Optional)" col="2"> 
+                  <field name="street"  placeholder="Street Address"/>
+                  <field name="street2" placeholder="Street Address 2"/>
+                  <field name="city"    placeholder="City"/>
+                  <field name="state_id" placeholder="State"/>
+                  <field name="zip"     placeholder="ZIP Code"/>
+                  <field name="country_id" placeholder="Country"/>
+                </group>
+          
+              </group>
+              
+          </sheet>
+        </form>
+      </field>
+    </record>
+  </odoo>
+  

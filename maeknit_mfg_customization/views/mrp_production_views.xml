@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mrp_production_form_view_produce_all_wizard" model="ir.ui.view">
+        <field name="name">mrp.production.form.produce.all.wizard</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_mark_done']" position="attributes">
+                <attribute name="name">action_prepare_produce_all</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_mark_done']" position="attributes">
+                <attribute name="name">action_prepare_produce_all</attribute>
+            </xpath>
+
+            <!-- Make To Consume editable in active MO states -->
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='product_uom_qty'][@widget='mrp_should_consume']" position="attributes">
+                <attribute name="readonly">parent.state in ('done', 'cancel')</attribute>
+            </xpath>
+
+            <!-- Allow editing Quantity even when product has lot tracking -->
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='quantity']" position="attributes">
+                <attribute name="readonly">state in ('done', 'cancel')</attribute>
+            </xpath>
+
+            <!-- Make Lot/Serial Numbers editable inline and always visible when state != draft -->
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='lot_ids']" position="attributes">
+                <attribute name="readonly">state in ('done', 'cancel')</attribute>
+                <attribute name="column_invisible">parent.state == 'draft'</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added MRP Production form view inheritance to display CAD fields -->
+    <record id="mrp_production_form_view_inherit_cad" model="ir.ui.view">
+        <field name="name">mrp.production.form.inherit.cad</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <field name="all_workorders_completed" invisible="1"/>
+                <field name="product_category" invisible="1"/>
+                <field name="style_colorway_ids" invisible="1"/>
+                <field name="service_badge" invisible="1"/>
+                <field name="is_toile_mo" invisible="1"/>
+                <field name="is_dev_mo" invisible="1"/>
+                <field name="toile_doc_data" invisible="1"/>
+            </xpath>
+            <xpath expr="//group[@name='group_extra_info']//field[@name='date_start']" position="attributes">
+                <attribute name="required">1</attribute>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_bom_request" type="object" class="oe_stat_button" icon="fa-handshake-o">
+                        BOM Request
+                </button>
+                <button name="action_open_swatches" type="object" class="oe_stat_button" icon="fa-tint"
+                        invisible="swatch_count == 0">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value"><field name="swatch_count" nolabel="1"/></span>
+                        <span class="o_stat_text">Swatches</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//div[@class='oe_title']/h1" position="replace">
+                <h1 class="d-flex align-items-center w-100">
+                    <!-- Left: product name (large, bold) -->
+                    <div class="d-flex align-items-center flex-grow-1" style="min-width: 0;">
+                        <!-- New record: searchable/creatable many2one, domain driven by toggle -->
+                        <field name="product_id"
+                               invisible="id"
+                               readonly="not rel_service"
+                               context="{'default_is_storable': True, 'default_product_category': is_swatch_mo and 'swatch' or 'garment'}"
+                               domain="[('product_tmpl_id.product_category', '=', is_swatch_mo and 'swatch' or 'garment')]"
+                               placeholder="Select a Product..."
+                               options="{'no_quick_create': False, 'no_create': False, 'no_open': True}"/>
+                        <!-- Saved record: editable product name only -->
+                        <field name="product_tmpl_name"
+                               invisible="not id"
+                               readonly="not rel_service"
+                               placeholder="Product name"/>
+                        <!-- Invisible anchor kept for child-view backwards compat during DB transitions -->
+                        <field name="name" invisible="1"/>
+                        <field name="is_swatch_mo" invisible="1"/>
+                        <field name="is_toile_mo" invisible="1"/>
+                        <field name="is_dev_mo" invisible="1"/>
+                    </div>
+
+                    <!-- Right: Create Variant button (swatch + development) -->
+                    <div class="ms-auto d-flex gap-2">
+                        <button
+                            name="action_open_bom_duplicate_wizard"
+                            type="object"
+                            class="btn btn-outline-primary"
+                            icon="fa-layer-group"
+                            invisible="not show_bom_duplicate_button and not show_create_variant_button">
+                            Create Variant
+                        </button>
+                    </div>
+                </h1>
+            </xpath>
+            
+            
+            
+
+            <!-- Swatch tab — Production/Grading MOs only.
+                 Dev MOs already have their own Swatch tab in maeknit_bom_mfg_link. -->
+            <xpath expr="//page[@name='miscellaneous']" position="before">
+                <page string="Swatch" name="swatch_tab" invisible="is_swatch_mo or is_dev_mo or is_toile_mo">
+                    <field name="swatch_mo_ids" nolabel="1">
+                        <list string="Linked Swatch MOs">
+                            <field name="name"/>
+                            <field name="product_id"/>
+                            <field name="state"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+
+            <!-- Add CAD data tabs in the notebook -->
+            <xpath expr="//page[@name='miscellaneous']" position="before">
+                <!-- Whole CAD tab -->
+                <page string="Whole CAD" name="whole_cad" invisible="is_swatch_mo">
+                    <group col="1">
+                        <field name="whole_cad_data_with_images" widget="whole_cad_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="whole_cad_data" invisible="1"/>
+                    </group>
+                </page>
+
+                <!-- Panel CAD tab -->
+                <page string="Panel CAD" name="panel_cad" invisible="is_swatch_mo">
+                    <group col="1">
+                        <field name="measurement_widget_data" widget="measurement_sheet_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="measurement_widget_data_with_images" invisible="1"/>
+                    </group>
+                </page>
+
+                <!-- Calibration tab — garment MOs only (not swatch, not toile) -->
+                <page string="Calibration" name="calibration" invisible="is_swatch_mo or is_toile_mo or is_dev_mo">
+                    <group col="1">
+                        <field name="calibration_data_with_images" widget="calibration_widget" nolabel="1" class="o_fullwidth_widget"/>
+                        <field name="calibration_data" invisible="1"/>
+                    </group>
+                </page>
+
+                <!-- Stitch Density tab — Swatch and Toile MOs -->
+                <page string="Stitch Density" name="stitch_density" invisible="not is_swatch_mo and not is_toile_mo">
+                    <group col="1">
+                        <field name="calibration_data_with_images" widget="calibration_widget" nolabel="1" class="o_fullwidth_widget" hideSwatchSelection="True"/>
+                        <field name="calibration_data" invisible="1"/>
+                    </group>
+                </page>
+
+                <!-- Render Tab -->
+                <page string="Render" name="render_tab" invisible="is_swatch_mo">
+                    <group>
+                        <group>
+                            <label for="style_3d_link" string="STYLE 3D LINK:" class="fw-bold text-center"/>
+                            <div class="d-flex align-items-center gap-2">
+                                <field name="style_3d_link" widget="url" placeholder="https://cloud.style3d.com/..." nolabel="1" class="flex-grow-1"/>
+                            </div>
+                        </group>
+                    </group>
+
+                    <separator string="Render Images"/>
+
+                    <field name="render_image_ids" nolabel="1">
+                        <kanban create="false" delete="true">
+                            <field name="id"/>
+                            <field name="name"/>
+                            <field name="image"/>
+                            <field name="image_filename"/>
+                            <field name="sequence"/>
+                            <templates>
+                                <t t-name="card">
+                                    <div class="card m-2" style="width: 220px;">
+                                        <div class="card-body text-center p-2">
+                                            <div class="o_kanban_image_wrapper mb-2">
+                                                <t t-if="record.image.raw_value">
+                                                    <div class="oe_kanban_action o_render_lightbox_trigger" t-att-data-id="record.id.raw_value" title="Click to preview">
+                                                        <field name="image" widget="image" options="{'size': [200, 200], 'preview_image': 'image'}" class="o_attachment_image"/>
+                                                    </div>
+                                                </t>
+                                                <t t-else="">
+                                                    <div class="oe_kanban_action o_render_upload_trigger o_kanban_image_placeholder d-flex flex-column align-items-center justify-content-center" t-att-data-id="record.id.raw_value" style="height: 200px; width: 200px; border: 2px dashed #ccc; background: #f8f9fa;">
+                                                        <i class="fa fa-cloud-upload fa-3x text-muted mb-2"/>
+                                                        <span class="text-muted small">Click to Upload</span>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                            <field name="name" placeholder="Image Name" class="mb-2"/>
+                                            <div class="d-flex gap-1 justify-content-center">
+                                                <a class="btn btn-sm btn-secondary o_render_upload_trigger" role="button" t-att-data-id="record.id.raw_value">
+                                                    <i class="fa fa-upload"/> Replace
+                                                </a>
+                                                <a class="btn btn-sm btn-primary oe_kanban_action o_render_lightbox_trigger" role="button" t-att-data-id="record.id.raw_value" t-if="record.image.raw_value">
+                                                    <i class="fa fa-search-plus"/> Preview
+                                                </a>
+                                                <a class="btn btn-sm btn-outline-danger oe_kanban_action o_render_delete_trigger" role="button" t-att-data-id="record.id.raw_value" title="Delete">
+                                                    <i class="fa fa-trash"/>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+
+                    <div class="text-center mt-3">
+                        <button name="action_add_render_image" type="object" string="Add More Images" class="btn btn-primary" icon="fa-plus"/>
+                    </div>
+                </page>
+            </xpath>
+
+            <!-- Hide Miscellaneous tab for swatch and toile MOs -->
+            <xpath expr="//page[@name='miscellaneous']" position="attributes">
+                <attribute name="invisible">is_swatch_mo or is_toile_mo</attribute>
+            </xpath>
+
+            <!-- Hide product_id in body — now shown in the title h1 -->
+            <xpath expr="//field[@name='product_id'][@default_focus='1']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Add MO reference (name) below Bill of Material -->
+            <xpath expr="//div[@name='bom_div']" position="after">
+                <label for="name" string="Manufacturing Order" invisible="not id"/>
+                <field name="name" readonly="1" invisible="not id"/>
+            </xpath>
+
+            <!-- Enable quick create/edit for MRP production components -->
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='product_id']" position="attributes">
+                <!-- Updated context to open product.template form instead of product.product -->
+                <attribute name="context">{
+                    'default_detailed_type': 'product',
+                    'default_product_category': 'yarn',
+                    'force_create': True,
+                    'force_create_product_template': True,
+                    'form_view_ref': 'product.product_template_only_form_view'
+                }</attribute>
+                <attribute name="domain">[('product_tmpl_id.product_category', '=', 'yarn')]</attribute>
+                <attribute name="options">{'no_quick_create': True, 'no_create': False, 'no_open': False}</attribute>
+            </xpath>
+
+            <!-- Enable quick create/edit for finished products -->
+            <xpath expr="//field[@name='move_finished_ids']//field[@name='product_id']" position="attributes">
+                <!-- Updated context to open product.template form instead of product.product -->
+                <attribute name="context">{'default_detailed_type': 'product', 'form_view_ref': 'product.product_template_only_form_view'}</attribute>
+                <attribute name="options">{'no_create': False, 'no_open': False}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added Request New Program button before Maintenance Request button -->
+    <record id="mrp_production_form_view_inherit_program_button" model="ir.ui.view">
+        <field name="name">mrp.production.form.inherit.program.button</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp_maintenance.mrp_production_view_form_inherit_maintenance"/>
+        <field name="arch" type="xml">
+            <button name="button_plan" position="before">
+                <button name="action_remanufacture" type="object" string="Re-manufacturing" invisible="state in ('draft', 'done')" class="btn-warning"/>
+            </button>
+            <button name="button_plan" position="before">
+                <button name="action_bump_whole_cad_version" type="object" string="Preship QC" invisible="1" class="btn-success"/>
+            </button>
+        </field>
+    </record>
+
+    <record id="view_mrp_production_tree_inherit" model="ir.ui.view">
+        <field name="name">mrp.production.tree.inherit.sort.start</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="default_order">date_start</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mrp_production_workorder_tree_editable_view_inherit" model="ir.ui.view">
+        <field name="name">mrp.production.workorder.tree.editable.inherit</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_tree_editable_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='employee_ids']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='state']" position="after">
+                <!-- Updated restart button to only show on last finished work order -->
+
+                <button name="action_upload_instruction_files" type="object" string="Instructions" class="btn btn-sm" invisible="has_instruction_files"/>
+
+                <button name="action_upload_instruction_files" type="object" string="Instructions" class="btn btn-sm btn-outline-success" invisible="not has_instruction_files"/>
+
+                <button name="action_upload_program_files" type="object" string="Programs" class="btn btn-sm" invisible="has_program_files or (not is_program_workorder and not is_knit_workorder)"/>
+
+                <button name="action_upload_program_files" type="object" string="Programs" class="btn btn-sm btn-outline-success" invisible="not has_program_files or (not is_program_workorder and not is_knit_workorder)"/>
+
+                <field name="is_knit_workorder" column_invisible="True"/>
+                <field name="is_program_workorder" column_invisible="True"/>
+                <field name="is_wash_workorder" column_invisible="True"/>
+                <field name="is_dry_workorder" column_invisible="True"/>
+
+                <button name="action_show_latest_reprogram_note"
+                        type="object"
+                        icon="fa-info-circle"
+                        class="btn btn-sm btn-link text-info"
+                        string="Note"
+                        width="70"
+                        invisible= "not latest_reprogram_message_id or (not is_knit_workorder and not is_program_workorder)"/>
+            </xpath>
+
+            <xpath expr="//field[@name='workcenter_id']" position="attributes">
+                <attribute name="width">100</attribute>
+            </xpath>
+            
+            
+            <xpath expr="//field[@name='product_id']" position="attributes">
+                <attribute name="width">180</attribute>
+            </xpath>
+            
+            <xpath expr="//field[@name='workcenter_id']" position="before">
+                <!-- Updated restart button to only show on last finished work order -->
+                <field name="shopfloor_operation_id" string="Operation" width="100"
+                       domain="[('company_id','in', allowed_company_ids)]"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='employee_assigned_ids']" position="replace"></xpath>
+
+            <xpath expr="//field[@name='workcenter_id']" position="after">
+                <field name="employee_assigned_ids" widget="many2many_avatar_user" string="Assigned"/>
+            </xpath>
+            
+            <xpath expr="//button[@name='button_finish']" position="after">
+                <!-- Updated restart button to only show on last finished work order -->
+                <button name="button_restart" type="object" icon="fa-undo" class="btn btn-danger" title="Restart" invisible= "production_state in ('draft', 'done', 'cancel') or working_state == 'blocked' or not is_user_working" />
+            </xpath>
+
+        </field>
+    </record>
+
+
+    <record id="mrp_production_workorder_tree_editable_view_mo_form_inherit" model="ir.ui.view">
+        <field name="name">mrp.production.work.order.list.editable.inherit</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_tree_editable_view_mo_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sequence']" position="attributes">
+                <attribute name="column_invisible">parent.state not in ('draft', 'confirmed', 'progress')</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added search view to search all visible columns at once -->
+    <record id="mrp_production_search_view_inherit" model="ir.ui.view">
+        <field name="name">mrp.production.search.inherit.multi</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.view_mrp_production_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="filter_domain">['|', '|', '|', '|', '|', '|', '|',
+                    ('name', 'ilike', self),
+                    ('product_id.name', 'ilike', self),
+                    ('product_id.product_tmpl_id.name', 'ilike', self),
+                    ('partner_id.name', 'ilike', self),
+                    ('colorway_id.name', 'ilike', self),
+                    ('origin', 'ilike', self),
+                    ('workorder_ids.workcenter_id.name', 'ilike', self),
+                    ('picking_type_id.name', 'ilike', self)
+                ]</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

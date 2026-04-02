@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- PLANT-BASED NATURAL FIBERS -->
+        <record id="fiber_type_cotton" model="fiber.type" forcecreate="false">
+            <field name="name">Cotton</field>
+            <field name="value">cotton</field>
+            <field name="category_id" ref="fiber_category_plant"/>
+            <field name="description">Soft, fluffy staple fiber that grows in a boll around the seeds of cotton plants</field>
+        </record>
+        
+        <record id="fiber_type_linen" model="fiber.type" forcecreate="false">
+            <field name="name">Linen</field>
+            <field name="value">linen</field>
+            <field name="category_id" ref="fiber_category_plant"/>
+            <field name="description">Textile made from the fibers of the flax plant</field>
+        </record>
+        
+        <record id="fiber_type_hemp" model="fiber.type" forcecreate="false">
+            <field name="name">Hemp</field>
+            <field name="value">hemp</field>
+            <field name="category_id" ref="fiber_category_plant"/>
+            <field name="description">Strong and durable fiber from the cannabis plant</field>
+        </record>
+        
+        <record id="fiber_type_jute" model="fiber.type" forcecreate="false">
+            <field name="name">Jute</field>
+            <field name="value">jute</field>
+            <field name="category_id" ref="fiber_category_plant"/>
+            <field name="description">Long, soft, shiny vegetable fiber that can be spun into coarse, strong threads</field>
+        </record>
+        
+        <record id="fiber_type_ramie" model="fiber.type" forcecreate="false">
+            <field name="name">Ramie</field>
+            <field name="value">ramie</field>
+            <field name="category_id" ref="fiber_category_plant"/>
+            <field name="description">Flowering plant in the nettle family, one of the strongest natural fibers</field>
+        </record>
+        
+        <record id="fiber_type_sisal" model="fiber.type" forcecreate="false">
+            <field name="name">Sisal</field>
+            <field name="value">sisal</field>
+            <field name="category_id" ref="fiber_category_plant"/>
+            <field name="description">Stiff fiber from the agave plant used in making rope and twine</field>
+        </record>
+        
+        <record id="fiber_type_coir" model="fiber.type" forcecreate="false">
+            <field name="name">Coir</field>
+            <field name="value">coir</field>
+            <field name="category_id" ref="fiber_category_plant"/>
+            <field name="description">Natural fiber extracted from the husk of coconut</field>
+        </record>
+        
+        <record id="fiber_type_kapok" model="fiber.type" forcecreate="false">
+            <field name="name">Kapok</field>
+            <field name="value">kapok</field>
+            <field name="category_id" ref="fiber_category_plant"/>
+            <field name="description">Light, fluffy fiber from the seed pods of the kapok tree</field>
+        </record>
+        
+        <record id="fiber_type_abaca" model="fiber.type" forcecreate="false">
+            <field name="name">Abaca</field>
+            <field name="value">abaca</field>
+            <field name="category_id" ref="fiber_category_plant"/>
+            <field name="description">Fiber from the leaf-stems of the abaca plant, also known as Manila hemp</field>
+        </record>
+        
+        <record id="fiber_type_bamboo" model="fiber.type" forcecreate="false">
+            <field name="name">Bamboo</field>
+            <field name="value">bamboo</field>
+            <field name="category_id" ref="fiber_category_plant"/>
+            <field name="description">Natural fiber extracted from bamboo plants</field>
+        </record>
+        
+        <!-- ANIMAL-BASED NATURAL FIBERS -->
+        <record id="fiber_type_wool" model="fiber.type" forcecreate="false">
+            <field name="name">Wool</field>
+            <field name="value">wool</field>
+            <field name="category_id" ref="fiber_category_animal"/>
+            <field name="description">Natural fiber from sheep or other animals</field>
+        </record>
+        
+        <record id="fiber_type_silk" model="fiber.type" forcecreate="false">
+            <field name="name">Silk</field>
+            <field name="value">silk</field>
+            <field name="category_id" ref="fiber_category_animal"/>
+            <field name="description">Natural protein fiber produced by silkworms</field>
+        </record>
+        
+        <record id="fiber_type_cashmere" model="fiber.type" forcecreate="false">
+            <field name="name">Cashmere</field>
+            <field name="value">cashmere</field>
+            <field name="category_id" ref="fiber_category_animal"/>
+            <field name="description">Fine fiber obtained from cashmere goats</field>
+        </record>
+        
+        <record id="fiber_type_mohair" model="fiber.type" forcecreate="false">
+            <field name="name">Mohair</field>
+            <field name="value">mohair</field>
+            <field name="category_id" ref="fiber_category_animal"/>
+            <field name="description">Lustrous fiber from the hair of the Angora goat</field>
+        </record>
+        
+        <record id="fiber_type_alpaca" model="fiber.type" forcecreate="false">
+            <field name="name">Alpaca</field>
+            <field name="value">alpaca</field>
+            <field name="category_id" ref="fiber_category_animal"/>
+            <field name="description">Natural fiber from alpacas, similar to sheep's wool</field>
+        </record>
+        
+        <record id="fiber_type_angora" model="fiber.type" forcecreate="false">
+            <field name="name">Angora</field>
+            <field name="value">angora</field>
+            <field name="category_id" ref="fiber_category_animal"/>
+            <field name="description">Downy coat produced by the Angora rabbit</field>
+        </record>
+        
+        <record id="fiber_type_camel_hair" model="fiber.type" forcecreate="false">
+            <field name="name">Camel hair</field>
+            <field name="value">camel_hair</field>
+            <field name="category_id" ref="fiber_category_animal"/>
+            <field name="description">Natural fiber from the undercoat of the Bactrian camel</field>
+        </record>
+        
+        <record id="fiber_type_qiviut" model="fiber.type" forcecreate="false">
+            <field name="name">Qiviut</field>
+            <field name="value">qiviut</field>
+            <field name="category_id" ref="fiber_category_animal"/>
+            <field name="description">Inner wool from the undercoat of the muskox</field>
+        </record>
+        
+        <record id="fiber_type_yak" model="fiber.type" forcecreate="false">
+            <field name="name">Yak</field>
+            <field name="value">yak</field>
+            <field name="category_id" ref="fiber_category_animal"/>
+            <field name="description">Soft down fiber from the undercoat of yaks</field>
+        </record>
+        
+        <record id="fiber_type_llama" model="fiber.type" forcecreate="false">
+            <field name="name">Llama</field>
+            <field name="value">llama</field>
+            <field name="category_id" ref="fiber_category_animal"/>
+            <field name="description">Natural fiber from llamas, similar to alpaca but coarser</field>
+        </record>
+        
+        <!-- MINERAL FIBERS -->
+        <record id="fiber_type_asbestos" model="fiber.type" forcecreate="false">
+            <field name="name">Asbestos</field>
+            <field name="value">asbestos</field>
+            <field name="category_id" ref="fiber_category_mineral"/>
+            <field name="description">Naturally occurring mineral fiber (historical use, now restricted)</field>
+        </record>
+        
+        <record id="fiber_type_basalt" model="fiber.type" forcecreate="false">
+            <field name="name">Basalt</field>
+            <field name="value">basalt</field>
+            <field name="category_id" ref="fiber_category_mineral"/>
+            <field name="description">Fiber made from extremely fine fibers of basalt</field>
+        </record>
+        
+        <record id="fiber_type_glass_fiber" model="fiber.type" forcecreate="false">
+            <field name="name">Glass fiber</field>
+            <field name="value">glass_fiber</field>
+            <field name="category_id" ref="fiber_category_mineral"/>
+            <field name="description">Material made from extremely fine fibers of glass</field>
+        </record>
+        
+        <!-- SYNTHETIC FIBERS -->
+        <record id="fiber_type_polyester" model="fiber.type" forcecreate="false">
+            <field name="name">Polyester</field>
+            <field name="value">polyester</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Synthetic polymer made of purified terephthalic acid</field>
+        </record>
+        
+        <record id="fiber_type_nylon" model="fiber.type" forcecreate="false">
+            <field name="name">Nylon</field>
+            <field name="value">nylon</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Synthetic thermoplastic linear polyamide</field>
+        </record>
+        
+        <record id="fiber_type_acrylic" model="fiber.type" forcecreate="false">
+            <field name="name">Acrylic</field>
+            <field name="value">acrylic</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Synthetic fiber made from a polymer of acrylonitrile</field>
+        </record>
+        
+        <record id="fiber_type_spandex" model="fiber.type" forcecreate="false">
+            <field name="name">Spandex</field>
+            <field name="value">spandex</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Highly elastic synthetic fiber made of polyurethane</field>
+        </record>
+        
+        <record id="fiber_type_elastane" model="fiber.type" forcecreate="false">
+            <field name="name">Elastane</field>
+            <field name="value">elastane</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Synthetic fiber known for its elasticity (also known as Lycra)</field>
+        </record>
+        
+        <record id="fiber_type_lycra" model="fiber.type" forcecreate="false">
+            <field name="name">Lycra</field>
+            <field name="value">lycra</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Brand name for elastane, a synthetic fiber known for its elasticity</field>
+        </record>
+        
+        <record id="fiber_type_polyamide" model="fiber.type" forcecreate="false">
+            <field name="name">Polyamide</field>
+            <field name="value">polyamide</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Synthetic polymer containing repeating amide linkages</field>
+        </record>
+        
+        <record id="fiber_type_polypropylene" model="fiber.type" forcecreate="false">
+            <field name="name">Polypropylene</field>
+            <field name="value">polypropylene</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Thermoplastic polymer used in a wide variety of applications</field>
+        </record>
+        
+        <record id="fiber_type_aramid" model="fiber.type" forcecreate="false">
+            <field name="name">Aramid</field>
+            <field name="value">aramid</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Class of heat-resistant and strong synthetic fibers</field>
+        </record>
+        
+        <record id="fiber_type_kevlar" model="fiber.type" forcecreate="false">
+            <field name="name">Kevlar</field>
+            <field name="value">kevlar</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Brand name for para-aramid synthetic fiber</field>
+        </record>
+        
+        <record id="fiber_type_nomex" model="fiber.type" forcecreate="false">
+            <field name="name">Nomex</field>
+            <field name="value">nomex</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Brand name for meta-aramid synthetic fiber</field>
+        </record>
+        
+        <record id="fiber_type_modacrylic" model="fiber.type" forcecreate="false">
+            <field name="name">Modacrylic</field>
+            <field name="value">modacrylic</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Modified acrylic fiber with flame-resistant properties</field>
+        </record>
+        
+        <record id="fiber_type_olefin" model="fiber.type" forcecreate="false">
+            <field name="name">Olefin</field>
+            <field name="value">olefin</field>
+            <field name="category_id" ref="fiber_category_synthetic"/>
+            <field name="description">Synthetic fiber made from polyolefin, like polypropylene or polyethylene</field>
+        </record>
+        
+        <!-- SEMI-SYNTHETIC FIBERS -->
+        <record id="fiber_type_rayon" model="fiber.type" forcecreate="false">
+            <field name="name">Rayon</field>
+            <field name="value">rayon</field>
+            <field name="category_id" ref="fiber_category_semi_synthetic"/>
+            <field name="description">Regenerated cellulose fiber</field>
+        </record>
+        
+        <record id="fiber_type_modal" model="fiber.type" forcecreate="false">
+            <field name="name">Modal</field>
+            <field name="value">modal</field>
+            <field name="category_id" ref="fiber_category_semi_synthetic"/>
+            <field name="description">Type of rayon that is high wet strength and extra soft</field>
+        </record>
+        
+        <record id="fiber_type_lyocell" model="fiber.type" forcecreate="false">
+            <field name="name">Lyocell</field>
+            <field name="value">lyocell</field>
+            <field name="category_id" ref="fiber_category_semi_synthetic"/>
+            <field name="description">Form of rayon made from dissolved wood pulp</field>
+        </record>
+        
+        <record id="fiber_type_tencel" model="fiber.type" forcecreate="false">
+            <field name="name">Tencel</field>
+            <field name="value">tencel</field>
+            <field name="category_id" ref="fiber_category_semi_synthetic"/>
+            <field name="description">Brand name for lyocell and modal fibers</field>
+        </record>
+        
+        <record id="fiber_type_acetate" model="fiber.type" forcecreate="false">
+            <field name="name">Acetate</field>
+            <field name="value">acetate</field>
+            <field name="category_id" ref="fiber_category_semi_synthetic"/>
+            <field name="description">Semi-synthetic fiber made from cellulose acetate</field>
+        </record>
+        
+        <record id="fiber_type_triacetate" model="fiber.type" forcecreate="false">
+            <field name="name">Triacetate</field>
+            <field name="value">triacetate</field>
+            <field name="category_id" ref="fiber_category_semi_synthetic"/>
+            <field name="description">Cellulose acetate fiber with a higher degree of acetylation than acetate</field>
+        </record>
+        
+        <record id="fiber_type_viscose" model="fiber.type" forcecreate="false">
+            <field name="name">Viscose</field>
+            <field name="value">viscose</field>
+            <field name="category_id" ref="fiber_category_semi_synthetic"/>
+            <field name="description">Semi-synthetic fiber made from wood pulp, a type of rayon</field>
+        </record>
+        
+        <record id="fiber_type_cupro" model="fiber.type" forcecreate="false">
+            <field name="name">Cupro</field>
+            <field name="value">cupro</field>
+            <field name="category_id" ref="fiber_category_semi_synthetic"/>
+            <field name="description">Regenerated cellulose fiber made using copper and ammonia</field>
+        </record>
+        
+        <!-- SPECIALTY FIBERS -->
+        <record id="fiber_type_carbon_fiber" model="fiber.type" forcecreate="false">
+            <field name="name">Carbon fiber</field>
+            <field name="value">carbon_fiber</field>
+            <field name="category_id" ref="fiber_category_specialty"/>
+            <field name="description">Extremely strong and light fiber-reinforced polymer</field>
+        </record>
+        
+        <record id="fiber_type_ptfe" model="fiber.type" forcecreate="false">
+            <field name="name">PTFE</field>
+            <field name="value">ptfe</field>
+            <field name="category_id" ref="fiber_category_specialty"/>
+            <field name="description">Polytetrafluoroethylene, a synthetic fluoropolymer (Teflon)</field>
+        </record>
+        
+        <record id="fiber_type_pbi" model="fiber.type" forcecreate="false">
+            <field name="name">PBI</field>
+            <field name="value">pbi</field>
+            <field name="category_id" ref="fiber_category_specialty"/>
+            <field name="description">Polybenzimidazole, a synthetic fiber with exceptional thermal and chemical stability</field>
+        </record>
+        
+        <record id="fiber_type_peek" model="fiber.type" forcecreate="false">
+            <field name="name">PEEK</field>
+            <field name="value">peek</field>
+            <field name="category_id" ref="fiber_category_specialty"/>
+            <field name="description">Polyether ether ketone, a high-performance thermoplastic polymer</field>
+        </record>
+        
+        <record id="fiber_type_pla" model="fiber.type" forcecreate="false">
+            <field name="name">PLA</field>
+            <field name="value">pla</field>
+            <field name="category_id" ref="fiber_category_eco_friendly"/>
+            <field name="description">Polylactic acid, a biodegradable thermoplastic derived from renewable resources</field>
+        </record>
+        
+        <!-- ECO-FRIENDLY FIBERS -->
+        <record id="fiber_type_recycled_polyester" model="fiber.type" forcecreate="false">
+            <field name="name">Recycled polyester</field>
+            <field name="value">recycled_polyester</field>
+            <field name="category_id" ref="fiber_category_eco_friendly"/>
+            <field name="description">Polyester made from recycled plastic bottles and other post-consumer waste</field>
+        </record>
+        
+        <record id="fiber_type_organic_cotton" model="fiber.type" forcecreate="false">
+            <field name="name">Organic cotton</field>
+            <field name="value">organic_cotton</field>
+            <field name="category_id" ref="fiber_category_eco_friendly"/>
+            <field name="description">Cotton grown without synthetic pesticides or fertilizers</field>
+        </record>
+        
+        <record id="fiber_type_seacell" model="fiber.type" forcecreate="false">
+            <field name="name">SeaCell</field>
+            <field name="value">seacell</field>
+            <field name="category_id" ref="fiber_category_eco_friendly"/>
+            <field name="description">Lyocell fiber enhanced with seaweed</field>
+        </record>
+        
+        <record id="fiber_type_soybean" model="fiber.type" forcecreate="false">
+            <field name="name">Soybean</field>
+            <field name="value">soybean</field>
+            <field name="category_id" ref="fiber_category_eco_friendly"/>
+            <field name="description">Protein fiber derived from soybean residue</field>
+        </record>
+        
+        <record id="fiber_type_qmilch" model="fiber.type" forcecreate="false">
+            <field name="name">QMilch</field>
+            <field name="value">qmilch</field>
+            <field name="category_id" ref="fiber_category_eco_friendly"/>
+            <field name="description">Fiber made from casein in milk that cannot be sold</field>
+        </record>
+        
+        <record id="fiber_type_pinatex" model="fiber.type" forcecreate="false">
+            <field name="name">Piñatex</field>
+            <field name="value">pinatex</field>
+            <field name="category_id" ref="fiber_category_eco_friendly"/>
+            <field name="description">Natural leather alternative made from pineapple leaf fibers</field>
+        </record>
+        
+        <record id="fiber_type_econyl" model="fiber.type" forcecreate="false">
+            <field name="name">Econyl</field>
+            <field name="value">econyl</field>
+            <field name="category_id" ref="fiber_category_eco_friendly"/>
+            <field name="description">Regenerated nylon made from waste materials like fishing nets</field>
+        </record>
+        
+        <!-- COMMON BLENDS -->
+        <record id="fiber_type_cotton_polyester" model="fiber.type" forcecreate="false">
+            <field name="name">Cotton-polyester</field>
+            <field name="value">cotton_polyester</field>
+            <field name="category_id" ref="fiber_category_blends"/>
+            <field name="description">Common blend of cotton and polyester</field>
+        </record>
+        
+        <record id="fiber_type_wool_acrylic" model="fiber.type" forcecreate="false">
+            <field name="name">Wool-acrylic</field>
+            <field name="value">wool_acrylic</field>
+            <field name="category_id" ref="fiber_category_blends"/>
+            <field name="description">Blend of wool and acrylic fibers</field>
+        </record>
+        
+        <record id="fiber_type_cotton_linen" model="fiber.type" forcecreate="false">
+            <field name="name">Cotton-linen</field>
+            <field name="value">cotton_linen</field>
+            <field name="category_id" ref="fiber_category_blends"/>
+            <field name="description">Blend of cotton and linen fibers</field>
+        </record>
+        
+        <record id="fiber_type_silk_wool" model="fiber.type" forcecreate="false">
+            <field name="name">Silk-wool</field>
+            <field name="value">silk_wool</field>
+            <field name="category_id" ref="fiber_category_blends"/>
+            <field name="description">Blend of silk and wool fibers</field>
+        </record>
+        
+        <record id="fiber_type_cotton_spandex" model="fiber.type" forcecreate="false">
+            <field name="name">Cotton-spandex</field>
+            <field name="value">cotton_spandex</field>
+            <field name="category_id" ref="fiber_category_blends"/>
+            <field name="description">Blend of cotton with a small percentage of spandex for stretch</field>
+        </record>
+        
+        <record id="fiber_type_wool_silk" model="fiber.type" forcecreate="false">
+            <field name="name">Wool-silk</field>
+            <field name="value">wool_silk</field>
+            <field name="category_id" ref="fiber_category_blends"/>
+            <field name="description">Blend of wool and silk fibers</field>
+        </record>
+        
+        <record id="fiber_type_cotton_modal" model="fiber.type" forcecreate="false">
+            <field name="name">Cotton-modal</field>
+            <field name="value">cotton_modal</field>
+            <field name="category_id" ref="fiber_category_blends"/>
+            <field name="description">Blend of cotton and modal fibers</field>
+        </record>
+        
+        <record id="fiber_type_wool_cashmere" model="fiber.type" forcecreate="false">
+            <field name="name">Wool-cashmere</field>
+            <field name="value">wool_cashmere</field>
+            <field name="category_id" ref="fiber_category_blends"/>
+            <field name="description">Blend of wool and cashmere fibers</field>
+        </record>
+        
+        <record id="fiber_type_polyester_viscose" model="fiber.type" forcecreate="false">
+            <field name="name">Polyester-viscose</field>
+            <field name="value">polyester_viscose</field>
+            <field name="category_id" ref="fiber_category_blends"/>
+            <field name="description">Blend of polyester and viscose fibers</field>
+        </record>
+        
+        <record id="fiber_type_nylon_spandex" model="fiber.type" forcecreate="false">
+            <field name="name">Nylon-spandex</field>
+            <field name="value">nylon_spandex</field>
+            <field name="category_id" ref="fiber_category_blends"/>
+            <field name="description">Blend of nylon and spandex, common in activewear</field>
+        </record>
+    </data>
+</odoo>

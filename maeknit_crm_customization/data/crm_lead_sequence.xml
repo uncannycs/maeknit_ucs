@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sequence for Child Opportunity Style Names -->
+        <record id="seq_crm_lead_child_style" model="ir.sequence">
+            <field name="name">CRM Lead Child Style Sequence</field>
+            <field name="code">crm.lead.child.style</field>
+            <field name="prefix"></field> <!-- Prefix will be dynamically generated (e.g., LP) -->
+            <field name="padding">4</field> <!-- e.g., 0001, 0002 -->
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

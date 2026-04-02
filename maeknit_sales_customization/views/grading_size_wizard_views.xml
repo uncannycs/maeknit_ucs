@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_grading_size_wizard_form" model="ir.ui.view">
+        <field name="name">grading.size.wizard.form</field>
+        <field name="model">grading.size.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add Grading Sizes">
+                <group>
+                    <field name="sale_order_id" invisible="1"/>
+                    <field name="product_id" options="{'no_create': True}"/>
+                    <field name="price_per_grade"/>
+                </group>
+                <group string="Sizes">
+                     Changed from One2many tree to simple Char field for comma-separated sizes 
+                    <field name="sizes" placeholder="e.g., S, M, L, XL, XXL"/>
+                </group>
+                <footer>
+                    <button string="Add Sizes" name="action_add_sizes" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

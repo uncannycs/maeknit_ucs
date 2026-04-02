@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="maeknit_bom_mfg_lib.CalibrationSection">
+        <!-- Reusable: renders Body + Cuff cards for a given calibration data object -->
+        <t t-set="cd" t-value="props.cd"/>
+        <t t-set="unit" t-value="cd.measurementUnit || 'inches'"/>
+        <div class="row g-3 mb-3">
+            <!-- Body -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header py-2 fw-semibold">Body</div>
+                    <div class="card-body py-2">
+                        <div class="mb-2">
+                            <small class="text-muted d-block">Swatch Specs</small>
+                            <span class="fw-semibold" t-esc="(cd.bodySwatchSpecsX || 0) + ' W x ' + (cd.bodySwatchSpecsY || 0) + ' H (wales x courses)'"/>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted d-block">Measurement Width (<t t-esc="unit"/>)</small>
+                            <span class="fw-semibold" t-esc="cd.bodyMeasurementX || 0"/>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted d-block">Measurement Height (<t t-esc="unit"/>)</small>
+                            <span class="fw-semibold" t-esc="cd.bodyMeasurementY || 0"/>
+                        </div>
+                        <div class="row g-2 mt-1">
+                            <div class="col-6">
+                                <div class="p-2 rounded text-center" style="background: #d4edda;">
+                                    <small class="text-muted d-block">Cal. Width</small>
+                                    <span class="fw-bold text-success fs-6" t-esc="props.fmt(cd.bodyCalibrationX)"/>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 rounded text-center" style="background: #d4edda;">
+                                    <small class="text-muted d-block">Cal. Height</small>
+                                    <span class="fw-bold text-success fs-6" t-esc="props.fmt(cd.bodyCalibrationY)"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Cuff -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header py-2 fw-semibold">Cuff</div>
+                    <div class="card-body py-2">
+                        <div class="mb-2">
+                            <small class="text-muted d-block">Swatch Specs</small>
+                            <span class="fw-semibold" t-esc="(cd.cuffSwatchSpecsX || 0) + ' W x ' + (cd.cuffSwatchSpecsY || 0) + ' H (wales x courses)'"/>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted d-block">Measurement Width (<t t-esc="unit"/>)</small>
+                            <span class="fw-semibold" t-esc="cd.cuffMeasurementX || 0"/>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted d-block">Measurement Height (<t t-esc="unit"/>)</small>
+                            <span class="fw-semibold" t-esc="cd.cuffMeasurementY || 0"/>
+                        </div>
+                        <div class="row g-2 mt-1">
+                            <div class="col-6">
+                                <div class="p-2 rounded text-center" style="background: #d4edda;">
+                                    <small class="text-muted d-block">Cal. Width</small>
+                                    <span class="fw-bold text-success fs-6" t-esc="props.fmt(cd.cuffCalibrationX)"/>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 rounded text-center" style="background: #d4edda;">
+                                    <small class="text-muted d-block">Cal. Height</small>
+                                    <span class="fw-bold text-success fs-6" t-esc="props.fmt(cd.cuffCalibrationY)"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Images row -->
+        <t t-if="cd.widthImage or cd.heightImage or cd.widthImage2 or cd.heightImage2">
+            <div class="row g-2">
+                <t t-if="cd.widthImage">
+                    <div class="col-md-3 col-6">
+                        <small class="text-muted d-block mb-1">Width (Body)</small>
+                        <img t-att-src="cd.widthImage" class="img-fluid rounded border" style="max-height:120px; object-fit:contain; width:100%;"/>
+                    </div>
+                </t>
+                <t t-if="cd.widthImage2">
+                    <div class="col-md-3 col-6">
+                        <small class="text-muted d-block mb-1">Width (Cuff)</small>
+                        <img t-att-src="cd.widthImage2" class="img-fluid rounded border" style="max-height:120px; object-fit:contain; width:100%;"/>
+                    </div>
+                </t>
+                <t t-if="cd.heightImage">
+                    <div class="col-md-3 col-6">
+                        <small class="text-muted d-block mb-1">Height (Body)</small>
+                        <img t-att-src="cd.heightImage" class="img-fluid rounded border" style="max-height:120px; object-fit:contain; width:100%;"/>
+                    </div>
+                </t>
+                <t t-if="cd.heightImage2">
+                    <div class="col-md-3 col-6">
+                        <small class="text-muted d-block mb-1">Height (Cuff)</small>
+                        <img t-att-src="cd.heightImage2" class="img-fluid rounded border" style="max-height:120px; object-fit:contain; width:100%;"/>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </t>
+
+    <t t-name="maeknit_bom_mfg_link.StitchDensityPanel">
+        <div class="sd-panel" style="padding: 4px 0;">
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2 mb-3 flex-wrap align-items-center">
+                <t t-if="!isToile">
+                    <button class="btn btn-sm btn-outline-secondary"
+                            t-on-click="() => this.toggleLibrary()">
+                        <i class="fa fa-search me-1"/>Add from Library
+                    </button>
+                    <button class="btn btn-sm btn-primary"
+                            t-on-click="() => this.generateSwatch()">
+                        <i class="fa fa-flask me-1"/>Generate Calibration Swatch
+                    </button>
+                </t>
+                <t t-if="isToile">
+                    <button class="btn btn-sm btn-primary"
+                            t-on-click="() => this.generateToile()">
+                        <i class="fa fa-magic me-1"/>Generate Toile
+                    </button>
+                </t>
+            </div>
+
+            <!-- Library Search Panel -->
+            <div t-if="state.showLibrary"
+                 class="card border border-primary mb-3 shadow-sm"
+                 style="max-width: 500px;">
+                <div class="card-header d-flex align-items-center py-2 bg-primary bg-opacity-10">
+                    <span class="fw-semibold small text-primary">
+                        <i class="fa fa-search me-1"/>Add Swatch from Library
+                    </span>
+                    <button class="btn btn-sm btn-link ms-auto p-0 text-muted"
+                            t-on-click="() => this.toggleLibrary()">
+                        <i class="fa fa-times"/>
+                    </button>
+                </div>
+                <div class="card-body p-2">
+                    <input type="text"
+                           class="form-control form-control-sm mb-2"
+                           placeholder="Search by product or MO name..."
+                           t-att-value="state.librarySearch"
+                           t-on-input="(ev) => this.onLibraryInput(ev)"/>
+                    <div t-if="state.libraryLoading" class="text-muted small py-2 text-center">
+                        <i class="fa fa-spinner fa-spin me-1"/> Searching...
+                    </div>
+                    <div t-elif="state.libraryResults.length === 0"
+                         class="text-muted small py-2 text-center">
+                        No available swatches found.
+                    </div>
+                    <div t-else="" style="max-height: 220px; overflow-y: auto;">
+                        <div t-foreach="state.libraryResults" t-as="result" t-key="result.id"
+                             class="d-flex align-items-center justify-content-between px-2 py-2 rounded"
+                             style="cursor: pointer;"
+                             t-on-mouseenter="(ev) => ev.currentTarget.classList.add('bg-light')"
+                             t-on-mouseleave="(ev) => ev.currentTarget.classList.remove('bg-light')"
+                             t-on-click="() => this.addFromLibrary(result.id)">
+                            <div class="d-flex flex-column">
+                                <span class="fw-semibold small" t-esc="result.productName"/>
+                                <span class="text-muted" style="font-size:0.75rem;" t-esc="result.moRef"/>
+                            </div>
+                            <button class="btn btn-sm btn-primary ms-2 py-0 px-2"
+                                    t-on-click.stop="() => this.addFromLibrary(result.id)">
+                                <i class="fa fa-plus me-1"/>Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div t-if="state.isLoading" class="text-center py-5 text-muted">
+                <i class="fa fa-spinner fa-spin fa-lg me-2"/>Loading...
+            </div>
+
+            <!-- Empty state -->
+            <div t-elif="state.records.length === 0"
+                 class="text-center py-5 border rounded bg-light text-muted">
+                <i t-if="!isToile" class="fa fa-tint fa-2x mb-2 d-block opacity-50"/>
+                <i t-if="isToile" class="fa fa-scissors fa-2x mb-2 d-block opacity-50"/>
+                <div class="small fw-semibold" t-if="!isToile">No swatches linked yet</div>
+                <div class="small fw-semibold" t-if="isToile">No toiles generated yet</div>
+                <div class="small text-muted mt-1" t-if="!isToile">
+                    Add from library or generate a new calibration swatch above.
+                </div>
+                <div class="small text-muted mt-1" t-if="isToile">
+                    Click "Generate Toile" to create one from the linked calibration swatch.
+                </div>
+            </div>
+
+            <!-- Records: pill selector + inline stitch density -->
+            <div t-elif="state.records.length > 0">
+
+                <!-- Pill selector row -->
+                <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+                    <span class="text-muted small me-1">
+                        <t t-if="!isToile">Select Swatch:</t>
+                        <t t-if="isToile">Select Toile:</t>
+                    </span>
+                    <t t-foreach="state.records" t-as="mo" t-key="mo.id">
+                        <t t-set="isSelected" t-value="state.selectedMoId === mo.id"/>
+                        <div class="d-flex align-items-center gap-1">
+                            <button t-att-class="'btn btn-sm ' + (isSelected ? 'btn-primary' : 'btn-outline-secondary')"
+                                    t-on-click="() => this.selectMo(mo.id)"
+                                    style="max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <i t-if="!isToile" class="fa fa-tint me-1 opacity-75"/>
+                                <i t-if="isToile" class="fa fa-scissors me-1 opacity-75"/>
+                                <t t-esc="mo.product_id ? mo.product_id[1] : mo.name"/>
+                                <t t-if="mo.colorway_id">
+                                    <span class="opacity-75 ms-1 small">(<t t-esc="mo.colorway_id[1]"/>)</span>
+                                </t>
+                            </button>
+                            <!-- Open + unlink icons next to pill -->
+                            <button class="btn btn-sm btn-link p-0 text-primary"
+                                    title="Open full MO"
+                                    t-on-click="(ev) => this.openMo(ev, mo.id)">
+                                <i class="fa fa-external-link"/>
+                            </button>
+                            <button t-if="!isToile"
+                                    class="btn btn-sm btn-link p-0 text-muted"
+                                    title="Unlink"
+                                    t-on-click="(ev) => this.removeSwatch(ev, mo.id)">
+                                <i class="fa fa-unlink"/>
+                            </button>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Inline stitch density panel for selected MO -->
+                <div t-if="state.selectedMoId" class="border rounded p-3 bg-white">
+                    <t t-set="selMo" t-value="state.records.find(r => r.id === state.selectedMoId)"/>
+                    <!-- Header -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <span class="fw-bold" t-esc="selMo and selMo.product_id ? selMo.product_id[1] : ''"/>
+                            <span class="text-muted ms-2 small" t-esc="selMo ? selMo.name : ''"/>
+                            <t t-if="selMo and selMo.yarn_variant">
+                                <span class="badge bg-light text-dark border ms-2 small"
+                                      t-esc="'Yarn: ' + selMo.yarn_variant[1]"/>
+                            </t>
+                            <t t-if="selMo and selMo.colorway_id">
+                                <span class="badge bg-light text-dark border ms-1 small"
+                                      t-esc="'Colorway: ' + selMo.colorway_id[1]"/>
+                            </t>
+                            <t t-if="selMo and selMo.toile_swatch_mo_id">
+                                <span class="badge bg-light text-dark border ms-1 small"
+                                      t-esc="'Swatch: ' + selMo.toile_swatch_mo_id[1]"/>
+                            </t>
+                        </div>
+                        <t t-if="selMo">
+                            <t t-set="badge" t-value="stateBadge(selMo.state)"/>
+                            <span t-att-class="badge.cls" t-esc="badge.label"/>
+                        </t>
+                    </div>
+
+                    <!-- Calibration data -->
+                    <div t-if="state.calibLoading" class="text-center py-4 text-muted">
+                        <i class="fa fa-spinner fa-spin me-2"/>Loading stitch density data...
+                    </div>
+                    <div t-elif="!state.calibData" class="text-center py-4 text-muted">
+                        <i class="fa fa-info-circle me-1"/>No stitch density data recorded yet.
+                        <a t-on-click="(ev) => this.openMo(ev, state.selectedMoId)"
+                           style="cursor:pointer;" class="ms-2 text-primary small">
+                            Open MO to add data
+                        </a>
+                    </div>
+                    <t t-else="">
+                        <!-- Body + Cuff cards -->
+                        <t t-set="cd" t-value="state.calibData"/>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header py-2 fw-semibold small">Body</div>
+                                    <div class="card-body py-2">
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block">Swatch Specs (W x H)</small>
+                                            <span class="fw-semibold" t-esc="(cd.bodySwatchSpecsX || 0) + ' x ' + (cd.bodySwatchSpecsY || 0) + ' wales x courses'"/>
+                                        </div>
+                                        <div class="mb-2 row g-1">
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Meas. Width</small>
+                                                <span class="fw-semibold" t-esc="(cd.bodyMeasurementX || 0) + ' ' + unit"/>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Meas. Height</small>
+                                                <span class="fw-semibold" t-esc="(cd.bodyMeasurementY || 0) + ' ' + unit"/>
+                                            </div>
+                                        </div>
+                                        <div class="row g-2 mt-1">
+                                            <div class="col-6">
+                                                <div class="p-2 rounded text-center" style="background:#d4edda;">
+                                                    <small class="text-muted d-block">Cal. Width</small>
+                                                    <span class="fw-bold text-success fs-6" t-esc="fmtNum(cd.bodyCalibrationX)"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="p-2 rounded text-center" style="background:#d4edda;">
+                                                    <small class="text-muted d-block">Cal. Height</small>
+                                                    <span class="fw-bold text-success fs-6" t-esc="fmtNum(cd.bodyCalibrationY)"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header py-2 fw-semibold small">Cuff</div>
+                                    <div class="card-body py-2">
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block">Swatch Specs (W x H)</small>
+                                            <span class="fw-semibold" t-esc="(cd.cuffSwatchSpecsX || 0) + ' x ' + (cd.cuffSwatchSpecsY || 0) + ' wales x courses'"/>
+                                        </div>
+                                        <div class="mb-2 row g-1">
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Meas. Width</small>
+                                                <span class="fw-semibold" t-esc="(cd.cuffMeasurementX || 0) + ' ' + unit"/>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Meas. Height</small>
+                                                <span class="fw-semibold" t-esc="(cd.cuffMeasurementY || 0) + ' ' + unit"/>
+                                            </div>
+                                        </div>
+                                        <div class="row g-2 mt-1">
+                                            <div class="col-6">
+                                                <div class="p-2 rounded text-center" style="background:#d4edda;">
+                                                    <small class="text-muted d-block">Cal. Width</small>
+                                                    <span class="fw-bold text-success fs-6" t-esc="fmtNum(cd.cuffCalibrationX)"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="p-2 rounded text-center" style="background:#d4edda;">
+                                                    <small class="text-muted d-block">Cal. Height</small>
+                                                    <span class="fw-bold text-success fs-6" t-esc="fmtNum(cd.cuffCalibrationY)"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Reference images -->
+                        <t t-if="cd.widthImage or cd.heightImage or cd.widthImage2 or cd.heightImage2">
+                            <div class="row g-2">
+                                <div t-if="cd.widthImage" class="col-md-3 col-6">
+                                    <small class="text-muted d-block mb-1">Width (Body)</small>
+                                    <img t-att-src="cd.widthImage" class="img-fluid rounded border"
+                                         style="max-height:140px; object-fit:contain; width:100%; cursor:zoom-in;"
+                                         t-on-click="() => this.openLightbox(cd.widthImage, 'Width (Body)')"/>
+                                </div>
+                                <div t-if="cd.widthImage2" class="col-md-3 col-6">
+                                    <small class="text-muted d-block mb-1">Width (Cuff)</small>
+                                    <img t-att-src="cd.widthImage2" class="img-fluid rounded border"
+                                         style="max-height:140px; object-fit:contain; width:100%; cursor:zoom-in;"
+                                         t-on-click="() => this.openLightbox(cd.widthImage2, 'Width (Cuff)')"/>
+                                </div>
+                                <div t-if="cd.heightImage" class="col-md-3 col-6">
+                                    <small class="text-muted d-block mb-1">Height (Body)</small>
+                                    <img t-att-src="cd.heightImage" class="img-fluid rounded border"
+                                         style="max-height:140px; object-fit:contain; width:100%; cursor:zoom-in;"
+                                         t-on-click="() => this.openLightbox(cd.heightImage, 'Height (Body)')"/>
+                                </div>
+                                <div t-if="cd.heightImage2" class="col-md-3 col-6">
+                                    <small class="text-muted d-block mb-1">Height (Cuff)</small>
+                                    <img t-att-src="cd.heightImage2" class="img-fluid rounded border"
+                                         style="max-height:140px; object-fit:contain; width:100%; cursor:zoom-in;"
+                                         t-on-click="() => this.openLightbox(cd.heightImage2, 'Height (Cuff)')"/>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </div>
+
+            </div>
+
+            <!-- Lightbox overlay -->
+            <div t-if="state.lightboxImages.length"
+                 class="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column"
+                 style="z-index:10000; background:rgba(0,0,0,0.93);"
+                 t-on-click="() => this.closeLightbox()">
+
+                <!-- Top bar: label + counter + close -->
+                <div class="d-flex align-items-center px-3 py-2 gap-2"
+                     style="background:rgba(255,255,255,0.07); flex-shrink:0;"
+                     t-on-click.stop="() => {}">
+                    <span class="text-white fw-semibold" style="font-size:0.95rem;"
+                          t-esc="lightboxCurrent ? lightboxCurrent.label : ''"/>
+                    <span class="text-white-50 small" t-if="state.lightboxImages.length > 1">
+                        (<t t-esc="state.lightboxIndex + 1"/> / <t t-esc="state.lightboxImages.length"/>)
+                    </span>
+                    <button class="btn btn-sm btn-link text-white ms-auto p-1"
+                            style="font-size:1.15rem; line-height:1; opacity:0.7;"
+                            title="Close (Esc)"
+                            t-on-click.stop="() => this.closeLightbox()">
+                        <i class="fa fa-times"/>
+                    </button>
+                </div>
+
+                <!-- Image area with prev / next -->
+                <div class="position-relative d-flex align-items-center justify-content-center"
+                     t-att-style="'flex:1; min-height:0; overflow:hidden; cursor:' + (state.lightboxDragging ? 'grabbing' : state.lightboxZoom > 1 ? 'grab' : 'default') + ';'"
+                     t-on-click.stop="() => {}"
+                     t-on-mousedown="(ev) => this.onLightboxMouseDown(ev)">
+
+                    <button t-if="state.lightboxImages.length > 1"
+                            class="btn btn-link text-white position-absolute start-0 top-50 translate-middle-y px-3 h-100 d-flex align-items-center"
+                            style="z-index:1; background:rgba(0,0,0,0.25); border:none; font-size:1.6rem;"
+                            title="Previous (←)"
+                            t-on-click.stop="() => this.lightboxPrev()"
+                            t-on-mousedown.stop="() => {}">
+                        <i class="fa fa-chevron-left"/>
+                    </button>
+
+                    <img t-att-src="lightboxCurrent ? lightboxCurrent.src : ''"
+                         t-att-style="'max-width:85vw; max-height:72vh; object-fit:contain; border-radius:4px; transform:translate(' + state.lightboxPanX + 'px,' + state.lightboxPanY + 'px) scale(' + state.lightboxZoom + '); transform-origin:center center; transition:' + (state.lightboxDragging ? 'none' : 'transform 0.12s ease') + '; user-select:none; pointer-events:none;'"/>
+
+                    <button t-if="state.lightboxImages.length > 1"
+                            class="btn btn-link text-white position-absolute end-0 top-50 translate-middle-y px-3 h-100 d-flex align-items-center"
+                            style="z-index:1; background:rgba(0,0,0,0.25); border:none; font-size:1.6rem;"
+                            title="Next (→)"
+                            t-on-click.stop="() => this.lightboxNext()"
+                            t-on-mousedown.stop="() => {}">
+                        <i class="fa fa-chevron-right"/>
+                    </button>
+                </div>
+
+                <!-- Bottom toolbar -->
+                <div class="d-flex align-items-center justify-content-center gap-2 px-3 py-2"
+                     style="background:rgba(255,255,255,0.07); flex-shrink:0;"
+                     t-on-click.stop="() => {}">
+                    <button class="btn btn-sm btn-outline-light" title="Zoom out (-)"
+                            t-on-click.stop="() => this.lightboxZoomOut()">
+                        <i class="fa fa-search-minus"/>
+                    </button>
+                    <button class="btn btn-sm btn-outline-light"
+                            style="min-width:58px; font-variant-numeric:tabular-nums;"
+                            title="Reset zoom (0)"
+                            t-on-click.stop="() => this.lightboxResetZoom()">
+                        <t t-esc="Math.round(state.lightboxZoom * 100) + '%'"/>
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" title="Zoom in (+)"
+                            t-on-click.stop="() => this.lightboxZoomIn()">
+                        <i class="fa fa-search-plus"/>
+                    </button>
+                    <div style="width:1px; height:22px; background:rgba(255,255,255,0.2); margin:0 4px;"/>
+                    <button class="btn btn-sm btn-outline-light" title="Download image"
+                            t-on-click.stop="() => this.lightboxDownload()">
+                        <i class="fa fa-download me-1"/>Download
+                    </button>
+                    <div class="text-white-50 ms-3" style="font-size:0.7rem;">
+                        Scroll to zoom · drag to pan · ← → navigate · Esc close
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Swatch picker overlay (Generate Toile) -->
+            <div t-if="state.showSwatchPicker"
+                 class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                 style="z-index:10001; background:rgba(0,0,0,0.55);"
+                 t-on-click="() => this.cancelSwatchPicker()">
+                <div class="card shadow-lg"
+                     style="width:480px; max-width:95vw; max-height:80vh; display:flex; flex-direction:column;"
+                     t-on-click.stop="() => {}">
+
+                    <!-- Header -->
+                    <div class="card-header d-flex align-items-center py-2 bg-primary bg-opacity-10">
+                        <span class="fw-semibold text-primary">
+                            <i class="fa fa-magic me-2"/>Select Calibration Swatch for Toile
+                        </span>
+                        <button class="btn btn-sm btn-link ms-auto p-0 text-muted"
+                                t-on-click.stop="() => this.cancelSwatchPicker()">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </div>
+
+                    <!-- Swatch list -->
+                    <div class="card-body p-0" style="overflow-y:auto;">
+                        <div t-foreach="state.swatchPickerOptions" t-as="sw" t-key="sw.id"
+                             class="d-flex align-items-center justify-content-between px-3 py-3 border-bottom">
+                            <div class="d-flex flex-column">
+                                <span class="fw-semibold" t-esc="sw.product_id ? sw.product_id[1] : sw.name"/>
+                                <span class="text-muted small" t-esc="sw.name"/>
+                                <div class="d-flex gap-2 mt-1 flex-wrap">
+                                    <t t-if="sw.colorway_id">
+                                        <span class="badge bg-light text-dark border"
+                                              t-esc="'Colorway: ' + sw.colorway_id[1]"/>
+                                    </t>
+                                    <t t-if="sw.yarn_variant">
+                                        <span class="badge bg-light text-dark border"
+                                              t-esc="'Yarn: ' + sw.yarn_variant[1]"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-primary ms-3"
+                                    t-on-click.stop="() => this.selectSwatchForToile(sw.id)">
+                                <i class="fa fa-magic me-1"/>Use this Swatch
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="card-footer py-2 text-end">
+                        <button class="btn btn-sm btn-outline-secondary"
+                                t-on-click.stop="() => this.cancelSwatchPicker()">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </t>
+</templates>

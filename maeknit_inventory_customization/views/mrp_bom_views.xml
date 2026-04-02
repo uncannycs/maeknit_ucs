@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Production Form View -->
+    <record id="mrp_production_form_view_inherit_cad" model="ir.ui.view">
+        <field name="name">mrp.production.form.inherit.cad</field>
+        <field name="model">mrp.production</field>
+
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='product_id']" position="after">
+                <field name="x_ply"
+                       string="Ply"
+                />
+                <field name="is_uk_company" invisible="1" column_invisible="1"/>
+                <field name="left_carrier"
+                       string="Left Carrier"
+                       invisible="is_uk_company"
+                />
+                <field name="right_carrier"
+                       string="Right Carrier"
+                       invisible="is_uk_company"
+                />
+            </xpath>
+
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='right_carrier']" position="after">
+                <field name="consumed_in_operation_id"
+                       string="Consumed in Operation"
+                       options="{'no_create': True}"/>
+            </xpath>
+
+
+        </field>
+    </record>
+    
+
+    <record id="mrp_bom_form_view_inherit" model="ir.ui.view">
+        <field name="name">mrp.bom.form.inherit</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Add hidden fields at the top level -->
+            <xpath expr="//sheet" position="inside">
+                <field name="is_garment_bom" invisible="1"/>
+                <field name="is_swatch_bom" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="style_colorway_ids" invisible="1"/>
+                <field name="style_size_ids" invisible="1"/>
+                <field name="style_yarn_variant_ids" invisible="1"/>
+            </xpath>
+
+            <!-- Reorganize the form layout -->
+            <xpath expr="//sheet/group" position="replace">
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <!-- Garment BOM -->
+                        <group name="common_fields">
+                            <field name="product_tmpl_id"
+                                placeholder="Product"
+                                required="1"
+                                domain="[('type', 'in', ['product', 'consu'])]"
+                            />
+                    
+                            <field name="partner_id"
+                                string="Customer"
+                                options="{'no_create': False}"
+                            />
+                        </group>
+                    
+                        <group name="garment_bom" invisible="not is_garment_bom">
+                            <field name="size_id" options="{'no_create': False, 'no_create_edit': False}" string="Size" domain="[('id', 'in', style_size_ids)]" context="{'default_attribute_id': %(maeknit_inventory_customization.attr_size)d}"/>
+                            <!-- Updated domain to filter colorways by current style using style_colorway_ids -->
+                            <field name="colorway_id" string="Colorway" domain="[('id', 'in', style_colorway_ids)]" context="{'default_attribute_id': %(maeknit_inventory_customization.attr_colorway)d}" 
+                            options="{'no_create': False, 'no_create_edit': True}"/>
+                            <field name="rel_service"
+                                invisible="not is_garment_bom"
+                                required="1"
+                                domain="[('product_tmpl_id.service_category','in',['development','grading','production','reverse'])]"
+                            />
+                            <field name="product_id" string="Variant"/>
+                            <field name="company_id" string="Company" options="{'no_create': True}"/>
+                        </group>
+
+                        <!-- Swatch BOM -->
+                        <group name="swatch_bom" invisible="not is_swatch_bom">
+                            <!-- Updated domain to filter colorways by current style using style_colorway_ids -->
+                            <field name="colorway_id" 
+                                string="Colorway" 
+                                domain="[('id', 'in', style_colorway_ids)]"
+                                context="{'default_attribute_id': %(maeknit_inventory_customization.attr_colorway)d}"
+                                options="{'no_create': False, 'no_create_edit': True}"/>
+                            <!-- Updated domain to filter yarn variants by style -->
+                            <field name="yarn_variant" 
+                                placeholder="Lot / Blend / Supplier / Other notes" 
+                                context="{'default_attribute_id': %(maeknit_inventory_customization.attr_yarn_variant)d}"
+                                domain="[('id', 'in', style_yarn_variant_ids)]"
+                             />
+                             <field name="product_id" string="Variant"/>
+                             <field name="rel_service"
+                                invisible="not is_swatch_bom"
+                                required="1"
+                                domain="[('product_tmpl_id.service_category','=','swatch')]"
+                            />
+                            <field name="company_id" string="Company" options="{'no_create': True}"/>
+                        </group>
+                    </div>
+
+                    <!-- Machine section - Right column -->
+                    <div class="col-md-6">
+                        <group>
+                            <field name="machine_id_selection" widget="radio"/>
+                            <field name="type" required="1" string="BOM Type"/>
+                            <field name="order_date" string="Order Date"/>
+                            <field name="due_date" string="Due Date"/>
+                        </group>
+                    </div>
+                </div>
+            </xpath>
+
+            <!-- Rename Components tab and adjust BOM Lines -->
+            <xpath expr="//page[1]" position="attributes">
+                <attribute name="string">Components</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='bom_line_ids']" position="attributes">
+                <attribute name="context">{'default_parent_product_tmpl_id': product_tmpl_id}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='bom_line_ids']/list" position="inside">
+                <field name="is_uk_company" column_invisible="1"/>
+                <field name="x_ply"/>
+                <field name="left_carrier" invisible="is_uk_company" />
+                <field name="right_carrier" invisible="is_uk_company" />
+                <field name="unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
+                <field name="line_cost" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" sum="Total"/>
+                <field name="currency_id" invisible="1"/>
+            </xpath>
+
+            <!-- Show Miscellaneous tab -->
+            <xpath expr="//page[@name='miscellaneous']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+
+            <!-- Add Sample # and Version to Miscellaneous tab -->
+            <xpath expr="//page[@name='miscellaneous']/group/group[1]" position="inside">
+                <field name="sample" readonly="1"/>
+                <field name="version"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="mrp_bom_list_view_context_based" model="ir.ui.view">
+        <field name="name">mrp.bom.list.context.based</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_tmpl_id']" position="after">
+                <field name="run_id" />
+                <field name="colorway_id" />
+                <field name="size_id"/>
+
+                <field name="swatch_number_id" column_invisible="not context.get('default_is_swatch_bom')"/>
+                <field name="colorway_id" column_invisible="not context.get('default_is_swatch_bom')"/>
+                <field name="body_stitch_id" column_invisible="not context.get('default_is_swatch_bom')"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="maeknit_mrp_bom_tree_inherit" model="ir.ui.view">
+        <field name="name">mrp.bom.list.inherit.maeknit</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="is_production_ready"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="mrp_bom_line_list_view" model="ir.ui.view">
+        <field name="name">mrp.bom.line.list</field>
+        <field name="model">mrp.bom.line</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="product_id"
+                       domain="[('product_tmpl_id.product_category', '=', 'yarn')]"/>
+                <field name="x_ply"/>
+                <field name="left_carrier"/>
+                <field name="right_carrier"/>
+                <field name="product_qty"/>
+                <field name="product_uom_id" groups="uom.group_uom"/>
+                <field name="unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
+                <field name="line_cost" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" sum="Total"/>
+                <field name="currency_id" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mrp.mrp_bom_form_action" model="ir.actions.act_window">
+        <field name="view_id" ref="mrp_bom_list_view_context_based"/>
+    </record>
+</odoo>
