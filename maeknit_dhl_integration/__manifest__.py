@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Maeknit DHL Integration (RFQ/PO)',
-    'version': '18.0.1.9.0',
+    'version': '18.0.1.10.0',
     'category': 'Purchase',
     'summary': 'Maeknit: Automatic Shipping (DHL) and Duty/Tax estimates for RFQs/POs',
     'author': 'Maeknit',

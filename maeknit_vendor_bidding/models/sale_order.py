@@ -85,12 +85,16 @@ class SaleOrder(models.Model):
         picking_type_id = so.fg_shipping_destinations.id if so.fg_shipping_destinations else False
 
         # 1. Gather ALL components needed for the SO lines and group by Vendor AND Product
+        # We now invite ALL vendors listed on each component
         vendor_components_map = {}
+        all_unique_products = self.env['product.product']
 
         for line in so.order_line:
             product = line.product_id
             if not product or product.type == 'service':
                 continue
+            
+            all_unique_products |= product
 
             all_possible_boms = self.env['mrp.bom'].sudo().with_context(active_test=False).search([
                 '|', ('product_id', '=', product.id),
@@ -115,33 +119,49 @@ class SaleOrder(models.Model):
 
             for bom_line in bom.bom_line_ids:
                 comp_product = bom_line.product_id
-                if comp_product.seller_ids:
-                    vendor = comp_product.seller_ids[0].partner_id
+                all_unique_products |= comp_product
+                
+                if not comp_product.seller_ids:
+                     raise UserError(
+                        _("The component '%s' has no Vendor assigned in its Purchase tab.") % comp_product.display_name)
+
+                # Collect BID info for EVERY vendor listed on the component
+                for seller in comp_product.seller_ids:
+                    vendor = seller.partner_id
                     v_id = vendor.id
                     p_id = comp_product.id
 
                     if v_id not in vendor_components_map:
                         vendor_components_map[v_id] = {}
 
-                    qty_needed = bom_line.product_qty * line.product_uom_qty
+                    # FETCH bidding qty and price from the vendor line directly
+                    # If min_qty is 0, we'll still use 1.0 for the bid request
+                    qty_to_bid = seller.min_qty if seller.min_qty > 0 else 1.0
+                    price_to_bid = seller.price
 
                     if p_id not in vendor_components_map[v_id]:
                         vendor_components_map[v_id][p_id] = {
                             'product_id': p_id,
                             'name': comp_product.name,
-                            'product_qty': qty_needed,
+                            'product_qty': qty_to_bid,
                             'product_uom': comp_product.uom_po_id.id or comp_product.uom_id.id,
-                            'price_unit': comp_product.seller_ids[0].price,
+                            'price_unit': price_to_bid,
                         }
                     else:
-                        vendor_components_map[v_id][p_id]['product_qty'] += qty_needed
-                else:
-                    raise UserError(
-                        _("The component '%s' has no Vendor assigned in its Purchase tab.") % comp_product.display_name)
+                        # If the same component appears twice from same vendor, we just sum them
+                        vendor_components_map[v_id][p_id]['product_qty'] += qty_to_bid
+
+        # 1.5 Auto-generate HS codes for any storable product missing them (Yarn, Garments, Accessories)
+        dest_country_code = so.partner_id.country_id.code or 'US'
+        for product in all_unique_products:
+            if product.type != 'service' and not product.lookup_id:
+                # Try to generate in backend
+                product.product_tmpl_id.action_generate_dhl_hs_code_backend(dest_country_code)
 
         # 2. Iterate through each Factory to create its own set of RFQs
         for factory in factories:
             # Create Garment RFQ for this factory
+            # PER USER REQUEST: Garment RFQ should have Qty 1 and Price 1
             garment_po_vals = {
                 'partner_id': factory.id,
                 'bid_rfq_type': 'garment',
@@ -149,20 +169,37 @@ class SaleOrder(models.Model):
                 'company_id': so.company_id.id,
                 'origin': so.name,
                 'picking_type_id': picking_type_id,
-                'dest_address_id': factory.id if so.fg_shipping_destination_label == 'client' else False,
+                'dest_address_id': so.partner_id.id if so.fg_shipping_destination_label == 'client' else False,
                 'order_line': [(0, 0, {
                     'product_id': line.product_id.id,
                     'name': line.name,
-                    'product_qty': line.product_uom_qty,
+                    'product_qty': 1.0, # Forced to 1 for bidding
                     'product_uom': line.product_uom.id,
-                    'price_unit': line.price_unit,
+                    'price_unit': 1.0,   # Forced to 1 for bidding
                 }) for line in so.order_line if line.product_id]
             }
             if dest_address_id:
                 garment_po_vals['dest_address_id'] = dest_address_id
-            self.env['purchase.order'].create(garment_po_vals)
+            
+            garment_po = self.env['purchase.order'].create(garment_po_vals)
+
+            # URGENT FIX: DHL requires weight > 0. 
+            # If product weight is 0 in the DB, we force 0.1 for the initial quote.
+            if garment_po.total_weight <= 0:
+                garment_po.total_weight = 0.1
+
+            # Fetch DHL and Duty for Garment RFQ
+            try:
+                garment_po._onchange_dhl_trigger()
+                garment_po.action_get_dhl_quote()
+                garment_po.action_get_duty_rate()
+            except Exception as e:
+                # Post failure to chatter instead of blocking the entire wizard
+                garment_po.message_post(body=_("Automated cost fetch failed: %s") % str(e))
+                _logger.warning("Failed to calculate costs for Garment PO %s (Factory: %s): %s", garment_po.name, factory.name, str(e))
 
             # Create Separate Component RFQs for this factory-vendor combination
+            # This creates a PO for EVERY vendor on EVERY factory route
             for v_id, products_dict in vendor_components_map.items():
                 comp_po_vals = {
                     'partner_id': v_id,
@@ -172,9 +209,19 @@ class SaleOrder(models.Model):
                     'bid_partner_id': factory.id,
                     'dest_address_id': factory.id,
                     'origin': f"{so.name} ({factory.name} Material Bidding)",
-                    'order_line': [(0, 0, p_data) for p_data in products_dict.values()]
+                    'order_line': [(0, 0, {
+                        'product_id': p_data['product_id'],
+                        'product_qty': p_data['product_qty'],
+                        'product_uom': p_data['product_uom'],
+                        'price_unit': p_data['price_unit'],
+                        'name': p_data['name'],
+                    }) for p_data in products_dict.values()]
                 }
                 comp_po = self.env['purchase.order'].create(comp_po_vals)
+
+                # URGENT FIX: Ensure weight is > 0 for DHL
+                if comp_po.total_weight <= 0:
+                    comp_po.total_weight = 0.1
 
                 # Create the Routing Breakdown for this specific factory route
                 breakdown = self.env['purchase.order.factory.breakdown'].create({
@@ -194,7 +241,11 @@ class SaleOrder(models.Model):
                         'duty_cost': comp_po.duty_tax_estimate
                     })
                 except Exception as e:
-                    _logger.warning("Failed to calculate costs for PO %s (Factory: %s): %s", comp_po.name, factory.name, str(e))
+                    comp_po.message_post(body=_("Automated cost fetch failed: %s") % str(e))
+                    _logger.warning("Failed to calculate costs for Component PO %s (Factory: %s): %s", comp_po.name, factory.name, str(e))
+
+        so.write({'bids_requested': True})
+        return {'type': 'ir.actions.act_window_close'}
 
         so.write({'bids_requested': True})
         return {'type': 'ir.actions.act_window_close'}

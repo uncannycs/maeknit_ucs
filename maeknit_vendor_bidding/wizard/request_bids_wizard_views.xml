@@ -5,16 +5,40 @@
         <field name="model">sale.order.rfq.wizard</field>
         <field name="arch" type="xml">
             <form string="Request Bids from Factories">
-                <group string="Select Factories for Bidding">
-                    <field name="sale_order_id" invisible="1"/>
+                <field name="sale_order_id" invisible="1"/>
+                
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <div class="o_searchview d-flex align-items-center p-2 mb-3 bg-view" 
+                             style="border: 1px solid #ccc; border-radius: 4px;">
+                            <i class="oi oi-search me-2 text-600" style="font-size: 1.1em; opacity: 0.7;"/>
+                            <field name="search_partner_id" 
+                                   nolabel="1"
+                                   class="flex-grow-1"
+                                   options="{'no_create': True}"
+                                   placeholder="Search Factory..."
+                                   context="{'show_bidding_buttons': True}"/>
+                        </div>
+                    </div>
+                </div>
+
+                <group string="Selected Factories for Bidding">
                     <field name="factory_ids" 
+                           nolabel="1"
                            widget="many2many" 
                            options="{'no_create': True}"
                            context="{'show_bidding_buttons': True, 'default_sale_order_id': sale_order_id}">
-                        <list string="Factories">
+                        <list string="Factories" create="0">
                             <field name="name"/>
                             <field name="city"/>
                             <field name="country_id"/>
+                            <button name="action_generate_rfq_from_selection"
+                                    string="Generate RFQ"
+                                    type="object"
+                                    icon="fa-truck"
+                                    class="o_replenish_buttons"
+                                    invisible="not context.get('show_bidding_buttons')"
+                                    help="Generate RFQ for this factory immediately."/>
                         </list>
                     </field>
                 </group>
