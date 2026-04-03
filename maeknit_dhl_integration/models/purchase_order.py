@@ -39,6 +39,7 @@ class PurchaseOrder(models.Model):
             weight = 0.0
             for line in order.order_line:
                 if line.product_id:
+                    # Fetching weight directly from the product record
                     weight += line.product_id.weight * line.product_qty
             order.total_weight = weight
 
@@ -343,49 +344,62 @@ class PurchaseOrder(models.Model):
     def action_get_duty_rate(self):
         for order in self:
             company = order.company_id
+            if not company.dutify_api_key:
+                _logger.warning("Missing Dutify API Key for company %s", company.name)
+                continue
+
+            # Determine destination country code
+            dest_partner = order.dest_address_id or order.picking_type_id.warehouse_id.partner_id
+            country_code = dest_partner.country_id.code or order.company_id.country_id.code or 'US'
 
             rate = 0.0
-            missing_products = []
             for line in order.order_line:
-                product_hs = (line.product_id.hs_code or '')
-
                 if not line.product_id or line.product_id.type == 'service':
                     continue
 
-                if not line.product_id.lookup_id:
-                    missing_products.append(line.product_id.display_name)
+                product = line.product_id
+                template = product.product_tmpl_id
 
-                if missing_products:
-                    raise UserError(_(
-                        "HS Code (Lookup ID) is not generated for below products:\n\n%s"
-                    ) % "\n".join(missing_products))
-                if not product_hs:
+                # Auto-generate HS Code for any storable product missing it
+                if template.type != 'service' and not product.lookup_id:
+                    try:
+                        template.action_generate_dhl_hs_code_backend(country_code)
+                    except Exception as e:
+                        _logger.error("Failed to auto-generate HS code for %s: %s", product.display_name, str(e))
+
+                # If still no lookup_id, skip this product's duty but don't block the order
+                if not product.lookup_id:
+                    order.message_post(body=_("Skipping duty estimate for product '%s' (Missing HS Code/Lookup ID)") % product.display_name)
                     continue
 
-                product_hs_6 = product_hs[:6]
+                if not product.hs_code:
+                    continue
+
+                product_hs_6 = product.hs_code[:6]
 
                 # API CALL (example GET using lookup_id)
-                url = f"https://dutify.com/api/v1/hs_lookups/{line.product_id.lookup_id}"
-
+                url = f"https://dutify.com/api/v1/hs_lookups/{product.lookup_id}"
                 headers = {
                     "accept": "application/json",
                     "X-API-KEY": company.dutify_api_key
                 }
 
-                response = requests.get(url, headers=headers)
-                data = response.json()
+                try:
+                    response = requests.get(url, headers=headers, timeout=15)
+                    data = response.json()
 
+                    for item in data.get('included', []):
+                        attr = item.get('attributes', {})
+                        api_hs = (attr.get('hs_code') or '')[:6]
 
-                for item in data.get('included', []):
-                    attr = item.get('attributes', {})
-                    api_hs = (attr.get('hs_code') or '')[:6]
-
-                    if product_hs_6 == api_hs:
-                        duty_rate = float(attr.get('general_rate_percent', 0.0))
-                        rate += (line.price_subtotal * duty_rate) / 100
+                        if product_hs_6 == api_hs:
+                            duty_rate = float(attr.get('general_rate_percent', 0.0))
+                            rate += (line.price_subtotal * duty_rate) / 100
+                except Exception as e:
+                    _logger.error("Duty fetch failed for line %s: %s", product.display_name, str(e))
 
             order.duty_tax_estimate = rate
-            self.message_post(body=_("Duty/Tax Estimate updated: %s") % rate)
+            order.message_post(body=_("Duty/Tax Estimate updated: %s") % rate)
 
     def _update_dhl_po_lines(self):
         """ Create or update a PO line for the DHL service product """
@@ -434,7 +448,7 @@ class PurchaseOrder(models.Model):
                     # We only auto-call if we have the basics: vendor, destination, and some weight
                     if self.total_weight > 0:
                         self.action_get_dhl_quote()
-                        self.action_estimate_duties()
+                        self.action_get_duty_rate()
                 except Exception:
                     # Avoid blocking UI on API errors during onchange
                     pass

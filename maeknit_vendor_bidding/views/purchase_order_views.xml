@@ -69,7 +69,7 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="maeknit_dhl_integration.purchase_order_form_inherit_landed_cost"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='landed_costs']" position="after">
+            <xpath expr="//group[@name='total_weight']" position="after">
                 <group name="cost_breakdown" string="Cost Breakdown" invisible="bid_rfq_type != 'garment'">
                     <button name="action_open_shipping_duty_wizard"
                             string="View Component Breakdown"
@@ -86,6 +86,21 @@
                     <field name="landed_cost" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 </group>
             </xpath>
+        </field>
+    </record>
+    <record id="view_purchase_order_tree_bidding" model="ir.ui.view">
+        <field name="name">purchase.order.tree.bidding</field>
+        <field name="model">purchase.order</field>
+        <field name="arch" type="xml">
+            <list string="Component Bids" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'">
+                <field name="name"/>
+                <field name="partner_id" string="Vendor"/>
+                <field name="bid_partner_id" string="Route (Factory)"/>
+                <field name="date_order"/>
+                <field name="amount_untaxed" sum="Total Untaxed"/>
+                <field name="amount_total" sum="Total Amount"/>
+                <field name="state"/>
+            </list>
         </field>
     </record>
 </odoo>

@@ -294,8 +294,7 @@
   z-index: 2 !important;
   background-color: #fff;
   box-shadow: 3px 0 8px -3px rgba(0, 0, 0, 0.18);
-  min-width: 300px !important;
-  width: 300px !important;
+  min-width: 420px !important;
 }
 /* header cell — nth-child because class doesn't reach <th> */
 .maeknit-workorder-sticky thead tr th:nth-child(2) {
@@ -304,8 +303,7 @@
   z-index: 4 !important;
   background-color: #f8f9fa;
   box-shadow: 3px 0 8px -3px rgba(0, 0, 0, 0.18);
-  min-width: 300px !important;
-  width: 300px !important;
+  min-width: 420px !important;
 }
 tr:hover .maeknit-sticky-product,
 tr.o_data_row:hover .maeknit-sticky-product {

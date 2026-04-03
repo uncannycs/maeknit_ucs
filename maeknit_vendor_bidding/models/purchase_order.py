@@ -37,10 +37,11 @@ class PurchaseOrder(models.Model):
             'default_bid_rfq_type': 'component',
             'default_bid_partner_id': self.partner_id.id
         }
-        kanban_view = self.env.ref('maeknit_vendor_bidding.view_purchase_order_kanban_bidding',
-                                   raise_if_not_found=False)
-        if kanban_view:
-            action['views'] = [(kanban_view.id, 'kanban'), (False, 'list'), (False, 'form')]
+        tree_view = self.env.ref('maeknit_vendor_bidding.view_purchase_order_tree_bidding', raise_if_not_found=False)
+        if tree_view:
+            action['views'] = [(tree_view.id, 'list'), (False, 'form')]
+        else:
+            action['views'] = [(False, 'list'), (False, 'form')]
         return action
 
     # Cost Breakdown Fields for Garment RFQ

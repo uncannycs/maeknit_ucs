@@ -10,7 +10,17 @@ class RequestBidsWizard(models.TransientModel):
     _description = 'Request Bids Wizard'
 
     sale_order_id = fields.Many2one('sale.order', string='Sales Order', required=True)
-    factory_ids = fields.Many2many('res.partner', string='Factories', domain="[('contact_type', '=', 'factory')]")
+    search_partner_id = fields.Many2one('res.partner', string='Search Factory', domain="[('contact_type', '=', 'factory')]")
+    factory_ids = fields.Many2many('res.partner', 'sale_order_rfq_wizard_factory_rel', 'wizard_id', 'partner_id', string='Selected Factories', domain="[('contact_type', '=', 'factory')]")
+
+
+    @api.onchange('search_partner_id')
+    def _onchange_search_partner_id(self):
+        """Add selected partner to factory_ids list and clear the search box."""
+        if self.search_partner_id:
+            if self.search_partner_id not in self.factory_ids:
+                self.factory_ids = [(4, self.search_partner_id.id)]
+            self.search_partner_id = False
 
     def action_generate_rfqs(self):
         self.ensure_one()

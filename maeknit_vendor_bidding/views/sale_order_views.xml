@@ -13,7 +13,7 @@
                         string="Request Bids" 
                         type="object" 
                         class="btn-primary" 
-                        invisible="state not in ['draft', 'sent'] or bids_requested or not has_garment_product"/>
+                        invisible="state not in ['draft', 'sent'] or not has_garment_product"/>
             </xpath>
 
             <xpath expr="//div[@name='button_box']" position="inside">

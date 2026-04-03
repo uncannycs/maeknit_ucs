@@ -2577,47 +2577,34 @@ class MrpProduction(models.Model):
         logging.info(f" Custom Code: Swatch MO components left empty (will sync from parent)")
 
 
+        # Find swatch template from BOM Operation Templates (same company, service type = swatch)
+        swatch_template = self.env['maeknit.bom.operation.template'].search([
+            ('related_service', '=', 'swatch'),
+            ('company_id', '=', self.company_id.id),
+        ], limit=1)
+        logging.info(f" Custom Code: Swatch template found: {swatch_template.name if swatch_template else 'None'}")
+
         Workorder = self.env['mrp.workorder']
-        for wo in self.workorder_ids:
-            # Skip linking operations (operations with "link" in the name)
-            if 'link' in wo.name.lower():
-                logging.info(f" Custom Code: Skipping linking operation: {wo.name}")
-                continue
-
-            name_final = wo.name
-            ShopOp = self.env['maeknit.shopfloor.operation']
-            shop_op = ShopOp.search([
-                        ('name', '=ilike', name_final)
-                    ], limit=1)
-            if not shop_op:
-                shop_op = ShopOp.search([
-                    ('name', 'ilike', operation_name)
-                ], limit=1)
-            new_vals = {
-                'production_id': new_mo.id,
-                'name': wo.name,
-                'workcenter_id': wo.workcenter_id.id,
-                'product_id': new_mo.product_id.id,
-                'product_uom_id': wo.product_uom_id.id,
-                'company_id': wo.company_id.id,
-                'duration_expected': wo.duration_expected,
-                'sequence': wo.sequence,
-                'state': 'waiting',
-            }
-            if shop_op:
-                new_vals['shopfloor_operation_id'] = shop_op.id
-                
-            if wo.employee_assigned_ids:
-                new_vals['employee_assigned_ids'] = [(6, 0, wo.employee_assigned_ids.ids)]
-            new_wo = Workorder.create(new_vals)
-
-            # Copy attachments if helper exists
-            if hasattr(self, '_copy_all_attachments'):
-                try:
-                    self._copy_all_attachments(wo, new_wo)
-                except Exception as e:
-                    logging.info(f" Custom Code: Attachment copy failed for {wo.name}: {e}")
-            logging.info(f" Custom Code: Copied workorder {wo.name} → {new_wo.name}")
+        if swatch_template:
+            for line in swatch_template.line_ids:
+                shop_op = line.operation_id
+                new_vals = {
+                    'production_id': new_mo.id,
+                    'name': shop_op.name,
+                    'product_id': new_mo.product_id.id,
+                    'product_uom_id': new_mo.product_uom_id.id,
+                    'company_id': new_mo.company_id.id,
+                    'sequence': line.sequence,
+                    'state': 'waiting',
+                }
+                if shop_op:
+                    new_vals['shopfloor_operation_id'] = shop_op.id
+                if line.user_ids:
+                    new_vals['employee_assigned_ids'] = [(6, 0, line.user_ids.ids)]
+                new_wo = Workorder.create(new_vals)
+                logging.info(f" Custom Code: Created workorder from swatch template: {new_wo.name}")
+        else:
+            logging.info(f" Custom Code: No swatch template found, skipping workorder creation")
 
         # Force colorway / yarn_variant / gauge after all ORM computes have settled
         forced_vals = {}

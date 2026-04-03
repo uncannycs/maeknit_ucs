@@ -268,7 +268,7 @@
                 <field name="product_id"
                        options="{'tooltip': true}"
                        class="maeknit-sticky-product"
-                       width="300"
+                       width="420"
                        context="{'display_default_code': False}"/>
             </xpath>
 
